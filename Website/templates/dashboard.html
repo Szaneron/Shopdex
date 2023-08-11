@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <title>Shopdex</title>
 
-    <link rel="stylesheet" type="text/css" href="{% static 'style/style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard_style.css' %}"/>
 
 </head>
 <body>
@@ -57,6 +57,12 @@
                         local_shipping
                         </span>
                 <h3>Dostawy</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        report_problem
+                        </span>
+                <h3>Zwroty</h3>
             </a>
             <a href="#">
                         <span class="material-icons-sharp">
@@ -116,8 +122,8 @@
 
         <!-- Recent Orders Table -->
         <div class="recent-orders">
-            <h2>Recent Orders</h2>
-            <table>
+            <h2>Dostawy</h2>
+            <table class="para1">
                 <thead>
                 <tr>
                     <th>Course Name</th>
@@ -134,8 +140,8 @@
         <!-- End of Recent Orders -->
         <!-- Recent Orders Table -->
         <div class="recent-orders">
-            <h2>Recent Orders</h2>
-            <table>
+            <h2>Zadania</h2>
+            <table class="para2">
                 <thead>
                 <tr>
                     <th>Course Name</th>
@@ -151,6 +157,49 @@
         </div>
         <!-- End of Recent Orders -->
     </main>
+    <!-- End of Main Content -->
+
+    <!-- Right Section -->
+    <div class="right-section">
+
+
+        <div class="calendar">
+            <span class="month-name">Sierpień</span>
+            <span class="day-name">Piątek</span>
+            <span class="date-number">11</span>
+            <span class="year">2023</span>
+        </div>
+
+        <div class="returns">
+            <!-- Recent Orders Table -->
+            <div class="returns-table">
+                <h2>Zwroty</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Ateneum</td>
+                        <td>Przygotowany</td>
+                    </tr>
+                    <tr>
+                        <td>Ateneum</td>
+                        <td>Przygotowany</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <a href="#">Show All</a>
+            </div>
+            <!-- End of Recent Orders -->
+
+        </div>
+
+    </div>
     <script src="../static/style/orders.js"></script>
     <script src="../static/style/index.js"></script>
 </div>
