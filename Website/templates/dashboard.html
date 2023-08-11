@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'style/style.css' %}"/>
+
+</head>
+<body>
+
+<!-- Sidebar Section -->
+<div class="container">
+    <aside>
+        <div class="toggle">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="">
+                <h2>Shopde<span class="danger">x</span></h2>
+            </div>
+            <div class="close d-none" id="close-btn">
+                <span class="material-icons-sharp">
+                    close
+                </span>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="user">
+                <div class="user_image">
+                    <img src="{% static 'images/logo.png' %}" alt="">
+                    <h2>Karolina</h2>
+                </div>
+                <div class="user_rating">
+
+                    <p><span class="material-icons-sharp">
+                        star
+                    </span> 4.8</p>
+                </div>
+            </div>
+            <a href="#" class="active ">
+                        <span class="material-icons-sharp">
+                        dashboard
+                        </span>
+                <h3>Tablica</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        fact_check
+                        </span>
+                <h3>Zadania</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        local_shipping
+                        </span>
+                <h3>Dostawy</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        shopping_cart
+                        </span>
+                <h3>Do zamówienia</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        calendar_month
+                        </span>
+                <h3>Kalendarz</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        report_gmailerrorred
+                        </span>
+                <h3>Raporty</h3>
+            </a>
+            <a href="#">
+                        <span class="material-icons-sharp">
+                        logout
+                        </span>
+                <h3>Wyloguj</h3>
+            </a>
+        </div>
+    </aside>
+    <!-- End of Sidebar Section-->
+
+    <!-- Main content -->
+    <main>
+        <h1>Panel główny</h1>
+
+        <!-- Progress Bar Section -->
+        <div class="progress_bar">
+            <div class="progress_bar_card">
+                <div class="task_image">
+                    <span class="material-icons-sharp">
+                    assignment
+                    </span>
+                </div>
+
+                <div>
+                    <div class="bar_card_content">
+                        <h2>50%</h2>
+                        <span>Wykonano 2 z 4</span>
+                    </div>
+
+                    <div class="progress_bar_empty">
+                        <div class="progress_bar_success" style="--width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Progress Bar Section -->
+
+
+        <!-- Recent Orders Table -->
+        <div class="recent-orders">
+            <h2>Recent Orders</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Course Number</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <a href="#">Show All</a>
+        </div>
+        <!-- End of Recent Orders -->
+        <!-- Recent Orders Table -->
+        <div class="recent-orders">
+            <h2>Recent Orders</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Course Number</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <a href="#">Show All</a>
+        </div>
+        <!-- End of Recent Orders -->
+    </main>
+    <script src="../static/style/orders.js"></script>
+    <script src="../static/style/index.js"></script>
+</div>
+</body>
+</html>

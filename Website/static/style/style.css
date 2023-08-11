@@ -1,0 +1,346 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --color-primary: #EFB34A;
+    --color-secondary: #816EB0;
+    --color-danger: #FF0060;
+    --color-success: #1B9C85;
+    --color-warning: #EDB34E;
+    --color-white: #fff;
+    --color-black: #000;
+    --color-dark: #272B37;
+    --color-light: rgba(132, 139, 200, 0.18);
+    --color-background: #ECECF0;
+
+    --card-border-radius: 2rem;
+    --border-radius-1: 0.4rem;
+    --border-radius-2: 1.2rem;
+
+    --card-padding: 1.8rem;
+    --padding-1: 1.2rem;
+
+    --box-shadow: 0 2rem 3rem var(--color-light)
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    appearance: none;
+    border: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 14px;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    user-select: none;
+    overflow-x: hidden;
+    color: var(--color-dark);
+    background-color: var(--color-background);
+}
+
+a {
+    color: var(--color-dark);
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+}
+
+h1 {
+    font-weight: 800;
+    font-size: 1.8rem;
+}
+
+h2 {
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+h3 {
+    font-weight: 500;
+    font-size: 0.87rem;
+}
+
+small {
+    font-size: 0.76rem;
+}
+
+p {
+    color: var(--color-dark);
+}
+
+b {
+    color: var(--color-dark);
+}
+
+.primary {
+    color: var(--color-primary);
+}
+
+.danger {
+    color: var(--color-danger);
+}
+
+.success {
+    color: var(--color-success);
+}
+
+.warning {
+    color: var(--color-warning);
+}
+
+.container {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    gap: 1.8rem;
+    grid-template-columns: 16rem auto 30rem;
+}
+
+aside {
+    height: 100%;
+    width: 16rem;
+}
+
+aside .toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.4rem;
+}
+
+aside .toggle .logo {
+    display: flex;
+    gap: 0.5rem;
+}
+
+aside .toggle .logo img {
+    width: 2rem;
+    height: 2rem;
+}
+
+
+aside .toggle .close {
+    padding-right: 1rem;
+    display: none;
+}
+
+aside .user {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+aside .user .user_image img {
+    height: 5rem;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+}
+
+
+aside .user .user_rating p {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    justify-content: space-between;
+    border-radius: 15px;
+    padding: 0.1rem 0.6rem 0.1rem 0.5rem;
+    box-shadow: 0 1px 3px 1px var(--color-secondary);
+    color: var(--color-white);
+    background-color: var(--color-secondary);
+}
+
+aside .user .user_rating p span {
+    font-size: 20px;
+    color: var(--color-primary);
+}
+
+aside .sidebar {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    border-radius: 15px;
+    height: 88%;
+    position: relative;
+    top: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar:hover {
+    box-shadow: none;
+}
+
+aside .sidebar a {
+    display: flex;
+    align-items: center;
+    color: var(--color-dark);
+    height: 3.7rem;
+    gap: 1rem;
+    position: relative;
+    margin-left: 2rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar a span {
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar a:last-child {
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+}
+
+aside .sidebar a.active {
+    width: 100%;
+    color: var(--color-primary);
+    margin-left: 0;
+}
+
+aside .sidebar a.active::before {
+    content: '';
+    width: 6px;
+    height: 18px;
+    background-color: var(--color-primary);
+}
+
+aside .sidebar a.active span {
+    color: var(--color-primary);
+    margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover {
+    color: var(--color-primary);
+}
+
+aside .sidebar a:hover span {
+    margin-left: 0.6rem;
+}
+
+aside .sidebar .message-count {
+    background-color: var(--color-danger);
+    padding: 2px 6px;
+    color: var(--color-white);
+    font-size: 11px;
+    border-radius: var(--border-radius-1);
+}
+
+main {
+    margin-top: 1.4rem;
+}
+
+main .progress_bar {
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+main .progress_bar .progress_bar_card {
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    justify-content: center;
+    gap: 1.4rem;
+    transition: all 0.3s ease;
+}
+
+main .progress_bar .progress_bar_card .task_image span {
+    margin-top: 5px;
+    font-size: 50px;
+    color: var(--color-primary);
+}
+
+main .progress_bar .progress_bar_card .bar_card_content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+main .progress_bar .progress_bar_card .progress_bar_empty {
+    width: 600px;
+    height: 1em;
+    background-color: var(--color-background);
+    border-radius: 1.5em;
+}
+
+main .progress_bar .progress_bar_card .progress_bar_success {
+    width: var(--width, 0%);
+    height: 1em;
+    background-color: var(--color-secondary);
+    border-radius: 1.5em;
+}
+
+main .recent-orders {
+    margin-top: 1.3rem;
+}
+
+main .recent-orders h2 {
+    margin-bottom: 0.8rem;
+}
+
+main .recent-orders table {
+    background-color: var(--color-white);
+    width: 100%;
+    height: 50%;
+    padding: var(--card-padding);
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    border-radius: var(--card-border-radius);
+    transition: all 0.3s ease;
+}
+
+main .recent-orders table:hover {
+    box-shadow: none;
+}
+
+main table tbody td {
+    height: 2.8rem;
+    border-bottom: 1px solid var(--color-light);
+    color: var(--color-dark);
+}
+
+main table tbody tr:last-child td {
+    border: none;
+}
+
+main .recent-orders a {
+    text-align: center;
+    display: block;
+    margin: 1rem auto;
+    color: var(--color-primary);
+}
+
+/*.progress_bar_content::before {*/
+/*    content: '';*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    position: absolute;*/
+/*    width: calc(var(--width, 0) * 1%);*/
+/*    max-width: 100%;*/
+/*    background-color: var(--color-success);*/
+/*    border-radius: 1.5em;*/
+/*    padding: 1em;*/
+/*}*/
