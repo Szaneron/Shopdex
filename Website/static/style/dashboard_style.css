@@ -89,6 +89,10 @@ b {
     color: var(--color-primary);
 }
 
+.secondary {
+    color: var(--color-secondary);
+}
+
 .danger {
     color: var(--color-danger);
 }
@@ -112,7 +116,6 @@ b {
 
 aside {
     height: 100%;
-    width: 16rem;
 }
 
 aside .toggle {
@@ -128,8 +131,9 @@ aside .toggle .logo {
 }
 
 aside .toggle .logo img {
-    width: 2rem;
-    height: 2rem;
+    margin-top: -0.5rem;
+    width: 4rem;
+    height: 3rem;
 }
 
 
@@ -139,8 +143,9 @@ aside .toggle .close {
 }
 
 aside .user {
-    margin-top: 4rem;
-    margin-bottom: 4rem;
+    padding: var(--card-padding);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -148,11 +153,13 @@ aside .user {
 }
 
 aside .user .user_image img {
-    height: 5rem;
-    margin-bottom: 1rem;
+    height: 8rem;
     border-radius: 50%;
 }
 
+aside .user .user_image h2 {
+    text-align: center;
+}
 
 aside .user .user_rating p {
     margin-top: 0.5rem;
@@ -174,6 +181,7 @@ aside .user .user_rating p span {
 
 aside .sidebar {
     display: flex;
+    margin-top: -4px;
     flex-direction: column;
     background-color: var(--color-white);
     box-shadow: var(--box-shadow);
@@ -237,10 +245,10 @@ aside .sidebar a:hover span {
 }
 
 aside .sidebar .message-count {
-    background-color: var(--color-danger);
-    padding: 2px 6px;
+    background-color: var(--color-secondary);
+    padding: 2px 8px;
     color: var(--color-white);
-    font-size: 11px;
+    font-size: 12px;
     border-radius: var(--border-radius-1);
 }
 
@@ -283,7 +291,7 @@ main .progress_bar .progress_bar_card .bar_card_content {
 }
 
 main .progress_bar .progress_bar_card .progress_bar_empty {
-    width: 600px;
+    width: 35rem;
     height: 1em;
     background-color: var(--color-background);
     border-radius: 1.5em;
@@ -296,27 +304,25 @@ main .progress_bar .progress_bar_card .progress_bar_success {
     border-radius: 1.5em;
 }
 
-main .recent-orders {
+main .dashboard-table {
     margin-top: 1.3rem;
 }
 
-main .recent-orders h2 {
+main .dashboard-table h2 {
     margin-bottom: 0.7rem;
 }
 
-main .recent-orders table {
-    background-color: var(--color-white);
+main .dashboard-table table {
     width: 100%;
-    height: 50%;
-    padding: var(--card-padding);
-
+    padding: 1.2rem;
+    background-color: var(--color-white);
     box-shadow: var(--box-shadow);
     text-align: center;
     border-radius: var(--card-border-radius);
     transition: all 0.3s ease;
 }
 
-main .recent-orders table:hover {
+main .dashboard-table table:hover {
     box-shadow: none;
 }
 
@@ -327,7 +333,7 @@ main table tbody td {
 }
 
 
-main .recent-orders a {
+main .dashboard-table a {
     font-size: 15px;
     font-weight: 500;
     text-align: center;
@@ -377,14 +383,14 @@ main .recent-orders a {
     background: var(--color-secondary);
     width: 100%;
     font-size: 1.8rem;
-    padding: 1rem;
+    padding: 0.5rem;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
 }
 
 .right-section .calendar .day-name {
     font-size: 1.4rem;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .right-section .calendar .date-number {
@@ -393,12 +399,59 @@ main .recent-orders a {
 
 .right-section .calendar .year {
     font-size: 1.4rem;
-    padding: 1rem;
+    padding: 0.5rem;
 }
+
+.right-section .time-card {
+    margin-top: 1.3rem
+}
+
+.right-section .time-card h2 {
+    margin-bottom: 0.7rem;
+}
+
+.right-section .time-card a {
+    font-weight: 500;
+    font-size: 15px;
+    text-align: center;
+    display: block;
+    margin: 0.5rem auto;
+    color: var(--color-primary);
+}
+
+.right-section .working-time {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+.right-section .working-time span {
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--color-secondary);
+    font-weight: 600;
+}
+
 
 /*
     ----------------------------------------------------------------
  */
+
+.right-section .nav {
+    display: flex;
+    justify-content: end;
+}
+
+.right-section .nav button {
+    display: none;
+}
 
 .right-section .returns {
     margin-top: 1.3rem;
@@ -412,8 +465,7 @@ main .recent-orders a {
     background-color: var(--color-white);
     width: 100%;
     height: 50%;
-    padding: var(--card-padding);
-
+    padding: 1.2rem;
     box-shadow: var(--box-shadow);
     text-align: center;
     border-radius: var(--card-border-radius);
@@ -427,7 +479,6 @@ main .recent-orders a {
 .right-section .returns table tbody td {
     height: 2.8rem;
     border-bottom: 1px solid var(--color-light);
-    color: var(--color-dark);
 }
 
 
@@ -438,4 +489,147 @@ main .recent-orders a {
     display: block;
     margin: 0.5rem auto;
     color: var(--color-primary);
+}
+
+
+@media screen and (max-width: 1300px) {
+    .container {
+        grid-template-columns: 7rem auto 18rem;
+    }
+
+    aside .logo h2 {
+        display: none;
+    }
+
+    aside .sidebar h3 {
+        display: none;
+    }
+
+
+    aside .user .user_image img {
+        height: 6rem;
+        border-radius: 50%;
+    }
+
+    aside .sidebar a {
+        width: 5.6rem;
+    }
+
+    main .progress_bar .progress_bar_card .progress_bar_empty {
+        width: 15rem;
+    }
+
+    main .dashboard-table {
+        flex-basis: 40%;
+    }
+
+    main table thead tr th:nth-child(2),
+    main table thead tr th:nth-child(3) {
+        display: none;
+    }
+
+    main table tbody tr td:nth-child(2),
+    main table tbody tr td:nth-child(3) {
+        display: none;
+    }
+
+}
+
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 16rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        margin-left: 1rem;
+        cursor: pointer;
+    }
+
+    main {
+        margin-top: 7rem;
+        padding: 0 1rem;
+    }
+
+
+    main .dashboard-table {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .dashboard-table table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 2rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
 }

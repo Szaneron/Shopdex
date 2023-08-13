@@ -7,14 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <title>Shopdex</title>
-
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard_style.css' %}"/>
 
 </head>
 <body>
 
-<!-- Sidebar Section -->
+
 <div class="container">
+    <!-- Sidebar Section -->
     <aside>
         <div class="toggle">
             <div class="logo">
@@ -30,62 +31,68 @@
         <div class="sidebar">
             <div class="user">
                 <div class="user_image">
-                    <img src="{% static 'images/logo.png' %}" alt="">
+                    <img src="{% static 'images/karolina-user.jpg' %}" alt="">
                     <h2>Karolina</h2>
                 </div>
                 <div class="user_rating">
-
                     <p><span class="material-icons-sharp">
                         star
                     </span> 4.8</p>
                 </div>
             </div>
             <a href="#" class="active ">
-                        <span class="material-icons-sharp">
+                    <span class="material-icons-sharp">
                         dashboard
-                        </span>
+                    </span>
                 <h3>Tablica</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        fact_check
-                        </span>
+                <span class="material-icons-sharp">
+                    fact_check
+                </span>
                 <h3>Zadania</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        local_shipping
-                        </span>
+                <span class="material-icons-sharp">
+                    local_shipping
+                </span>
                 <h3>Dostawy</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        report_problem
-                        </span>
+                <span class="material-icons-sharp">
+                    report_problem
+                </span>
                 <h3>Zwroty</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        shopping_cart
-                        </span>
+                <span class="material-icons-sharp">
+                    shopping_cart
+                </span>
                 <h3>Do zamówienia</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        calendar_month
-                        </span>
+                <span class="material-icons-sharp">
+                    calendar_month
+                </span>
                 <h3>Kalendarz</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        report_gmailerrorred
-                        </span>
+                    <span class="material-icons-sharp">
+                        notifications
+                    </span>
+                <h3>Powiadomienia</h3>
+                <span class="message-count">12</span>
+            </a>
+            <a href="#">
+                <span class="material-icons-sharp">
+                    report_gmailerrorred
+                </span>
                 <h3>Raporty</h3>
             </a>
             <a href="#">
-                        <span class="material-icons-sharp">
-                        logout
-                        </span>
+                <span class="material-icons-sharp">
+                    logout
+                </span>
                 <h3>Wyloguj</h3>
             </a>
         </div>
@@ -101,18 +108,17 @@
             <div class="progress_bar_card">
                 <div class="task_image">
                     <span class="material-icons-sharp">
-                    assignment
+                        assignment
                     </span>
                 </div>
-
                 <div>
                     <div class="bar_card_content">
-                        <h2>50%</h2>
-                        <span>Wykonano 2 z 4</span>
+                        <h2>20%</h2>
+                        <span>Wykonano 2 z 10</span>
                     </div>
 
                     <div class="progress_bar_empty">
-                        <div class="progress_bar_success" style="--width: 50%"></div>
+                        <div class="progress_bar_success" style="--width: 20%"></div>
                     </div>
                 </div>
             </div>
@@ -120,58 +126,77 @@
         <!-- End of Progress Bar Section -->
 
 
-        <!-- Recent Orders Table -->
-        <div class="recent-orders">
+        <!-- Delivery Table -->
+        <div class="dashboard-table">
             <h2>Dostawy</h2>
             <table class="para1">
                 <thead>
                 <tr>
-                    <th>Course Name</th>
-                    <th>Course Number</th>
-                    <th>Payment</th>
+                    <th>Firma</th>
+                    <th>Struktura</th>
+                    <th>Opis</th>
                     <th>Status</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody></tbody>
             </table>
-            <a href="#">Show All</a>
+            <a href="#">Pokaż wszystkie</a>
         </div>
-        <!-- End of Recent Orders -->
-        <!-- Recent Orders Table -->
-        <div class="recent-orders">
+        <!-- End of Delivery Table -->
+        <!-- Tasks Table -->
+        <div class="dashboard-table">
             <h2>Zadania</h2>
             <table class="para2">
                 <thead>
                 <tr>
-                    <th>Course Name</th>
-                    <th>Course Number</th>
-                    <th>Payment</th>
+                    <th>Firma</th>
+                    <th>Struktura</th>
+                    <th>Opis</th>
                     <th>Status</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody></tbody>
             </table>
-            <a href="#">Show All</a>
+            <a href="#">Pokaż wszystkie</a>
         </div>
-        <!-- End of Recent Orders -->
+        <!-- End of Tasks Table -->
     </main>
     <!-- End of Main Content -->
 
     <!-- Right Section -->
     <div class="right-section">
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
 
-
+        <!-- Calendar Section -->
         <div class="calendar">
             <span class="month-name">Sierpień</span>
             <span class="day-name">Piątek</span>
             <span class="date-number">11</span>
             <span class="year">2023</span>
         </div>
+        <!-- End of Calendar Section -->
+
+        <!-- Working hour Section -->
+        <div class="time-card">
+            <h2>Koniec pracy</h2>
+            <div class="working-time">
+                <span>13:30</span>
+
+            </div>
+            <a href="">Zmień</a>
+        </div>
+        <!-- End of Working hour Section -->
 
         <div class="returns">
-            <!-- Recent Orders Table -->
+            <!-- Returns Table -->
             <div class="returns-table">
                 <h2>Zwroty</h2>
                 <table>
@@ -185,21 +210,24 @@
                     <tbody>
                     <tr>
                         <td>Ateneum</td>
-                        <td>Przygotowany</td>
+                        <td class="secondary">Przygotowany</td>
+                        <td class="primary">Szczegóły</td>
                     </tr>
                     <tr>
                         <td>Ateneum</td>
-                        <td>Przygotowany</td>
+                        <td class="warning">Do spakowania</td>
+                        <td class="primary">Szczegóły</td>
                     </tr>
                     </tbody>
                 </table>
-                <a href="#">Show All</a>
+                <a href="#">Pokaż wszystkie</a>
             </div>
-            <!-- End of Recent Orders -->
+            <!-- End of Returns Table -->
 
         </div>
-
     </div>
+    <!-- End of Right Section -->
+
     <script src="../static/style/orders.js"></script>
     <script src="../static/style/index.js"></script>
 </div>
