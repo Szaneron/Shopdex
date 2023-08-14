@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopdex</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+</head>
+<body>
+{% if messages %}
+    {% for message in messages %}
+        <div id="alert-message-content">
+            <p>{{ message }}<span class="material-icons-sharp" id="close-alert">
+                    close
+                </span></p>
+
+        </div>
+    {% endfor %}
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/login_style.css' %}"/>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="left-up-corner"></div>
+    <div class="right-down-corner"></div>
+    <div class="login-card">
+        <div class="left-side">
+            <div class="left-content">
+                <h1>LOGOWANIE</h1>
+                <p>Witaj! Miłej pracy i smacznej kawusi.</p>
+                <div class="form-div">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <span class="material-icons-sharp">
+                                account_circle
+                            </span>
+                            <input type="text" name="username" class="form-style" placeholder="Login"
+                                   autocomplete="off">
+                        </div>
+                        <div class="form-group mt-2">
+                            <span class="material-icons-sharp">
+                                lock
+                            </span>
+                            <input type="password" name="password" class="form-style" placeholder="Hasło"
+                                   autocomplete="off">
+                        </div>
+                        <input class="send-form" type="submit" value="ZALOGUJ">
+                    </form>
+                </div>
+                <div class="message-alert">
+                    {% include 'messages.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="right-content">
+                <img src="{% static 'images/logo.png' %}" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/js/login.js"></script>
+</body>
+</html>
