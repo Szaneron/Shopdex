@@ -2,13 +2,16 @@ const form = document.querySelector("form");
 const usernameInput = form.querySelector("[name='username']");
 const passwordInput = form.querySelector("[name='password']");
 
-
+// Listens for the 'submit' event on the form and prevents its default action.
+// Calls the 'checkInputs()' function, which validates the entered data.
 form.addEventListener('submit', e => {
     e.preventDefault();
 
     checkInputs();
 });
 
+
+// Function that checks the validity of the form data.
 function checkInputs() {
     // trim to remove the whitespaces
     const usernameValue = usernameInput.value.trim();
@@ -35,6 +38,8 @@ function checkInputs() {
     }
 }
 
+
+// Sets an error state for the input field.
 function setErrorFor(input, message) {
     const formControl = input.parentElement;
     const small = formControl.querySelector('small');
@@ -42,6 +47,7 @@ function setErrorFor(input, message) {
     small.innerText = message;
 }
 
+// Sets a success state for the input field.
 function setSuccessFor(input) {
     const formControl = input.parentElement;
     formControl.className = 'form-group';
