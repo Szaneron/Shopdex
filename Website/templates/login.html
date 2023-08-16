@@ -17,6 +17,8 @@
     <div class="left-up-corner"></div>
     <div class="right-down-corner"></div>
     <div class="login-card">
+
+        <!-- Left content -->
         <div class="left-side">
             <div class="left-content">
                 <h1>LOGOWANIE</h1>
@@ -30,13 +32,15 @@
                             </span>
                             <input type="text" name="username" class="form-style" placeholder="Login"
                                    autocomplete="off">
+                            <small>Error message</small>
                         </div>
-                        <div class="form-group mt-2">
+                        <div class="form-group">
                             <span class="material-icons-sharp">
                                 lock
                             </span>
                             <input type="password" name="password" class="form-style" placeholder="Hasło"
                                    autocomplete="off">
+                            <small>Error message</small>
                         </div>
                         <input class="send-form" type="submit" value="ZALOGUJ">
                     </form>
@@ -46,12 +50,15 @@
                 </div>
             </div>
         </div>
+        <!-- End of Left content -->
 
+        <!-- Right content -->
         <div class="right-side">
             <div class="right-content">
                 <img src="{% static 'images/logo.png' %}" alt="">
             </div>
         </div>
+        <!-- End of Right content -->
     </div>
 </div>
 

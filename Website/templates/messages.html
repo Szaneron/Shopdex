@@ -9,10 +9,12 @@
 {% if messages %}
     {% for message in messages %}
         <div id="alert-message-content">
-            <p>{{ message }}<span class="material-icons-sharp" id="close-alert">
+            <p>
+                {{ message }}
+                <span class="material-icons-sharp" id="close-alert">
                     close
-                </span></p>
-
+                </span>
+            </p>
         </div>
     {% endfor %}
 {% endif %}

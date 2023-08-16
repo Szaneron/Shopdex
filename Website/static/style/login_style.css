@@ -57,12 +57,12 @@
     color: var(--color-dark);
     margin-left: 5rem;
     margin-right: 5rem;
+    margin-top: 1rem;
 }
 
 .form-group {
     position: relative;
-    display: block;
-    margin: 1rem;
+    margin: 0.2rem 1rem;
 }
 
 .form-group span {
@@ -76,6 +76,10 @@
     color: var(--color-dark);
     -webkit-transition: all 200ms linear;
     transition: all 200ms linear;
+}
+
+.form-group small {
+    visibility: hidden;
 }
 
 .form-group input::-webkit-input-placeholder {
@@ -99,6 +103,15 @@
     outline: none;
     color: var(--color-dark);
     background-color: var(--color-secondary-light);
+}
+
+.form-group.error input {
+    border: 1px solid var(--color-danger);
+}
+
+.form-group.error small {
+    visibility: visible;
+    color: var(--color-danger)
 }
 
 .send-form {
@@ -125,9 +138,10 @@
 #alert-message-content p {
     display: flex;
     align-items: center;
+    border: 1px solid var(--color-danger);
     justify-content: space-between;
-    background-color: var(--color-message-warning);
-    color: var(--color-dark);
+    background-color: var(--color-white);
+    color: var(--color-danger);
     border-radius: 1rem;
     height: 48px;
     padding-left: 1rem;
