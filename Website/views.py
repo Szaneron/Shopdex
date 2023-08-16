@@ -1,4 +1,5 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
@@ -12,12 +13,18 @@ def login_user(request):
             login(request, user)
             return redirect('dashboard')
         else:
-            messages.error(request, ('Invalid username or password'))
+            messages.error(request, 'Invalid username or password')
             return redirect('login_user')
 
     else:
         return render(request, 'login.html')
 
 
+def logout_user(request):
+    logout(request)
+    return redirect('login_user')
+
+
+@login_required(login_url='login_user')
 def dashboard(request):
     return render(request, "dashboard.html")
