@@ -31,8 +31,8 @@
         <div class="sidebar">
             <div class="user">
                 <div class="user_image">
-                    <img src="{% static 'images/karolina-user.jpg' %}" alt="">
-                    <h2>Karolina</h2>
+                    <img src="{{ user.userprofile.profile_picture.url }}" alt="">
+                    <h2> {{ user.username }}</h2>
                 </div>
                 <div class="user_rating">
                     <p><span class="material-icons-sharp">
@@ -145,21 +145,47 @@
         </div>
         <!-- End of Delivery Table -->
         <!-- Tasks Table -->
-        <div class="tasks-table">
+        <div class="tasks-table" data-tasks="{{ tasks|safe }}">
             <h2>Zadania</h2>
             <table class="para2">
-                <thead>
-                <tr>
-                    <th>Firma</th>
-                    <th>Struktura</th>
-                    <th>Opis</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody></tbody>
+                {% if tasks.count == 0 %}
+                    <thead>
+                    <tr>
+                        <th>Brak zadań</th>
+                    </tr>
+                    </thead>
+                {% else %}
+                    <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Opis</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            {% if task.is_important %}
+                                <td class="important">{{ task.name }}</td>
+                            {% else %}
+                                <td>{{ task.name }}</td>
+                            {% endif %}
+                            <td>{{ task.description }}</td>
+                            {% if task.status == "Do zrobienia" %}
+                                <td class="primary">{{ task.status }}</td>
+                            {% elif task.status == "Zrobione" %}
+                                <td class="success">{{ task.status }}</td>
+                            {% endif %}
+                            <td class="primary">Szczegóły</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
             </table>
-            <a href="#">Pokaż wszystkie</a>
+            {% if tasks.count > 5 %}
+                <a href="#">Pokaż wszystkie</a>
+            {% endif %}
         </div>
         <!-- End of Tasks Table -->
     </main>
@@ -177,10 +203,10 @@
 
         <!-- Calendar Section -->
         <div class="calendar">
-            <span class="month-name">Sierpień</span>
-            <span class="day-name">Piątek</span>
-            <span class="date-number">11</span>
-            <span class="year">2023</span>
+            <span class="month-name" id="month-name"></span>
+            <span class="day-name" id="day-name"></span>
+            <span class="date-number"> {{ current_date.day }}</span>
+            <span class="year"> {{ current_date.year }}</span>
         </div>
         <!-- End of Calendar Section -->
 
@@ -228,8 +254,11 @@
     </div>
     <!-- End of Right Section -->
 
-    <script src="../static/style/orders.js"></script>
-    <script src="../static/style/index.js"></script>
+    <script>
+        let current_month = {{ current_date.month }}; // Get the month number (0-11)
+        let current_day_name = '{{ day_name }}'; // Get the name of the day
+    </script>
+    <script src="../static/js/dashboard.js"></script>
 </div>
 </body>
 </html>
