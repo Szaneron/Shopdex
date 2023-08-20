@@ -35,9 +35,17 @@
                     <h2> {{ user.username }}</h2>
                 </div>
                 <div class="user_rating">
-                    <p><span class="material-icons-sharp">
-                        star
-                    </span> 4.8</p>
+                    <p>
+                        <span class="material-icons-sharp">
+                            star
+                        </span>
+                        {% if user.userprofile.position == "Pracownik" %}
+                            {{ user_rating }}
+                        {% else %}
+                            {{ user.userprofile.position }}
+                        {% endif %}
+                    </p>
+
                 </div>
             </div>
             <a href="#" class="active ">
@@ -129,17 +137,43 @@
         <!-- Delivery Table -->
         <div class="delivery-table">
             <h2>Dostawy</h2>
-            <table class="para1">
-                <thead>
-                <tr>
-                    <th>Firma</th>
-                    <th>Struktura</th>
-                    <th>Opis</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody></tbody>
+            <table>
+                {% if all_delivery.count == 0 %}
+                    <thead>
+                    <tr>
+                        <th>Brak dostaw</th>
+                    </tr>
+                    </thead>
+                {% else %}
+                    <thead>
+                    <tr>
+                        <th>Dostawca</th>
+                        <th>Forma</th>
+                        <th>Ilość</th>
+                        <th>Opis</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for delivery in delivery_for_dashboard %}
+                        <tr>
+                            <td>{{ delivery.delivery_company }}</td>
+                            <td>{{ delivery.form }}</td>
+                            <td>{{ delivery.quantity }}</td>
+                            <td>{{ delivery.description }}</td>
+                            {% if delivery.status == "W drodze" %}
+                                <td class="primary">{{ delivery.status }}</td>
+                            {% elif delivery.status == "Odebrana" %}
+                                <td class="success">{{ delivery.status }}</td>
+                            {% elif delivery.status == "Nie dostarczona" %}
+                                <td class="danger">{{ delivery.status }}</td>
+                            {% endif %}
+                            <td class="primary">Szczegóły</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
             </table>
             <a href="#">Pokaż wszystkie</a>
         </div>
@@ -147,8 +181,8 @@
         <!-- Tasks Table -->
         <div class="tasks-table" data-tasks="{{ tasks|safe }}">
             <h2>Zadania</h2>
-            <table class="para2">
-                {% if tasks.count == 0 %}
+            <table>
+                {% if all_tasks.count == 0 %}
                     <thead>
                     <tr>
                         <th>Brak zadań</th>
@@ -164,7 +198,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for task in tasks %}
+                    {% for task in tasks_for_dashboard %}
                         <tr>
                             {% if task.is_important %}
                                 <td class="important">{{ task.name }}</td>
@@ -183,8 +217,8 @@
                     </tbody>
                 {% endif %}
             </table>
-            {% if tasks.count > 5 %}
-                <a href="#">Pokaż wszystkie</a>
+            {% if all_tasks.count > 5 %}
+                <a href="#">Pokaż wszystkie ({{ all_tasks.count }})</a>
             {% endif %}
         </div>
         <!-- End of Tasks Table -->
@@ -215,9 +249,7 @@
             <h2>Koniec pracy</h2>
             <div class="working-time">
                 <span>13:30</span>
-
             </div>
-            <a href="">Zmień</a>
         </div>
         <!-- End of Working hour Section -->
 
@@ -249,8 +281,23 @@
                 <a href="#">Pokaż wszystkie</a>
             </div>
             <!-- End of Returns Table -->
+        </div>
+
+        <!-- External links section -->
+        <div class="external-links">
+            <div class="links-section">
+                <h2>Szybkie linki</h2>
+                <div class="link-conatiner">
+                    <div class="baselinker-card">
+                        <img src="{% static 'images/external_links/baselinker.png' %}" alt="">
+                        <p>Baselinker</p>
+                    </div>
+                </div>
+            </div>
 
         </div>
+        <!-- End of External links section -->
+
     </div>
     <!-- End of Right Section -->
 
