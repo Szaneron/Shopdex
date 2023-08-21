@@ -121,12 +121,13 @@
                 </div>
                 <div>
                     <div class="bar_card_content">
-                        <h2>20%</h2>
-                        <span>Wykonano 2 z 10</span>
+                        <h2>{{ progress_bar_data.percentage_done }}%</h2>
+                        <span>Wykonano {{ progress_bar_data.all_done }} z {{ progress_bar_data.all_to_do }}</span>
                     </div>
 
                     <div class="progress_bar_empty">
-                        <div class="progress_bar_success" style="--width: 20%"></div>
+                        <div class="progress_bar_success"
+                             style="--width: {{ progress_bar_data.percentage_done }}%"></div>
                     </div>
                 </div>
             </div>
@@ -175,7 +176,9 @@
                     </tbody>
                 {% endif %}
             </table>
-            <a href="#">Pokaż wszystkie</a>
+            {% if all_delivery.count > 5 %}
+                <a href="#">Pokaż wszystkie ({{ all_delivery.count }})</a>
+            {% endif %}
         </div>
         <!-- End of Delivery Table -->
         <!-- Tasks Table -->
@@ -304,6 +307,8 @@
     <script>
         let current_month = {{ current_date.month }}; // Get the month number (0-11)
         let current_day_name = '{{ day_name }}'; // Get the name of the day
+        {#let progress_bar_data_js = {{ progress_bar_data }};#}
+
     </script>
     <script src="../static/js/dashboard.js"></script>
 </div>

@@ -481,16 +481,21 @@ main .tasks-table a {
     }
 
 
-    main table thead tr th:nth-child(2),
-    main table thead tr th:nth-child(3) {
+    main .delivery-table thead tr th:nth-child(2), main .delivery-table thead tr th:nth-child(3) {
         display: none;
     }
 
-    main table tbody tr td:nth-child(2),
-    main table tbody tr td:nth-child(3) {
+    main .delivery-table tbody tr td:nth-child(2), main .delivery-table tbody tr td:nth-child(3) {
         display: none;
     }
 
+    main .tasks-table thead tr th:nth-child(2) {
+        display: none;
+    }
+
+    main .tasks-table tbody tr td:nth-child(2) {
+        display: none;
+    }
 }
 
 
