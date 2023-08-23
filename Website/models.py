@@ -45,7 +45,7 @@ class Task(models.Model):
     - assigned_to (ForeignKey): User profile to whom the task is assigned.
     - is_important (BooleanField): Indicates if the task is important.
     - date (DateField): Date of the task.
-    - creation_time (TimeField): Time of task creation.
+    - creation_time (TimeField, default=datetime.time): Time of task creation.
 
     Methods:
     - __str__: Returns the string representation of the task.
@@ -80,7 +80,7 @@ class Delivery(models.Model):
     - description (TextField): Description of the delivery.
     - status (CharField): Status of the delivery, choices: "W drodze", "Odebrana", "Nie dostarczona".
     - date (DateField): Date of the delivery.
-    - creation_time (TimeField): Time when the delivery was created.
+    - creation_time (TimeField, default=datetime.time): Time when the delivery was created.
 
     Methods:
     - __str__: Returns the string representation of the delivery.
@@ -92,6 +92,7 @@ class Delivery(models.Model):
         ('DPD', 'DPD'),
         ('GLS', 'GLS'),
         ('Poczta', 'Poczta'),
+        ('Paczkomat', 'Paczkomat'),
         ('DHL', 'DHL'),
         ('Media Expert', 'Media Expert'),
     ]
@@ -117,3 +118,53 @@ class Delivery(models.Model):
 
     def __str__(self):
         return f"{self.delivery_company} - {self.date}"
+
+
+class Day(models.Model):
+    """
+    Model representing work day information.
+
+    Fields:
+    - end_of_work_hour (TimeField): The time when work ends.
+    - date (DateField, unique=True): The date of the work day.
+
+    Methods:
+    - __str__: Returns the string representation of the work day.
+
+    """
+    end_of_work_hour = models.TimeField()
+    date = models.DateField(unique=True)
+
+    def __str__(self):
+        return f"{self.date} - {self.end_of_work_hour}"
+
+
+class Return(models.Model):
+    """
+    Model representing return information.
+
+    Fields:
+    - name (CharField): Name of the return.
+    - product_list (TextField): List of products for the return.
+    - status (CharField): Status of the return, choices: "Do spakowania", "Przygotowany", "Odebrany".
+    - date (DateField, default=timezone.now): Date when the return is prepared.
+    - creation_time (TimeField, default=timezone.now): Time when the return was created.
+
+    Methods:
+    - __str__: Returns the string representation of the return.
+
+    """
+    STATUS_CHOICES = [
+        ('Do spakowania', 'Do spakowania'),
+        ('Przygotowany', 'Przygotowany'),
+        ('Odebrany', 'Odebrany'),
+    ]
+
+    name = models.CharField(max_length=100)
+    product_list = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    date = models.DateField()
+    creation_time = models.TimeField(default=datetime.time)
+
+    def __str__(self):
+        return f"{self.name} - {self.date}"

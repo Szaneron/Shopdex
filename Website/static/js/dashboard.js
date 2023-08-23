@@ -26,5 +26,3 @@ days['Sunday'] = "Niedziela";
 
 let day_name = days[current_day_name];
 document.getElementById("day-name").innerText = day_name;
-
-console.log(progress_bar_data_js)

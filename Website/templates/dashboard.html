@@ -120,15 +120,27 @@
                     </span>
                 </div>
                 <div>
-                    <div class="bar_card_content">
-                        <h2>{{ progress_bar_data.percentage_done }}%</h2>
-                        <span>Wykonano {{ progress_bar_data.all_done }} z {{ progress_bar_data.all_to_do }}</span>
-                    </div>
+                    {% if user.userprofile.position == 'Szef' %}
+                        <div class="bar_card_content">
+                            <h2>{{ progress_bar_data.percentage_done }}%</h2>
+                            <span>Wykonano {{ progress_bar_data.all_done }} z {{ progress_bar_data.all_to_do }}</span>
+                        </div>
 
-                    <div class="progress_bar_empty">
-                        <div class="progress_bar_success"
-                             style="--width: {{ progress_bar_data.percentage_done }}%"></div>
-                    </div>
+                        <div class="progress_bar_empty">
+                            <div class="progress_bar_success"
+                                 style="--width: {{ progress_bar_data.percentage_done }}%"></div>
+                        </div>
+                    {% elif user.userprofile.position == 'Pracownik' %}
+                        <div class="bar_card_content">
+                            <h2>{{ progress_bar_data_for_user.percentage_done }}%</h2>
+                            <span>Wykonano {{ progress_bar_data_for_user.all_done }} z {{ progress_bar_data_for_user.all_to_do }}</span>
+                        </div>
+
+                        <div class="progress_bar_empty">
+                            <div class="progress_bar_success"
+                                 style="--width: {{ progress_bar_data_for_user.percentage_done }}%"></div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -185,39 +197,78 @@
         <div class="tasks-table" data-tasks="{{ tasks|safe }}">
             <h2>Zadania</h2>
             <table>
-                {% if all_tasks.count == 0 %}
-                    <thead>
-                    <tr>
-                        <th>Brak zadań</th>
-                    </tr>
-                    </thead>
-                {% else %}
-                    <thead>
-                    <tr>
-                        <th>Nazwa</th>
-                        <th>Opis</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for task in tasks_for_dashboard %}
+                {% if user.userprofile.position == 'Szef' %}
+                    {% if all_tasks.count == 0 %}
+                        <thead>
                         <tr>
-                            {% if task.is_important %}
-                                <td class="important">{{ task.name }}</td>
-                            {% else %}
-                                <td>{{ task.name }}</td>
-                            {% endif %}
-                            <td>{{ task.description }}</td>
-                            {% if task.status == "Do zrobienia" %}
-                                <td class="primary">{{ task.status }}</td>
-                            {% elif task.status == "Zrobione" %}
-                                <td class="success">{{ task.status }}</td>
-                            {% endif %}
-                            <td class="primary">Szczegóły</td>
+                            <th>Brak zadań</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
+                        </thead>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Opis</th>
+                            <th>Osoba</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in all_tasks_for_dashboard %}
+                            <tr>
+                                {% if task.is_important %}
+                                    <td class="important">{{ task.name }}</td>
+                                {% else %}
+                                    <td>{{ task.name }}</td>
+                                {% endif %}
+                                <td>{{ task.description }}</td>
+                                <td>{{ task.assigned_to }}</td>
+                                {% if task.status == "Do zrobienia" %}
+                                    <td class="primary">{{ task.status }}</td>
+                                {% elif task.status == "Zrobione" %}
+                                    <td class="success">{{ task.status }}</td>
+                                {% endif %}
+                                <td class="primary">Szczegóły</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
+                {% elif user.userprofile.position == 'Pracownik' %}
+                    {% if all_tasks_for_user.count == 0 %}
+                        <thead>
+                        <tr>
+                            <th>Brak zadań</th>
+                        </tr>
+                        </thead>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Opis</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in all_tasks_for_user_dashboard %}
+                            <tr>
+                                {% if task.is_important %}
+                                    <td class="important">{{ task.name }}</td>
+                                {% else %}
+                                    <td>{{ task.name }}</td>
+                                {% endif %}
+                                <td>{{ task.description }}</td>
+                                {% if task.status == "Do zrobienia" %}
+                                    <td class="primary">{{ task.status }}</td>
+                                {% elif task.status == "Zrobione" %}
+                                    <td class="success">{{ task.status }}</td>
+                                {% endif %}
+                                <td class="primary">Szczegóły</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
                 {% endif %}
             </table>
             {% if all_tasks.count > 5 %}
@@ -251,7 +302,11 @@
         <div class="time-card">
             <h2>Koniec pracy</h2>
             <div class="working-time">
-                <span>13:30</span>
+                {% if end_of_work_hour %}
+                    <span>{{ end_of_work_hour|time:"H:i" }}</span>
+                {% else %}
+                    <span>13:30</span>
+                {% endif %}
             </div>
         </div>
         <!-- End of Working hour Section -->
@@ -261,27 +316,40 @@
             <div class="returns-table">
                 <h2>Zwroty</h2>
                 <table>
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Ateneum</td>
-                        <td class="secondary">Przygotowany</td>
-                        <td class="primary">Szczegóły</td>
-                    </tr>
-                    <tr>
-                        <td>Ateneum</td>
-                        <td class="warning">Do spakowania</td>
-                        <td class="primary">Szczegóły</td>
-                    </tr>
-                    </tbody>
+                    {% if all_returns.count == 0 %}
+                        <thead>
+                        <tr>
+                            <th>Brak zwrotów</th>
+                        </tr>
+                        </thead>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for return in returns_for_dashboard %}
+                            <tr>
+                                <td>{{ return.name }}</td>
+                                {% if return.status == "Do spakowania" %}
+                                    <td class="primary">{{ return.status }}</td>
+                                {% elif return.status == "Przygotowany" %}
+                                    <td class="secondary">{{ return.status }}</td>
+                                {% elif return.status == "Odebrany" %}
+                                    <td class="success">{{ return.status }}</td>
+                                {% endif %}
+                                <td class="primary">Szczegóły</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
                 </table>
-                <a href="#">Pokaż wszystkie</a>
+                {% if all_returns.count > 2 %}
+                    <a href="#">Pokaż wszystkie ({{ all_returns.count }})</a>
+                {% endif %}
             </div>
             <!-- End of Returns Table -->
         </div>
@@ -307,7 +375,6 @@
     <script>
         let current_month = {{ current_date.month }}; // Get the month number (0-11)
         let current_day_name = '{{ day_name }}'; // Get the name of the day
-        {#let progress_bar_data_js = {{ progress_bar_data }};#}
 
     </script>
     <script src="../static/js/dashboard.js"></script>
