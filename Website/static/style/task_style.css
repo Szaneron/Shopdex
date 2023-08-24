@@ -1,0 +1,119 @@
+@import "root_style.css";
+@import "sidebar_style.css";
+
+.container {
+    display: grid;
+    height: 100%;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 16rem auto 27rem;
+}
+
+.wrapper {
+    width: 100%;
+    background-color: var(--color-white);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    box-shadow: var(--box-shadow);
+}
+
+.wrapper header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header {
+    border-bottom: 3px solid var(--color-secondary)
+}
+
+header .icons {
+    display: flex;
+}
+
+header .icons span {
+    height: 2rem;
+    width: 2rem;
+    cursor: pointer;
+    color: var(--color-dark);
+    text-align: center;
+    line-height: 2rem;
+    font-size: 1.9rem;
+    user-select: none;
+    border-radius: 50%;
+}
+
+.icons span:last-child {
+    margin-right: -10px;
+}
+
+header .icons span:hover {
+    background: #f2f2f2;
+}
+
+header .current-date {
+    font-size: 1.45rem;
+    font-weight: 500;
+}
+
+.calendar {
+    padding-top: 20px;
+}
+
+.calendar ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    text-align: center;
+}
+
+.calendar .days {
+    margin-bottom: 20px;
+}
+
+.calendar li {
+    color: var(--color-dark);
+    width: calc(100% / 7);
+    font-size: 1.02rem;
+}
+
+.calendar .weeks li {
+    font-weight: 500;
+    cursor: default;
+}
+
+.calendar .days li {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    margin-top: 10px;
+}
+
+.days li.inactive {
+    color: var(--color-background);
+}
+
+.days li.active {
+    color: var(--color-white);
+}
+
+.days li::before {
+    position: absolute;
+    content: "";
+    left: 50%;
+    top: 50%;
+    height: 2rem;
+    width: 2rem;
+    z-index: -1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.days li.active::before {
+    background: var(--color-secondary);
+}
+
+.days li:not(.active):hover::before {
+    background: var(--color-background);
+}

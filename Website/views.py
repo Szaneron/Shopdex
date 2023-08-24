@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from datetime import datetime
@@ -199,3 +200,41 @@ def dashboard(request):
 
     }
     return render(request, "dashboard.html", context)
+
+
+@login_required(login_url='login_user')
+def task(request, filtered_date=None):
+    current_date = get_current_date()
+    all_tasks = Task.objects.filter(date=current_date).order_by('status', '-is_important', 'creation_time')
+    for task in all_tasks:
+        print(task.date)
+
+    if request.method == 'POST':
+        selected_day = request.POST.get('selected_day')
+        selected_month_and_year = request.POST.get('selected_month')
+        selected_month, selected_year = selected_month_and_year.split(' ', 1)
+
+        months = dict(Styczeń='01', Luty='02', Marzec='03', Kwiecień='04', Maj='05', Czerwiec='06', Lipiec='07',
+                      Sierpień='08', Wrzesień='09', Październik='10', Listopad='11', Grudzień='12', )
+
+        selected_month = months[selected_month]
+        filtered_date = selected_year + '-' + selected_month + '-' + selected_day
+        print(filtered_date)
+
+        filtered_tasks = Task.objects.filter(date=filtered_date).order_by('status', '-is_important', 'creation_time')
+        tasks_data = []
+        for task in filtered_tasks:
+            tasks_data.append({
+                'name': task.name,
+                'description': task.description,
+                'status': task.status,
+            })
+
+        return JsonResponse({'filtered_tasks': tasks_data})
+
+    context = {
+        'all_tasks': all_tasks,
+        'current_date': current_date,
+        'filtered_date': filtered_date,
+    }
+    return render(request, "task.html", context)

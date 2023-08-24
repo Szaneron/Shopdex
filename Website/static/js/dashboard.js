@@ -1,3 +1,18 @@
+const active_link = document.getElementById('link_dashboard')
+active_link.className = 'active'
+
+const sideMenu = document.querySelector('aside');
+const menuBtn = document.getElementById('menu-btn');
+const closeBtn = document.getElementById('close-btn');
+
+menuBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'block';
+});
+
+closeBtn.addEventListener('click', () => {
+    sideMenu.style.display = '';
+});
+
 let months = [];
 months[1] = "Styczeń";
 months[2] = "Luty";

@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/task_style.css' %}"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+
+<div class="container">
+    <!-- Sidebar Section -->
+    {% include  "sidebar.html" %}
+    <!-- End of Sidebar Section-->
+
+    <!-- Main content -->
+    <main>
+        <h1>Panel główny</h1>
+
+        <!-- Tasks Table -->
+        <div class="tasks-table" data-tasks="{{ tasks|safe }}">
+            <h2>Zadania</h2>
+            <table id="tasks-table-content">
+                {% if user.userprofile.position == 'Szef' %}
+                    {% if all_tasks.count == 0 %}
+                        <thead>
+                        <tr>
+                            <th>Brak zadań</th>
+                        </tr>
+                        </thead>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Opis</th>
+                            <th>Osoba</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in all_tasks %}
+                            <tr>
+                                {% if task.is_important %}
+                                    <td class="important">{{ task.name }}</td>
+                                {% else %}
+                                    <td>{{ task.name }}</td>
+                                {% endif %}
+                                <td>{{ task.description }}</td>
+                                <td>{{ task.assigned_to }}</td>
+                                {% if task.status == "Do zrobienia" %}
+                                    <td class="primary">{{ task.status }}</td>
+                                {% elif task.status == "Zrobione" %}
+                                    <td class="success">{{ task.status }}</td>
+                                {% endif %}
+                                <td class="primary">Szczegóły</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
+                {% elif user.userprofile.position == 'Pracownik' %}
+                    {% if all_tasks_for_user.count == 0 %}
+                        <thead>
+                        <tr>
+                            <th>Brak zadań</th>
+                        </tr>
+                        </thead>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Opis</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in all_tasks %}
+                            <tr>
+                                {% if task.is_important %}
+                                    <td class="important">{{ task.name }}</td>
+                                {% else %}
+                                    <td>{{ task.name }}</td>
+                                {% endif %}
+                                <td>{{ task.date }}</td>
+                                {% if task.status == "Do zrobienia" %}
+                                    <td class="primary">{{ task.status }}</td>
+                                {% elif task.status == "Zrobione" %}
+                                    <td class="success">{{ task.status }}</td>
+                                {% endif %}
+                                <td class="primary">Szczegóły</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
+                {% endif %}
+            </table>
+            {% if all_tasks.count > 5 %}
+                <a href="#">Pokaż wszystkie ({{ all_tasks.count }})</a>
+            {% endif %}
+        </div>
+        <!-- End of Tasks Table -->
+    </main>
+    <!-- End of Main Content -->
+
+    <!-- Right Section -->
+    <div class="right-section">
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="wrapper">
+            <header>
+                <p class="current-date" id="selected-month"></p>
+                <div class="icons">
+                    <span id="prev" class="material-icons-sharp">chevron_left</span>
+                    <span id="next" class="material-icons-sharp">chevron_right</span>
+                </div>
+            </header>
+            <div class="calendar">
+                <ul class="weeks">
+                    <li>Pon</li>
+                    <li>Wto</li>
+                    <li>Śro</li>
+                    <li>Czw</li>
+                    <li>Pią</li>
+                    <li>Son</li>
+                    <li>Nie</li>
+                </ul>
+                <ul class="days"></ul>
+            </div>
+        </div>
+        <!-- End of Calendar Section -->
+
+
+    </div>
+    <!-- End of Right Section -->
+    <script>
+        const token = '{{ csrf_token }}'
+    </script>
+    <script src="../static/js/task.js"></script>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,200 @@
+@import "root_style.css";
+
+aside {
+    height: 100%;
+}
+
+aside .toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.4rem;
+}
+
+aside .toggle .logo {
+    display: flex;
+    gap: 0.5rem;
+}
+
+aside .toggle .logo img {
+    margin-top: -0.5rem;
+    width: 4rem;
+    height: 3rem;
+}
+
+
+aside .toggle .close {
+    padding-right: 1rem;
+    display: none;
+}
+
+aside .user {
+    padding: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+aside .user .user_image img {
+    height: 8rem;
+    border-radius: 50%;
+}
+
+aside .user .user_image h2 {
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+aside .user .user_rating p {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    justify-content: space-between;
+    border-radius: 15px;
+    padding: 0.2rem 0.7rem 0.2rem 0.7rem;
+    color: var(--color-white);
+    background-color: var(--color-secondary);
+}
+
+aside .user .user_rating p span {
+    font-size: 20px;
+    color: var(--color-primary);
+}
+
+aside .sidebar {
+    display: flex;
+    margin-top: -4px;
+    flex-direction: column;
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    border-radius: 15px;
+    height: 88%;
+    position: relative;
+    top: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar:hover {
+    box-shadow: none;
+}
+
+aside .sidebar a {
+    display: flex;
+    align-items: center;
+    color: var(--color-dark);
+    height: 3.7rem;
+    gap: 1rem;
+    position: relative;
+    margin-left: 2rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar a span {
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar a:last-child {
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+}
+
+aside .sidebar a.active {
+    width: 100%;
+    color: var(--color-primary);
+    margin-left: 0;
+}
+
+aside .sidebar a.active::before {
+    content: '';
+    width: 6px;
+    height: 18px;
+    background-color: var(--color-primary);
+}
+
+aside .sidebar a.active span {
+    color: var(--color-primary);
+    margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover {
+    color: var(--color-primary);
+}
+
+aside .sidebar a:hover span {
+    margin-left: 0.6rem;
+}
+
+aside .sidebar .message-count {
+    background-color: var(--color-secondary);
+    padding: 2px 8px;
+    color: var(--color-white);
+    font-size: 12px;
+    border-radius: var(--border-radius-1);
+}
+
+@media screen and (max-width: 1300px) {
+    aside .logo h2 {
+        display: none;
+    }
+
+    aside .sidebar h3 {
+        display: none;
+    }
+
+    aside .user .user_image img {
+        height: 6rem;
+        border-radius: 50%;
+    }
+
+    aside .sidebar a {
+        width: 5.6rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 16rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        margin-left: 1rem;
+        cursor: pointer;
+    }
+}
