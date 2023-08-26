@@ -12,6 +12,30 @@ def get_current_date():
     return current_date
 
 
+def get_employee_rating(user):
+    """
+    Calculate the user's rating based on completed and assigned tasks.
+
+    This function calculates the user's rating based on the ratio of completed tasks
+    to assigned tasks. The rating is scaled to a range from 1 to 5.
+
+    Args:
+        user.userprofile (UserProfile): The user's profile containing task information.
+
+    Returns:
+        float: The calculated user's rating.
+
+    """
+    completed_tasks = user.userprofile.completed_tasks
+    assigned_tasks = user.userprofile.assigned_tasks
+
+    if assigned_tasks == 0:
+        return 'Brak zadań'
+
+    rating = min(5, max(1, completed_tasks / assigned_tasks * 5))
+    return round(rating, 1)
+
+
 def login_user(request):
     if request.method == 'POST':
         username = request.POST["username"]
@@ -36,6 +60,7 @@ def logout_user(request):
 @login_required(login_url='login_user')
 def dashboard(request):
     user = request.user
+    user_rating = get_employee_rating(user)
     current_date = get_current_date()
     day_name = current_date.strftime('%A')
 
@@ -52,31 +77,6 @@ def dashboard(request):
 
     all_returns = Return.objects.filter(date=current_date).order_by('-status', 'creation_time')
     returns_for_dashboard = all_returns[:3]
-
-    def get_employee_rating():
-        """
-        Calculate the user's rating based on completed and assigned tasks.
-
-        This function calculates the user's rating based on the ratio of completed tasks
-        to assigned tasks. The rating is scaled to a range from 1 to 5.
-
-        Args:
-            user.userprofile (UserProfile): The user's profile containing task information.
-
-        Returns:
-            float: The calculated user's rating.
-
-        """
-        completed_tasks = user.userprofile.completed_tasks
-        assigned_tasks = user.userprofile.assigned_tasks
-
-        if assigned_tasks == 0:
-            return 'Brak zadań'
-
-        rating = min(5, max(1, completed_tasks / assigned_tasks * 5))
-        return round(rating, 1)
-
-    user_rating = get_employee_rating()
 
     def get_progress_bar_data(all_tasks, all_delivery, all_returns):
         """
@@ -203,15 +203,19 @@ def dashboard(request):
 
 
 @login_required(login_url='login_user')
-def task(request, filtered_date=None):
+def task(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
     current_date = get_current_date()
     all_tasks = Task.objects.filter(date=current_date).order_by('status', '-is_important', 'creation_time')
-    for task in all_tasks:
-        print(task.date)
-
+    all_tasks_for_user = Task.objects.filter(date=current_date, assigned_to__user=user).order_by('status',
+                                                                                                 '-is_important',
+                                                                                                 'creation_time')
     if request.method == 'POST':
         selected_day = request.POST.get('selected_day')
+        print(selected_day)
         selected_month_and_year = request.POST.get('selected_month')
+        print(selected_month_and_year)
         selected_month, selected_year = selected_month_and_year.split(' ', 1)
 
         months = dict(Styczeń='01', Luty='02', Marzec='03', Kwiecień='04', Maj='05', Czerwiec='06', Lipiec='07',
@@ -221,20 +225,41 @@ def task(request, filtered_date=None):
         filtered_date = selected_year + '-' + selected_month + '-' + selected_day
         print(filtered_date)
 
-        filtered_tasks = Task.objects.filter(date=filtered_date).order_by('status', '-is_important', 'creation_time')
-        tasks_data = []
-        for task in filtered_tasks:
-            tasks_data.append({
-                'name': task.name,
-                'description': task.description,
-                'status': task.status,
-            })
+        if user.userprofile.position == 'Szef':
+            filtered_tasks = Task.objects.filter(date=filtered_date).order_by('status', '-is_important',
+                                                                              'creation_time')
+            tasks_data = []
+            for task in filtered_tasks:
+                tasks_data.append({
+                    'name': task.name,
+                    'description': task.description,
+                    'status': task.status,
+                    'is_important': task.is_important,
+                    'assigned_to': task.assigned_to.user.userprofile.profile_picture.url,
+                })
 
-        return JsonResponse({'filtered_tasks': tasks_data})
+            return JsonResponse({'filtered_tasks': tasks_data, 'position': 'szef'})
+
+        elif user.userprofile.position == 'Pracownik':
+            filtered_tasks = Task.objects.filter(date=filtered_date, assigned_to__user=user).order_by('status',
+                                                                                                      '-is_important',
+                                                                                                      'creation_time')
+            tasks_data = []
+            for task in filtered_tasks:
+                tasks_data.append({
+                    'name': task.name,
+                    'description': task.description,
+                    'status': task.status,
+                    'is_important': task.is_important,
+                })
+
+            return JsonResponse({'filtered_tasks': tasks_data, 'position': 'pracownik'})
 
     context = {
+        'user': user,
+        'user_rating': user_rating,
         'all_tasks': all_tasks,
+        'all_tasks_for_user': all_tasks_for_user,
         'current_date': current_date,
-        'filtered_date': filtered_date,
     }
     return render(request, "task.html", context)

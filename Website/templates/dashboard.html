@@ -135,7 +135,7 @@
                                     <td>{{ task.name }}</td>
                                 {% endif %}
                                 <td>{{ task.description }}</td>
-                                <td>{{ task.assigned_to }}</td>
+                                <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt=""></td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}

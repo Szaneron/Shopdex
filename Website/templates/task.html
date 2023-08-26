@@ -20,11 +20,10 @@
 
     <!-- Main content -->
     <main>
-        <h1>Panel główny</h1>
+        <h1>Zadania</h1>
 
         <!-- Tasks Table -->
         <div class="tasks-table" data-tasks="{{ tasks|safe }}">
-            <h2>Zadania</h2>
             <table id="tasks-table-content">
                 {% if user.userprofile.position == 'Szef' %}
                     {% if all_tasks.count == 0 %}
@@ -33,6 +32,7 @@
                             <th>Brak zadań</th>
                         </tr>
                         </thead>
+                        <tbody style="display: none"></tbody>
                     {% else %}
                         <thead>
                         <tr>
@@ -52,7 +52,7 @@
                                     <td>{{ task.name }}</td>
                                 {% endif %}
                                 <td>{{ task.description }}</td>
-                                <td>{{ task.assigned_to }}</td>
+                                <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt=""></td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}
@@ -80,14 +80,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for task in all_tasks %}
+                        {% for task in all_tasks_for_user %}
                             <tr>
                                 {% if task.is_important %}
                                     <td class="important">{{ task.name }}</td>
                                 {% else %}
                                     <td>{{ task.name }}</td>
                                 {% endif %}
-                                <td>{{ task.date }}</td>
+                                <td>{{ task.description }}</td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}

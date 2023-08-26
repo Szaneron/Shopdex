@@ -93,6 +93,13 @@ main table tbody td {
     color: var(--color-dark);
 }
 
+main table tbody td img {
+    margin: auto;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+}
+
 main table tbody td.important {
     border-left: 4px solid var(--color-danger);
 }

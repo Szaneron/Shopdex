@@ -11,27 +11,181 @@ let date = new Date(),
 // storing full name of all months in array
 const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec",
     "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+
+let selectedDayDate = null;
+
+const addDayListeners = () => {
+    const daysList = document.querySelector('.days');
+    const days = daysList.querySelectorAll('li:not(.inactive)');
+
+    days.forEach(day => {
+        day.addEventListener('click', () => {
+            // Remove active class from previous active day
+            const prevActive = daysList.querySelector('.active');
+            if (prevActive) {
+                prevActive.classList.remove('active');
+            }
+
+            // Add the active class to the clicked day
+            day.classList.add('active');
+            selectedDayDate = {
+                year: currYear,
+                month: currMonth,
+                day: parseInt(day.innerText)
+            }; // Update the selectedDayDate variable
+            // const activeDay = daysList.querySelector('.active');
+            // if (activeDay) {
+            //     activeDay.classList.remove('active');
+            // }
+            //
+            // // Add active class to the clicked day
+            // day.classList.add('active');
+
+            // Send the selected date to Django view using AJAX
+            const selectedDay = day.textContent;
+            const selectedMonth = document.getElementById('selected-month').textContent
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {
+                    csrfmiddlewaretoken: token,
+                    selected_day: selectedDay,
+                    selected_month: selectedMonth,
+                },
+                success: function (data) {
+
+                    if (data.filtered_tasks.length === 0) {
+                        const filteredTableThead = $('#tasks-table-content thead');
+                        filteredTableThead.empty();
+                        const row = $('<tr></tr>');
+                        row.append($('<th>').text('Brak zadań'));
+
+                        filteredTableThead.append(row);
+
+                        const filteredTable = $('#tasks-table-content tbody');
+                        filteredTable.hide();
+                    } else {
+                        const filteredTableThead = $('#tasks-table-content thead');
+                        filteredTableThead.empty();
+                        if (data.position === "szef") {
+                            const row = $('<tr></tr>');
+                            row.append($('<th>').text('Nazwa'));
+                            row.append($('<th>').text('Opis'));
+                            row.append($('<th>').text('Osoba'));
+                            row.append($('<th>').text('Status'));
+                            row.append($('<th>').text(''));
+                            filteredTableThead.append(row);
+
+                            const filteredTable = $('#tasks-table-content tbody');
+                            filteredTable.empty();
+                            filteredTable.show();
+                            for (const task of data.filtered_tasks) {
+                                const row = $('<tr></tr>');
+
+                                if (task.is_important === true) {
+                                    row.append($('<td class="important">').text(task.name));
+                                } else {
+                                    row.append($('<td>').text(task.name));
+                                }
+                                row.append($('<td>').text(task.description));
+
+                                const imgTag = $('<img alt="" src="">').attr('src', task.assigned_to);
+                                const imgCell = $('<td>').append(imgTag);
+                                row.append(imgCell);
+
+                                if (task.status === 'Do zrobienia') {
+                                    row.append($('<td class="primary">').text(task.status));
+                                } else if (task.status === 'Zrobione') {
+                                    row.append($('<td class="success">').text(task.status));
+                                }
+
+                                row.append($('<td class="primary">').text('Szczegóły'));
+
+                                filteredTable.append(row);
+                            }
+
+                        } else if (data.position === "pracownik") {
+                            const row = $('<tr></tr>');
+                            row.append($('<th>').text('Nazwa'));
+                            row.append($('<th>').text('Opis'));
+                            row.append($('<th>').text('Status'));
+                            row.append($('<th>').text(''));
+                            filteredTableThead.append(row);
+
+                            const filteredTable = $('#tasks-table-content tbody');
+                            filteredTable.empty();
+                            filteredTable.show();
+                            for (const task of data.filtered_tasks) {
+                                const row = $('<tr></tr>');
+
+                                if (task.is_important === true) {
+                                    row.append($('<td class="important">').text(task.name));
+                                } else {
+                                    row.append($('<td>').text(task.name));
+                                }
+                                row.append($('<td>').text(task.description));
+
+                                if (task.status === 'Do zrobienia') {
+                                    row.append($('<td class="primary">').text(task.status));
+                                } else if (task.status === 'Zrobione') {
+                                    row.append($('<td class="success">').text(task.status));
+                                }
+
+                                row.append($('<td class="primary">').text('Szczegóły'));
+
+                                filteredTable.append(row);
+                            }
+
+                        }
+                    }
+                }
+            });
+        });
+    });
+}
+
+
 const renderCalendar = () => {
     let firstDayofMonth = new Date(currYear, currMonth, 0).getDay(), // getting first day of month
         lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), // getting last date of month
         lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), // getting last day of month
         lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); // getting last date of previous month
-    console.log(lastDayofMonth)
+
     let liTag = "";
     for (let i = firstDayofMonth; i > 0; i--) { // creating li of previous month last days
         liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
     }
     for (let i = 1; i <= lastDateofMonth; i++) { // creating li of all days of current month
-        // adding active class to li if the current day, month, and year matched
-        let isToday = i === date.getDate() && currMonth === new Date().getMonth()
-        && currYear === new Date().getFullYear() ? "active" : "";
-        liTag += `<li class="${isToday}">${i}</li>`;
+        liTag += `<li>${i}</li>`;
     }
     for (let i = lastDayofMonth; i < 7; i++) { // creating li of next month first days
         liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`
     }
+
+
     currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
     daysTag.innerHTML = liTag;
+    addDayListeners();
+
+    if (selectedDayDate && selectedDayDate.month === currMonth && selectedDayDate.year === currYear) {
+        const days = document.querySelectorAll('.days li:not(.inactive)');
+        days.forEach(day => {
+            if (parseInt(day.innerText) === selectedDayDate.day) {
+                day.classList.add('active');
+            }
+        });
+    } else if (selectedDayDate === null) {
+        // Apply "active" class to the current day when no selected day is present
+        const today = new Date();
+        if (today.getFullYear() === currYear && today.getMonth() === currMonth) {
+            const days = document.querySelectorAll('.days li:not(.inactive)');
+            days.forEach(day => {
+                if (parseInt(day.innerText) === today.getDate()) {
+                    day.classList.add('active');
+                }
+            });
+        }
+    }
 }
 renderCalendar();
 prevNextIcon.forEach(icon => { // getting prev and next icons
@@ -50,48 +204,3 @@ prevNextIcon.forEach(icon => { // getting prev and next icons
     });
 });
 
-const daysList = document.querySelector('.days');
-const days = daysList.querySelectorAll('li:not(.inactive)');
-
-days.forEach(day => {
-    day.addEventListener('click', () => {
-        // Remove active class from previous active day
-        const activeDay = daysList.querySelector('.active');
-        if (activeDay) {
-            activeDay.classList.remove('active');
-        }
-
-        // Add active class to the clicked day
-        day.classList.add('active');
-
-        // Send the selected date to Django view using AJAX
-        const selectedDay = day.textContent;
-        const selectedMonth = document.getElementById('selected-month').textContent
-        console.log(selectedMonth)
-        $.ajax({
-            type: "POST",
-            url: "",
-            data: {
-                csrfmiddlewaretoken: token,
-                selected_day: selectedDay,
-                selected_month: selectedMonth,
-            },
-            success: function (data) {
-                const filteredTable = $('#tasks-table-content');
-                filteredTable.empty();
-
-                for (const task of data.filtered_tasks) {
-                    const row = $('<tr></tr>');
-                    row.append($('<td>').text(task.name));
-                    row.append($('<td>').text(task.description));
-                    if (task.status === 'Do zrobienia')
-                        row.append($('<td class="primary">').text(task.status));
-                    else if (task.status === 'Zrobione')
-                        row.append($('<td class="success">').text(task.status));
-
-                    filteredTable.append(row);
-                }
-            }
-        });
-    });
-});

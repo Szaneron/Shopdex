@@ -7,7 +7,66 @@
     width: 96%;
     margin: 0 auto;
     gap: 1.8rem;
-    grid-template-columns: 16rem auto 27rem;
+    grid-template-columns: 16rem auto 23rem;
+}
+
+/*main*/
+main {
+    margin-top: 1.4rem;
+}
+
+main .tasks-table {
+    margin-top: 1rem;
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+main .tasks-table table {
+    border-spacing: 0;
+    width: 100%;
+    min-height: 5rem;
+    text-align: center;
+}
+
+main table thead th {
+    height: 2.8rem;
+}
+
+
+main table tbody td {
+    height: 2.8rem;
+    border-bottom: 1px solid var(--color-light);
+    color: var(--color-dark);
+}
+
+main table tbody td img {
+    margin: auto;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+}
+
+main table tbody td.important {
+    border-left: 4px solid var(--color-danger);
+}
+
+/*end of main*/
+
+
+/*right section*/
+.right-section {
+    margin-top: calc(5.2rem - 1px);
+}
+
+.right-section .nav {
+    display: flex;
+    justify-content: end;
+}
+
+.right-section .nav button {
+    display: none;
 }
 
 .wrapper {
@@ -91,7 +150,7 @@ header .current-date {
 }
 
 .days li.inactive {
-    color: var(--color-background);
+    color: var(--color-light);
 }
 
 .days li.active {
