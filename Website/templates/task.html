@@ -52,7 +52,8 @@
                                     <td>{{ task.name }}</td>
                                 {% endif %}
                                 <td>{{ task.description }}</td>
-                                <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt=""></td>
+                                <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt="">
+                                </td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}
@@ -70,6 +71,7 @@
                             <th>Brak zadań</th>
                         </tr>
                         </thead>
+                        <tbody style="display: none"></tbody>
                     {% else %}
                         <thead>
                         <tr>
@@ -100,9 +102,7 @@
                     {% endif %}
                 {% endif %}
             </table>
-            {% if all_tasks.count > 5 %}
-                <a href="#">Pokaż wszystkie ({{ all_tasks.count }})</a>
-            {% endif %}
+            
         </div>
         <!-- End of Tasks Table -->
     </main>

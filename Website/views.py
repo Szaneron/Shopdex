@@ -211,11 +211,10 @@ def task(request):
     all_tasks_for_user = Task.objects.filter(date=current_date, assigned_to__user=user).order_by('status',
                                                                                                  '-is_important',
                                                                                                  'creation_time')
+
     if request.method == 'POST':
         selected_day = request.POST.get('selected_day')
-        print(selected_day)
         selected_month_and_year = request.POST.get('selected_month')
-        print(selected_month_and_year)
         selected_month, selected_year = selected_month_and_year.split(' ', 1)
 
         months = dict(Styczeń='01', Luty='02', Marzec='03', Kwiecień='04', Maj='05', Czerwiec='06', Lipiec='07',
@@ -223,7 +222,6 @@ def task(request):
 
         selected_month = months[selected_month]
         filtered_date = selected_year + '-' + selected_month + '-' + selected_day
-        print(filtered_date)
 
         if user.userprofile.position == 'Szef':
             filtered_tasks = Task.objects.filter(date=filtered_date).order_by('status', '-is_important',
