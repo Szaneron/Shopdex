@@ -86,7 +86,7 @@
                             <td>{{ delivery.delivery_company }}</td>
                             <td>{{ delivery.form }}</td>
                             <td>{{ delivery.quantity }}</td>
-                            <td>{{ delivery.description }}</td>
+                            <td>{{ delivery.description|truncatechars:70 }}</td>
                             {% if delivery.status == "W drodze" %}
                                 <td class="primary">{{ delivery.status }}</td>
                             {% elif delivery.status == "Odebrana" %}
@@ -134,7 +134,7 @@
                                 {% else %}
                                     <td>{{ task.name }}</td>
                                 {% endif %}
-                                <td>{{ task.description }}</td>
+                                <td>{{ task.description|truncatechars:70 }}</td>
                                 <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt=""></td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>

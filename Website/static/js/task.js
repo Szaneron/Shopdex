@@ -87,7 +87,7 @@ const addDayListeners = () => {
                                 } else {
                                     row.append($('<td>').text(task.name));
                                 }
-                                row.append($('<td>').text(task.description));
+                                row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
 
                                 const imgTag = $('<img alt="" src="">').attr('src', task.assigned_to);
                                 const imgCell = $('<td>').append(imgTag);
@@ -123,8 +123,8 @@ const addDayListeners = () => {
                                 } else {
                                     row.append($('<td>').text(task.name));
                                 }
-                                row.append($('<td>').text(task.description));
-
+                                row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
+                                
                                 if (task.status === 'Do zrobienia') {
                                     row.append($('<td class="primary">').text(task.status));
                                 } else if (task.status === 'Zrobione') {

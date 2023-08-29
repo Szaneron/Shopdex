@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/task_detail_style.css' %}"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    {% include  "sidebar.html" %}
+
+    <main>
+        <h1>Szczegóły zadania</h1>
+
+        <div class="task-card">
+            <div class="task-card-left">
+                <div class="task-name"><h2> {{ task.name }}</h2></div>
+                {% if task.is_important %}
+                    <div class="task-important">
+                        <span>Zadanie ważne </span>
+                    </div>
+                {% endif %}
+                <div class="task-description"> {{ task.description|linebreaks }}</div>
+                <div class="task-date"> {{ task.date|date:"j E Y" }}</div>
+            </div>
+
+            <div class="task-card-right">
+                <div class="task-assignment"><img src="{{ task.assigned_to.profile_picture.url }}" alt=""></div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="{% static 'js/task_detail.js' %}"></script>
+
+</div>
+</body>
+</html>

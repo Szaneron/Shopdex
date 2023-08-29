@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime
 from .models import Task, Delivery, Day, Return
@@ -64,18 +64,18 @@ def dashboard(request):
     current_date = get_current_date()
     day_name = current_date.strftime('%A')
 
-    all_tasks = Task.objects.filter(date=current_date).order_by('status', '-is_important', 'creation_time')
+    all_tasks = Task.objects.filter(task_date=current_date).order_by('status', '-is_important', 'creation_time')
     all_tasks_for_dashboard = all_tasks[:5]
 
-    all_tasks_for_user = Task.objects.filter(date=current_date, assigned_to__user=user).order_by('status',
-                                                                                                 '-is_important',
-                                                                                                 'creation_time')
+    all_tasks_for_user = Task.objects.filter(task_date=current_date, assigned_to__user=user).order_by('status',
+                                                                                                      '-is_important',
+                                                                                                      'creation_time')
     all_tasks_for_user_dashboard = all_tasks_for_user[:5]
 
-    all_delivery = Delivery.objects.filter(date=current_date).order_by('-status', 'creation_time')
+    all_delivery = Delivery.objects.filter(delivery_date=current_date).order_by('-status', 'creation_time')
     delivery_for_dashboard = all_delivery[:5]
 
-    all_returns = Return.objects.filter(date=current_date).order_by('-status', 'creation_time')
+    all_returns = Return.objects.filter(return_date=current_date).order_by('-status', 'creation_time')
     returns_for_dashboard = all_returns[:3]
 
     def get_progress_bar_data(all_tasks, all_delivery, all_returns):
@@ -173,7 +173,7 @@ def dashboard(request):
         """
 
         try:
-            current_day = Day.objects.get(date=current_date)
+            current_day = Day.objects.get(day_date=current_date)
             end_of_work_hour = current_day.end_of_work_hour
             return end_of_work_hour
         except Day.DoesNotExist:
@@ -207,10 +207,10 @@ def task(request):
     user = request.user
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
-    all_tasks = Task.objects.filter(date=current_date).order_by('status', '-is_important', 'creation_time')
-    all_tasks_for_user = Task.objects.filter(date=current_date, assigned_to__user=user).order_by('status',
-                                                                                                 '-is_important',
-                                                                                                 'creation_time')
+    all_tasks = Task.objects.filter(task_date=current_date).order_by('status', '-is_important', 'creation_time')
+    all_tasks_for_user = Task.objects.filter(task_date=current_date, assigned_to__user=user).order_by('status',
+                                                                                                      '-is_important',
+                                                                                                      'creation_time')
 
     if request.method == 'POST':
         selected_day = request.POST.get('selected_day')
@@ -224,8 +224,8 @@ def task(request):
         filtered_date = selected_year + '-' + selected_month + '-' + selected_day
 
         if user.userprofile.position == 'Szef':
-            filtered_tasks = Task.objects.filter(date=filtered_date).order_by('status', '-is_important',
-                                                                              'creation_time')
+            filtered_tasks = Task.objects.filter(task_date=filtered_date).order_by('status', '-is_important',
+                                                                                   'creation_time')
             tasks_data = []
             for task in filtered_tasks:
                 tasks_data.append({
@@ -239,9 +239,9 @@ def task(request):
             return JsonResponse({'filtered_tasks': tasks_data, 'position': 'szef'})
 
         elif user.userprofile.position == 'Pracownik':
-            filtered_tasks = Task.objects.filter(date=filtered_date, assigned_to__user=user).order_by('status',
-                                                                                                      '-is_important',
-                                                                                                      'creation_time')
+            filtered_tasks = Task.objects.filter(task_date=filtered_date, assigned_to__user=user).order_by('status',
+                                                                                                           '-is_important',
+                                                                                                           'creation_time')
             tasks_data = []
             for task in filtered_tasks:
                 tasks_data.append({
@@ -261,3 +261,14 @@ def task(request):
         'current_date': current_date,
     }
     return render(request, "task.html", context)
+
+
+@login_required(login_url='login_user')
+def task_detail_view(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    context = {
+        'task': task,
+    }
+
+    return render(request, 'task_detail.html', context)

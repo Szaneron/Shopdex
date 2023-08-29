@@ -1,0 +1,65 @@
+@import "root_style.css";
+@import "sidebar_style.css";
+
+.container {
+    display: grid;
+    height: 100%;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 16rem auto 30rem;
+}
+
+/*main*/
+
+main {
+    margin-top: 1.4rem;
+}
+
+.task-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    background-color: var(--color-white);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.task-card-left {
+    border-left: 4px solid var(--color-danger);
+    padding: var(--card-padding);
+}
+
+.task-name {
+    border-bottom: 1px solid var(--color-secondary);
+}
+
+.task-important {
+    margin-top: 0.5rem;
+    color: var(--color-danger);
+    font-weight: 500;
+}
+
+.task-description {
+    border-bottom: 1px solid var(--color-secondary);
+    margin-top: 2rem;
+}
+
+.task-date {
+    margin-top: 0.5rem;
+    text-align: right;
+}
+
+.task-card-right {
+    padding: var(--card-padding);
+}
+
+.task-assignment img {
+    margin: auto;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 50%;
+}
+
