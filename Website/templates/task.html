@@ -59,7 +59,9 @@
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary"><a class="primary"
+                                                       href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

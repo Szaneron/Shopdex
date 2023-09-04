@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime
+
+from .forms import TaskEditForm
 from .models import Task, Delivery, Day, Return
 
 
@@ -229,6 +231,7 @@ def task(request):
             tasks_data = []
             for task in filtered_tasks:
                 tasks_data.append({
+                    'id': task.id,
                     'name': task.name,
                     'description': task.description,
                     'status': task.status,
@@ -245,6 +248,7 @@ def task(request):
             tasks_data = []
             for task in filtered_tasks:
                 tasks_data.append({
+                    'id': task.id,
                     'name': task.name,
                     'description': task.description,
                     'status': task.status,
@@ -266,9 +270,31 @@ def task(request):
 @login_required(login_url='login_user')
 def task_detail_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
+    user = request.user
+    task_edit_form = TaskEditForm(request.POST, instance=task)
+
+    if request.method == 'POST':
+        if 'task_edited' in request.POST:
+            if task_edit_form.is_valid():
+                task_edit_form.save()
+                return redirect('task_detail_view', task_id=task_id)
+
+        if 'task_done' in request.POST:
+            task.status = 'Zrobione'
+            task.save()
+            return redirect('task')
+
+        if 'task_delete' in request.POST:
+            task.delete()
+            return redirect('task')
+
+    else:
+        task_edit_form = TaskEditForm(instance=task)
 
     context = {
         'task': task,
+        'user': user,
+        'task_edit_form': task_edit_form,
     }
 
     return render(request, 'task_detail.html', context)

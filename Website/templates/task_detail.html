@@ -1,4 +1,6 @@
 {% load static %}
+{% load widget_tweaks %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,28 +18,102 @@
 
     <main>
         <h1>Szczegóły zadania</h1>
+        <div class="task-content">
+            <div class="task-card">
+                <div class="task-card-left" id="task-card-left-id">
+                    <div class="task-name"><h2> {{ task.name }}</h2></div>
+                    {% if task.is_important %}
+                        <div class="task-important">
+                            <span>Zadanie ważne </span>
+                        </div>
+                    {% endif %}
+                    <div class="task-description"> {{ task.description|linebreaks }}</div>
+                    <div class="task-date"> {{ task.task_date|date:"j E Y" }}</div>
+                </div>
 
-        <div class="task-card">
-            <div class="task-card-left">
-                <div class="task-name"><h2> {{ task.name }}</h2></div>
-                {% if task.is_important %}
-                    <div class="task-important">
-                        <span>Zadanie ważne </span>
+                <div class="task-card-right">
+                    <div class="task-assignment"><img src="{{ task.assigned_to.profile_picture.url }}" alt=""></div>
+                    {% if task.status == 'Do zrobienia' %}
+                        <div class="task-status-todo">
+                            <span class="material-icons-sharp">schedule</span>
+                            {{ task.status }}
+                        </div>
+                    {% elif task.status == 'Zrobione' %}
+                        <div class="task-status-done">
+                            <span class="material-icons-sharp">done</span>
+                            <h2>{{ task.status }}</h2>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+            <div class="buttons-container">
+                {% if task.status == 'Do zrobienia' %}
+                    <div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="task-to-complete" name="task_done" type="submit">Zadanie wykonane</button>
+                        </form>
                     </div>
+                    {% if user.userprofile.position == 'Szef' %}
+                        <div class="action-buttons">
+                            <button class="task-to-edit" id="task_edit_button" name="task_edit">Edytuj zadanie
+                            </button>
+                            <button class="task-to-delete" id="task_delete_button" name="task_delete"
+                                    onclick="confirmDeleteTask()">Usuń zadanie
+                            </button>
+                        </div>
+                    {% endif %}
                 {% endif %}
-                <div class="task-description"> {{ task.description|linebreaks }}</div>
-                <div class="task-date"> {{ task.date|date:"j E Y" }}</div>
-            </div>
 
-            <div class="task-card-right">
-                <div class="task-assignment"><img src="{{ task.assigned_to.profile_picture.url }}" alt=""></div>
             </div>
-
         </div>
     </main>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close">close</span>
+            <h2>Edycja zadania</h2>
+            <form method="post" action="{% url 'task_detail_view' task.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label">Nazwa</label>
+                    {% render_field task_edit_form.name class="form-control" %}
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Opis</label>
+                    {% render_field task_edit_form.description class="form-control-description" %}
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Przypisana osoba</label>
+                    {% render_field task_edit_form.assigned_to class="form-control" %}
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Status</label>
+                    {% render_field task_edit_form.status class="form-control" %}
+                </div>
+                <div class="form-group-checkbox">
+                    <label class="control-label">Ważne zadanie</label>
+                    {% render_field task_edit_form.is_important %}
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Data zadania</label>
+                    {% render_field task_edit_form.task_date class="form-control" %}
+                </div>
+                <div class="send-element">
+                    <button class="send-form" name="task_edited" type="submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        const importnat_task = '{{ task.is_important }}'
+        const token = '{{ csrf_token }}'
+        const task_id = '{{ task.id}}'
 
+    </script>
     <script src="{% static 'js/task_detail.js' %}"></script>
-
 </div>
 </body>
 </html>

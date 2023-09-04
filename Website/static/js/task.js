@@ -99,7 +99,12 @@ const addDayListeners = () => {
                                     row.append($('<td class="success">').text(task.status));
                                 }
 
-                                row.append($('<td class="primary">').text('Szczegóły'));
+                                // row.append($('<td class="primary">').text('Szczegóły'));
+
+                                const detailsLinkCell = $('<td class="primary">');
+                                const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
+                                detailsLinkCell.append(detailsLink);
+                                row.append(detailsLinkCell);
 
                                 filteredTable.append(row);
                             }
@@ -124,7 +129,7 @@ const addDayListeners = () => {
                                     row.append($('<td>').text(task.name));
                                 }
                                 row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
-                                
+
                                 if (task.status === 'Do zrobienia') {
                                     row.append($('<td class="primary">').text(task.status));
                                 } else if (task.status === 'Zrobione') {

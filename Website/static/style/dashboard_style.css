@@ -137,6 +137,11 @@ main .tasks-table table:hover {
     box-shadow: none;
 }
 
+main .tasks-table td a {
+    all: unset;
+    cursor: pointer;
+}
+
 main .tasks-table a {
     font-size: 15px;
     font-weight: 500;
