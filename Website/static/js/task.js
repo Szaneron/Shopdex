@@ -1,13 +1,29 @@
 const active_link = document.getElementById('link_task')
 active_link.className = 'active'
 
+const sideMenu = document.querySelector('aside');
+const menuBtn = document.getElementById('menu-btn');
+const closeBtn = document.getElementById('close-btn');
+
+// Add a click event listener to the menu button to display the side menu.
+menuBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'block';
+});
+
+// Add a click event listener to the close button to hide the side menu.
+closeBtn.addEventListener('click', () => {
+    sideMenu.style.display = '';
+});
+
 const daysTag = document.querySelector(".days"),
     currentDate = document.querySelector(".current-date"),
     prevNextIcon = document.querySelectorAll(".icons span");
+
 // getting new date, current year and month
 let date = new Date(),
     currYear = date.getFullYear(),
     currMonth = date.getMonth();
+
 // storing full name of all months in array
 const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec",
     "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
@@ -32,14 +48,7 @@ const addDayListeners = () => {
                 year: currYear,
                 month: currMonth,
                 day: parseInt(day.innerText)
-            }; // Update the selectedDayDate variable
-            // const activeDay = daysList.querySelector('.active');
-            // if (activeDay) {
-            //     activeDay.classList.remove('active');
-            // }
-            //
-            // // Add active class to the clicked day
-            // day.classList.add('active');
+            };
 
             // Send the selected date to Django view using AJAX
             const selectedDay = day.textContent;
@@ -69,6 +78,7 @@ const addDayListeners = () => {
                         filteredTableThead.empty();
                         if (data.position === "szef") {
                             const row = $('<tr></tr>');
+                            row.append($('<th>'));
                             row.append($('<th>').text('Nazwa'));
                             row.append($('<th>').text('Opis'));
                             row.append($('<th>').text('Osoba'));
@@ -83,11 +93,12 @@ const addDayListeners = () => {
                                 const row = $('<tr></tr>');
 
                                 if (task.is_important === true) {
-                                    row.append($('<td class="important">').text(task.name));
+                                    row.append($('<td class="important">'));
                                 } else {
-                                    row.append($('<td>').text(task.name));
+                                    row.append($('<td>'));
                                 }
-                                row.append($('<td>').text(task.description));
+                                row.append($('<td>').text(task.name))
+                                row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
 
                                 const imgTag = $('<img alt="" src="">').attr('src', task.assigned_to);
                                 const imgCell = $('<td>').append(imgTag);
@@ -99,13 +110,17 @@ const addDayListeners = () => {
                                     row.append($('<td class="success">').text(task.status));
                                 }
 
-                                row.append($('<td class="primary">').text('Szczegóły'));
+                                const detailsLinkCell = $('<td class="primary">');
+                                const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
+                                detailsLinkCell.append(detailsLink);
+                                row.append(detailsLinkCell);
 
                                 filteredTable.append(row);
                             }
 
                         } else if (data.position === "pracownik") {
                             const row = $('<tr></tr>');
+                            row.append($('<th>'));
                             row.append($('<th>').text('Nazwa'));
                             row.append($('<th>').text('Opis'));
                             row.append($('<th>').text('Status'));
@@ -119,11 +134,12 @@ const addDayListeners = () => {
                                 const row = $('<tr></tr>');
 
                                 if (task.is_important === true) {
-                                    row.append($('<td class="important">').text(task.name));
+                                    row.append($('<td class="important">'));
                                 } else {
-                                    row.append($('<td>').text(task.name));
+                                    row.append($('<td>'));
                                 }
-                                row.append($('<td>').text(task.description));
+                                row.append($('<td>').text(task.name))
+                                row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
 
                                 if (task.status === 'Do zrobienia') {
                                     row.append($('<td class="primary">').text(task.status));
@@ -131,7 +147,10 @@ const addDayListeners = () => {
                                     row.append($('<td class="success">').text(task.status));
                                 }
 
-                                row.append($('<td class="primary">').text('Szczegóły'));
+                                const detailsLinkCell = $('<td class="primary">');
+                                const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
+                                detailsLinkCell.append(detailsLink);
+                                row.append(detailsLinkCell);
 
                                 filteredTable.append(row);
                             }
@@ -188,6 +207,7 @@ const renderCalendar = () => {
     }
 }
 renderCalendar();
+
 prevNextIcon.forEach(icon => { // getting prev and next icons
     icon.addEventListener("click", () => { // adding click event on both icons
         // if clicked icon is previous icon then decrement current month by 1 else increment it by 1

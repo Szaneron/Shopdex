@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
@@ -9,9 +10,9 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/task_style.css' %}"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <body>
-
 
 <div class="container">
     <!-- Sidebar Section -->
@@ -36,6 +37,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Opis</th>
                             <th>Osoba</th>
@@ -47,11 +49,12 @@
                         {% for task in all_tasks %}
                             <tr>
                                 {% if task.is_important %}
-                                    <td class="important">{{ task.name }}</td>
+                                    <td class="important"></td>
                                 {% else %}
-                                    <td>{{ task.name }}</td>
+                                    <td></td>
                                 {% endif %}
-                                <td>{{ task.description }}</td>
+                                <td>{{ task.name }}</td>
+                                <td>{{ task.description|truncatechars:70 }}</td>
                                 <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt="">
                                 </td>
                                 {% if task.status == "Do zrobienia" %}
@@ -59,7 +62,9 @@
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -75,6 +80,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Opis</th>
                             <th>Status</th>
@@ -85,26 +91,29 @@
                         {% for task in all_tasks_for_user %}
                             <tr>
                                 {% if task.is_important %}
-                                    <td class="important">{{ task.name }}</td>
+                                    <td class="important"></td>
                                 {% else %}
-                                    <td>{{ task.name }}</td>
+                                    <td></td>
                                 {% endif %}
-                                <td>{{ task.description }}</td>
+                                <td>{{ task.name }}</td>
+                                <td>{{ task.description|truncatechars:70 }}</td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     {% endif %}
                 {% endif %}
             </table>
-            
         </div>
         <!-- End of Tasks Table -->
+
     </main>
     <!-- End of Main Content -->
 
@@ -142,14 +151,44 @@
         </div>
         <!-- End of Calendar Section -->
 
-
     </div>
     <!-- End of Right Section -->
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         const token = '{{ csrf_token }}'
+
+        // Function to display Django messages as SweetAlert alerts
+        function displayMessages() {
+            {% for message in messages %}
+                let message_type = "{{ message.tags }}";
+                let message_text = "{{ message }}";
+
+                // Map Django message types to SweetAlert types
+                let swalType = 'info';
+                if (message_type === "success") {
+                    swalType = 'success';
+                } else if (message_type === "error") {
+                    swalType = 'error';
+                } else if (message_type === "warning") {
+                    swalType = 'warning';
+                }
+
+                // Display SweetAlert popup
+                swal({
+                    icon: swalType,
+                    title: message_text,
+                    timer: 3000, // Auto-close after 3 seconds
+                });
+            {% endfor %}
+        }
+
+        // Call the function when the page loads
+        $(document).ready(function () {
+            displayMessages();
+        });
     </script>
     <script src="../static/js/task.js"></script>
-
 </div>
 </body>
 </html>

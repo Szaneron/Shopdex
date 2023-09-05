@@ -1,7 +1,7 @@
-import datetime
-
 from django.db import models
 from django.contrib.auth.models import User
+
+from django.utils import timezone
 
 
 class UserProfile(models.Model):
@@ -41,11 +41,11 @@ class Task(models.Model):
     Fields:
     - name (CharField): Name of the task.
     - description (TextField): Description of the task.
-    - status (CharField): Status of the task, choices: "Do zrobienia" or "Zrobione".
+    - status (CharField): Status of the task, available choices defined in STATUS_CHOICES.
     - assigned_to (ForeignKey): User profile to whom the task is assigned.
     - is_important (BooleanField): Indicates if the task is important.
-    - date (DateField): Date of the task.
-    - creation_time (TimeField, default=datetime.time): Time of task creation.
+    - task_date (DateField): Date of the task.
+    - creation_time (DateTimeField): Date and time when the task was created.
 
     Methods:
     - __str__: Returns the string representation of the task.
@@ -62,11 +62,11 @@ class Task(models.Model):
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='todo')
     assigned_to = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     is_important = models.BooleanField(default=False)
-    date = models.DateField()
-    creation_time = models.TimeField(default=datetime.time)
+    task_date = models.DateField(default=timezone.now)
+    creation_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.name} - {self.date}"
+        return f"{self.name} - {self.task_date}"
 
 
 class Delivery(models.Model):
@@ -74,13 +74,13 @@ class Delivery(models.Model):
     Model representing delivery information.
 
     Fields:
-    - delivery_company (CharField): Name of the delivery company, choices: "InPost", "DPD", "GLS", "Poczta", "DHL", "Media Expert".
-    - form (CharField): Form of the delivery, choices: "Paczka", "Paleta".
+    - delivery_company (CharField): Name of the delivery company, available choices defined in DELIVERY_COMPANY_CHOICES.
+    - form (CharField): Form of the delivery, available choices defined in FORM_CHOICES.
     - quantity (IntegerField): Quantity of items.
     - description (TextField): Description of the delivery.
-    - status (CharField): Status of the delivery, choices: "W drodze", "Odebrana", "Nie dostarczona".
-    - date (DateField): Date of the delivery.
-    - creation_time (TimeField, default=datetime.time): Time when the delivery was created.
+    - status (CharField): Status of the delivery, available choices defined in STATUS_CHOICES.
+    - delivery_date (DateField): Date of the delivery.
+    - creation_time (DateTimeField): Date and time when delivery task was created.
 
     Methods:
     - __str__: Returns the string representation of the delivery.
@@ -113,11 +113,11 @@ class Delivery(models.Model):
     quantity = models.PositiveIntegerField()
     description = models.TextField()
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='W drodze')
-    date = models.DateField()
-    creation_time = models.TimeField(default=datetime.time)
+    delivery_date = models.DateField(default=timezone.now)
+    creation_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.delivery_company} - {self.date}"
+        return f"{self.delivery_company} - {self.delivery_date}"
 
 
 class Day(models.Model):
@@ -126,17 +126,17 @@ class Day(models.Model):
 
     Fields:
     - end_of_work_hour (TimeField): The time when work ends.
-    - date (DateField, unique=True): The date of the work day.
+    - date (DateField): The date of the work day.
 
     Methods:
     - __str__: Returns the string representation of the work day.
 
     """
     end_of_work_hour = models.TimeField()
-    date = models.DateField(unique=True)
+    day_date = models.DateField(default=timezone.now, unique=True)
 
     def __str__(self):
-        return f"{self.date} - {self.end_of_work_hour}"
+        return f"{self.day_date} - {self.end_of_work_hour}"
 
 
 class Return(models.Model):
@@ -146,9 +146,9 @@ class Return(models.Model):
     Fields:
     - name (CharField): Name of the return.
     - product_list (TextField): List of products for the return.
-    - status (CharField): Status of the return, choices: "Do spakowania", "Przygotowany", "Odebrany".
-    - date (DateField, default=timezone.now): Date when the return is prepared.
-    - creation_time (TimeField, default=timezone.now): Time when the return was created.
+    - status (CharField): Status of the return, available choices defined in STATUS_CHOICES.
+    - return_date (DateField): Date when the return should be prepared.
+    - creation_time (DateTimeField): Date and time when the task was created.
 
     Methods:
     - __str__: Returns the string representation of the return.
@@ -163,8 +163,8 @@ class Return(models.Model):
     name = models.CharField(max_length=100)
     product_list = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    date = models.DateField()
-    creation_time = models.TimeField(default=datetime.time)
+    return_date = models.DateField(default=timezone.now)
+    creation_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.name} - {self.date}"
+        return f"{self.name} - {self.return_date}"

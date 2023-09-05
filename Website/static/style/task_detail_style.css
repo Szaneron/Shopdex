@@ -1,0 +1,385 @@
+@import "root_style.css";
+@import "sidebar_style.css";
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons+Sharp");
+
+.container {
+    display: grid;
+    height: 100%;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 16rem auto;
+}
+
+/* main */
+main {
+    margin-top: 1.4rem;
+}
+
+main .nav {
+    display: flex;
+    justify-content: end;
+}
+
+main .nav button {
+    display: none;
+}
+
+.task-content {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    background-color: var(--color-white);
+}
+
+.task-card {
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+
+.task-card-left {
+    padding: var(--card-padding);
+}
+
+.task-name {
+    border-bottom: 2px solid var(--color-secondary);
+}
+
+.task-important {
+    margin-top: 0.5rem;
+    color: var(--color-danger);
+    font-weight: 500;
+}
+
+.task-description {
+    border-bottom: 2px solid var(--color-secondary);
+    margin-top: 2rem;
+}
+
+.task-date {
+    margin-top: 0.5rem;
+    text-align: right;
+}
+
+.task-card-right {
+    padding: var(--card-padding);
+}
+
+.task-assignment img {
+    margin: auto;
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+}
+
+.task-status-todo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-white);;
+    width: fit-content;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    border-radius: var(--card-border-radius);
+    background-color: var(--color-primary);
+    text-align: center;
+    font-size: 1rem;
+    margin: 1.5rem auto;
+}
+
+
+.task-status-done {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-white);;
+    width: fit-content;
+    padding: 0.5rem 1.5rem 0.5rem 1.5rem;
+    border-radius: var(--card-border-radius);
+    background-color: var(--color-success);
+    text-align: center;
+    margin: 1.5rem auto;
+}
+
+.buttons-container {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+
+.task-to-complete {
+    width: 10rem;
+    font-weight: 500;
+    color: var(--color-white);
+    background-color: var(--color-success);
+    border-radius: var(--border-radius-1);
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.action-buttons-done {
+    padding-left: 1.8rem;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.task-to-edit {
+    width: 10rem;
+    font-weight: 500;
+    color: var(--color-dark);
+    background-color: #DEDDE4;
+    border-radius: var(--border-radius-1);
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.task-to-delete {
+    width: 10rem;
+    font-weight: 500;
+    color: var(--color-white);
+    background-color: var(--color-danger);
+    border-radius: var(--border-radius-1);
+    padding: 1rem;
+    cursor: pointer;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Modal content */
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-white);
+    padding: 2rem;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin: 1.3rem 0 1.3rem 0;
+}
+
+.form-group-checkbox {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Close button */
+.close-form {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-control {
+    height: 3rem;
+    width: 100%;
+    font-weight: 500;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-dark);
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-color: var(--color-white);
+    background-position: right 0.7rem top 50%;
+    background-size: 0.65rem auto;
+    padding: 5px;
+}
+
+.form-control-description {
+    width: 100%;
+    font-weight: 500;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-dark);
+}
+
+.send-element {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.send-form {
+    border-radius: var(--border-radius-1);
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+    height: 3rem;
+    font-weight: 600;
+    padding: 0 2.5rem;
+    letter-spacing: 1px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: var(--box-shadow);
+}
+
+/* swal css */
+.swal-text {
+    font-size: 1.3rem;
+}
+
+.swal-button {
+    background-color: var(--color-success);
+}
+
+.swal-icon--warning {
+    border-color: var(--color-primary);
+}
+
+.swal-icon--success {
+    border-color: var(--color-success);
+}
+
+.swal-icon--success__line {
+    background-color: var(--color-success);
+}
+
+.swal-icon--error {
+    border-color: var(--color-danger);
+}
+
+.swal-icon--error__line {
+    background-color: var(--color-danger);
+}
+
+.swal-button--cancel {
+    color: var(--color-dark);
+    background-color: #DEDDE4;
+}
+
+.swal-button--danger {
+    background-color: var(--color-danger);
+}
+
+.swal-button--danger:hover {
+    background-color: var(--color-danger);
+}
+
+.swal-overlay {
+    margin-top: -20%;
+}
+
+@media screen and (max-width: 1300px) {
+    .container {
+        grid-template-columns: 7rem auto;
+    }
+
+    .task-card {
+        grid-template-columns: 50% 50%;
+    }
+
+    .buttons-container {
+        grid-template-columns: 50% 50%;
+    }
+
+    .modal-content {
+        width: 70%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100%;
+        height: auto;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+        padding-bottom: 2rem;
+    }
+
+    main {
+        width: 100%;
+        height: fit-content;
+        margin-top: 7rem;
+        padding: 0 1rem;
+    }
+
+    main .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    main .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 2rem;
+    }
+
+    main .nav button span {
+        font-size: 2rem;
+    }
+
+    .task-card {
+        grid-template-columns: 1fr;
+    }
+
+    .buttons-container {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons-done {
+        padding-left: 0;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .action-buttons {
+        display: block;
+        text-align: center;
+    }
+
+    .action-buttons button {
+        margin-bottom: 1rem;
+    }
+
+    .modal-content {
+        margin-top: 2.5rem;
+        width: 85%;
+    }
+}
