@@ -277,11 +277,13 @@ def task_detail_view(request, task_id):
         if 'task_edited' in request.POST:
             if task_edit_form.is_valid():
                 task_edit_form.save()
+                messages.success(request, 'Zadanie zostało zedytowane!')
                 return redirect('task_detail_view', task_id=task_id)
 
         if 'task_done' in request.POST:
             task.status = 'Zrobione'
             task.save()
+            messages.success(request, 'Zadanie oznaczone jako wykonane!')
             return redirect('task')
 
         if 'task_delete' in request.POST:

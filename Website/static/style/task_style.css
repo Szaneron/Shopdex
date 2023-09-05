@@ -10,7 +10,7 @@
     grid-template-columns: 16rem auto 23rem;
 }
 
-/*main*/
+/* main */
 main {
     margin-top: 1.4rem;
 }
@@ -70,10 +70,10 @@ table tr td:first-child::before {
     margin: 0 0.5em 0 0.5em;
 }
 
-/*end of main*/
+/* end of main */
 
 
-/*right section*/
+/* right section */
 .right-section {
     margin-top: calc(5.2rem - 1px);
 }
@@ -134,6 +134,8 @@ header .current-date {
     font-weight: 500;
 }
 
+
+/* calendar */
 .calendar {
     padding-top: 20px;
 }
@@ -256,5 +258,4 @@ header .current-date {
     .right-section .nav button span {
         font-size: 2rem;
     }
-
 }

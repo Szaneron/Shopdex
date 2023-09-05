@@ -14,8 +14,11 @@
 </head>
 <body>
 <div class="container">
+    <!-- Sidebar Section -->
     {% include  "sidebar.html" %}
+    <!-- End of Sidebar Section-->
 
+    <!-- Main content -->
     <main>
         <div class="nav">
             <button id="menu-btn">
@@ -26,6 +29,7 @@
         </div>
         <h1>Szczegóły zadania</h1>
         <div class="task-content">
+            <div id="sweet-alert-container"></div>
             <div class="task-card">
                 <div class="task-card-left" id="task-card-left-id">
                     <div class="task-name"><h2> {{ task.name }}</h2></div>
@@ -77,6 +81,9 @@
             </div>
         </div>
     </main>
+    <!-- End of Main Content -->
+
+    <!-- Start modal form content -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span id="close-modal" class="material-icons-sharp close-form">close</span>
@@ -113,6 +120,8 @@
             </form>
         </div>
     </div>
+    <!-- End of modal form content -->
+
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         const importnat_task = '{{ task.is_important }}'
@@ -120,6 +129,35 @@
         const task_id = '{{ task.id}}'
         const user_position = '{{ user.userprofile.position }}'
 
+        // Function to display Django messages as SweetAlert alerts
+        function displayMessages() {
+            {% for message in messages %}
+                let message_type = "{{ message.tags }}";
+                let message_text = "{{ message }}";
+
+                // Map Django message types to SweetAlert types
+                let swalType = 'info';
+                if (message_type === "success") {
+                    swalType = 'success';
+                } else if (message_type === "error") {
+                    swalType = 'error';
+                } else if (message_type === "warning") {
+                    swalType = 'warning';
+                }
+
+                // Display SweetAlert popup
+                swal({
+                    icon: swalType,
+                    title: message_text,
+                    timer: 3000, // Auto-close after 3 seconds
+                });
+            {% endfor %}
+        }
+
+        // Call the function when the page loads
+        $(document).ready(function () {
+            displayMessages();
+        });
     </script>
     <script src="{% static 'js/task_detail.js' %}"></script>
 </div>

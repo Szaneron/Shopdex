@@ -18,10 +18,12 @@ closeBtn.addEventListener('click', () => {
 const daysTag = document.querySelector(".days"),
     currentDate = document.querySelector(".current-date"),
     prevNextIcon = document.querySelectorAll(".icons span");
+
 // getting new date, current year and month
 let date = new Date(),
     currYear = date.getFullYear(),
     currMonth = date.getMonth();
+
 // storing full name of all months in array
 const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec",
     "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
@@ -205,6 +207,7 @@ const renderCalendar = () => {
     }
 }
 renderCalendar();
+
 prevNextIcon.forEach(icon => { // getting prev and next icons
     icon.addEventListener("click", () => { // adding click event on both icons
         // if clicked icon is previous icon then decrement current month by 1 else increment it by 1

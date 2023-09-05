@@ -13,7 +13,6 @@
 </head>
 <body>
 
-
 <div class="container">
     <!-- Sidebar Section -->
     {% include  "sidebar.html" %}
@@ -37,7 +36,6 @@
                             <h2>{{ progress_bar_data.percentage_done }}%</h2>
                             <span>Wykonano {{ progress_bar_data.all_done }} z {{ progress_bar_data.all_to_do }}</span>
                         </div>
-
                         <div class="progress_bar_empty">
                             <div class="progress_bar_success"
                                  style="--width: {{ progress_bar_data.percentage_done }}%"></div>
@@ -50,7 +48,8 @@
 
                         <div class="progress_bar_empty">
                             <div class="progress_bar_success"
-                                 style="--width: {{ progress_bar_data_for_user.percentage_done }}%"></div>
+                                 style="--width: {{ progress_bar_data_for_user.percentage_done }}%">
+                            </div>
                         </div>
                     {% endif %}
                 </div>
