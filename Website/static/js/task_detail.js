@@ -73,14 +73,16 @@ function confirmDeleteTask() {
                     success: function () {
                         swal("Zadanie zostało usunięte!", {
                             icon: "success",
+                            timer: 3000,
                         }).then(() => {
-                            window.location.href = "/task/";
+                            window.location.href = "/dashboard/";
                         });
                     },
                     error: function (xhr, textStatus, errorThrown) {
                         console.log(xhr.status, textStatus, errorThrown);
                         swal("Wystąpił błąd podczas usuwania zadania.", {
                             icon: "error",
+                            timer: 3000,
                         }).then(() => {
                             window.location.reload();
                         });

@@ -284,11 +284,11 @@ def task_detail_view(request, task_id):
             task.status = 'Zrobione'
             task.save()
             messages.success(request, 'Zadanie oznaczone jako wykonane!')
-            return redirect('task')
+            return redirect('dashboard')
 
         if 'task_delete' in request.POST:
             task.delete()
-            return redirect('task')
+            return redirect('dashboard')
 
     else:
         task_edit_form = TaskEditForm(instance=task)
