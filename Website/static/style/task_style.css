@@ -194,3 +194,67 @@ header .current-date {
 .days li:not(.active):hover::before {
     background: var(--color-background);
 }
+
+@media screen and (max-width: 1300px) {
+    .container {
+        grid-template-columns: 7rem auto 18rem;
+    }
+
+    main .tasks-table thead tr th:nth-child(3) {
+        display: none;
+    }
+
+    main .tasks-table tbody tr td:nth-child(3) {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100%;
+        height: auto;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+        padding-bottom: 2rem;
+    }
+
+    main {
+        height: fit-content;
+        margin-top: 7rem;
+        padding: 0 1rem;
+    }
+
+    .right-section {
+        width: 100%;
+        margin-top: 2rem;
+        padding: 0 var(--padding-1);
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 2rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
+}

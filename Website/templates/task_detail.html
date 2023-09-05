@@ -17,6 +17,13 @@
     {% include  "sidebar.html" %}
 
     <main>
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
         <h1>Szczegóły zadania</h1>
         <div class="task-content">
             <div class="task-card">
@@ -50,7 +57,7 @@
             </div>
             <div class="buttons-container">
                 {% if task.status == 'Do zrobienia' %}
-                    <div>
+                    <div class="action-buttons-done">
                         <form method="post">
                             {% csrf_token %}
                             <button class="task-to-complete" name="task_done" type="submit">Zadanie wykonane</button>
@@ -72,7 +79,7 @@
     </main>
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <span id="close-modal" class="material-icons-sharp close">close</span>
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
             <h2>Edycja zadania</h2>
             <form method="post" action="{% url 'task_detail_view' task.id %}">
                 {% csrf_token %}
@@ -111,6 +118,7 @@
         const importnat_task = '{{ task.is_important }}'
         const token = '{{ csrf_token }}'
         const task_id = '{{ task.id}}'
+        const user_position = '{{ user.userprofile.position }}'
 
     </script>
     <script src="{% static 'js/task_detail.js' %}"></script>

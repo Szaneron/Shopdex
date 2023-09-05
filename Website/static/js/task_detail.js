@@ -1,13 +1,26 @@
 const active_link = document.getElementById('link_task')
 active_link.className = 'active'
 
+const sideMenu = document.querySelector('aside');
+const menuBtn = document.getElementById('menu-btn');
+const closeBtn = document.getElementById('close-btn');
+
+// Add a click event listener to the menu button to display the side menu.
+menuBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'block';
+});
+
+// Add a click event listener to the close button to hide the side menu.
+closeBtn.addEventListener('click', () => {
+    sideMenu.style.display = '';
+});
+
 function check_if_task_is_important(value) {
     const card_element = document.getElementById(`task-card-left-id`);
     if (value === 'True') {
         card_element.style.borderLeft = '4px solid #FF0060';
     }
 }
-
 
 check_if_task_is_important(importnat_task);
 
@@ -19,20 +32,22 @@ const openEditModal = document.getElementById('task_edit_button');
 // Get the <span> element that closes the modal
 const span = document.getElementById('close-modal');
 
-// When the user clicks on the button, open the modal
-openEditModal.onclick = function () {
-    editModal.style.display = 'block';
-}
+if (openEditModal) {
+    // When the user clicks on the button, open the modal
+    openEditModal.onclick = function () {
+        editModal.style.display = 'block';
+    }
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function () {
-    editModal.style.display = 'none';
-}
-
-// When the user clicks anywhere outside the modal, close it
-window.onclick = function (event) {
-    if (event.target === editModal) {
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
         editModal.style.display = 'none';
+    }
+
+    // When the user clicks anywhere outside the modal, close it
+    window.onclick = function (event) {
+        if (event.target === editModal) {
+            editModal.style.display = 'none';
+        }
     }
 }
 

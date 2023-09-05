@@ -369,11 +369,11 @@ main .tasks-table a {
         display: none;
     }
 
-    main .tasks-table thead tr th:nth-child(2) {
+    main .tasks-table thead tr th:nth-child(3) {
         display: none;
     }
 
-    main .tasks-table tbody tr td:nth-child(2) {
+    main .tasks-table tbody tr td:nth-child(3) {
         display: none;
     }
 }
