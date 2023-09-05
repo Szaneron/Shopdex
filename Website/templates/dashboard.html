@@ -105,8 +105,9 @@
             {% endif %}
         </div>
         <!-- End of Delivery Table -->
+
         <!-- Tasks Table -->
-        <div class="tasks-table" data-tasks="{{ tasks|safe }}">
+        <div class="tasks-table">
             <h2>Zadania</h2>
             <table>
                 {% if user.userprofile.position == 'Szef' %}
@@ -119,6 +120,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Opis</th>
                             <th>Osoba</th>
@@ -130,10 +132,11 @@
                         {% for task in all_tasks_for_dashboard %}
                             <tr>
                                 {% if task.is_important %}
-                                    <td class="important">{{ task.name }}</td>
+                                    <td class="important"></td>
                                 {% else %}
-                                    <td>{{ task.name }}</td>
+                                    <td></td>
                                 {% endif %}
+                                <td>{{ task.name }}</td>
                                 <td>{{ task.description|truncatechars:70 }}</td>
                                 <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt=""></td>
                                 {% if task.status == "Do zrobienia" %}
@@ -141,8 +144,8 @@
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary"><a class="primary"
-                                                       href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -158,6 +161,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Opis</th>
                             <th>Status</th>
@@ -168,28 +172,38 @@
                         {% for task in all_tasks_for_user_dashboard %}
                             <tr>
                                 {% if task.is_important %}
-                                    <td class="important">{{ task.name }}</td>
+                                    <td class="important"></td>
                                 {% else %}
-                                    <td>{{ task.name }}</td>
+                                    <td></td>
                                 {% endif %}
-                                <td>{{ task.description }}</td>
+                                <td>{{ task.name }}</td>
+                                <td>{{ task.description|truncatechars:70 }}</td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     {% endif %}
                 {% endif %}
             </table>
-            {% if all_tasks.count > 5 %}
-                <a href="#">Pokaż wszystkie ({{ all_tasks.count }})</a>
+            {% if user.userprofile.position == 'Szef' %}
+                {% if all_tasks.count > 5 %}
+                    <a href="{% url 'task' %}">Pokaż wszystkie ({{ all_tasks.count }})</a>
+                {% endif %}
+            {% elif user.userprofile.position == 'Pracownik' %}
+                {% if all_tasks_for_user.count > 5 %}
+                    <a href="{% url 'task' %}">Pokaż wszystkie ({{ all_tasks_for_user.count }})</a>
+                {% endif %}
             {% endif %}
         </div>
         <!-- End of Tasks Table -->
+
     </main>
     <!-- End of Main Content -->
 
@@ -289,7 +303,6 @@
     <script>
         let current_month = {{ current_date.month }}; // Get the month number (0-11)
         let current_day_name = '{{ day_name }}'; // Get the name of the day
-
     </script>
     <script src="../static/js/dashboard.js"></script>
 </div>

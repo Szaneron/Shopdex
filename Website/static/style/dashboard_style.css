@@ -104,6 +104,10 @@ main table tbody td img {
     border-radius: 50%;
 }
 
+main table tbody td {
+    border-left: 4px solid transparent;
+}
+
 main table tbody td.important {
     border-left: 4px solid var(--color-danger);
 }
@@ -118,7 +122,21 @@ main .delivery-table a {
 }
 
 main .tasks-table h2 {
-    margin-bottom: 0.3rem;
+    margin: 1.3rem 0 0.3rem 0;
+}
+
+table {
+    counter-reset: rowNumber -1;
+}
+
+table tr {
+    counter-increment: rowNumber;
+}
+
+table tr td:first-child::before {
+    content: counter(rowNumber);
+    min-width: 1em;
+    margin: 0 0.5em 0 0.5em;
 }
 
 main .tasks-table table {

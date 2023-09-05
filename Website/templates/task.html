@@ -36,6 +36,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Opis</th>
                             <th>Osoba</th>
@@ -47,10 +48,11 @@
                         {% for task in all_tasks %}
                             <tr>
                                 {% if task.is_important %}
-                                    <td class="important">{{ task.name }}</td>
+                                    <td class="important"></td>
                                 {% else %}
-                                    <td>{{ task.name }}</td>
+                                    <td></td>
                                 {% endif %}
+                                <td>{{ task.name }}</td>
                                 <td>{{ task.description|truncatechars:70 }}</td>
                                 <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt="">
                                 </td>
@@ -59,8 +61,8 @@
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary"><a class="primary"
-                                                       href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -77,6 +79,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Opis</th>
                             <th>Status</th>
@@ -87,17 +90,20 @@
                         {% for task in all_tasks_for_user %}
                             <tr>
                                 {% if task.is_important %}
-                                    <td class="important">{{ task.name }}</td>
+                                    <td class="important"></td>
                                 {% else %}
-                                    <td>{{ task.name }}</td>
+                                    <td></td>
                                 {% endif %}
+                                <td>{{ task.name }}</td>
                                 <td>{{ task.description|truncatechars:70 }}</td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}
                                     <td class="success">{{ task.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

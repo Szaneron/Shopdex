@@ -32,14 +32,7 @@ const addDayListeners = () => {
                 year: currYear,
                 month: currMonth,
                 day: parseInt(day.innerText)
-            }; // Update the selectedDayDate variable
-            // const activeDay = daysList.querySelector('.active');
-            // if (activeDay) {
-            //     activeDay.classList.remove('active');
-            // }
-            //
-            // // Add active class to the clicked day
-            // day.classList.add('active');
+            };
 
             // Send the selected date to Django view using AJAX
             const selectedDay = day.textContent;
@@ -69,6 +62,7 @@ const addDayListeners = () => {
                         filteredTableThead.empty();
                         if (data.position === "szef") {
                             const row = $('<tr></tr>');
+                            row.append($('<th>'));
                             row.append($('<th>').text('Nazwa'));
                             row.append($('<th>').text('Opis'));
                             row.append($('<th>').text('Osoba'));
@@ -83,10 +77,11 @@ const addDayListeners = () => {
                                 const row = $('<tr></tr>');
 
                                 if (task.is_important === true) {
-                                    row.append($('<td class="important">').text(task.name));
+                                    row.append($('<td class="important">'));
                                 } else {
-                                    row.append($('<td>').text(task.name));
+                                    row.append($('<td>'));
                                 }
+                                row.append($('<td>').text(task.name))
                                 row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
 
                                 const imgTag = $('<img alt="" src="">').attr('src', task.assigned_to);
@@ -99,8 +94,6 @@ const addDayListeners = () => {
                                     row.append($('<td class="success">').text(task.status));
                                 }
 
-                                // row.append($('<td class="primary">').text('Szczegóły'));
-
                                 const detailsLinkCell = $('<td class="primary">');
                                 const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
                                 detailsLinkCell.append(detailsLink);
@@ -111,6 +104,7 @@ const addDayListeners = () => {
 
                         } else if (data.position === "pracownik") {
                             const row = $('<tr></tr>');
+                            row.append($('<th>'));
                             row.append($('<th>').text('Nazwa'));
                             row.append($('<th>').text('Opis'));
                             row.append($('<th>').text('Status'));
@@ -124,10 +118,11 @@ const addDayListeners = () => {
                                 const row = $('<tr></tr>');
 
                                 if (task.is_important === true) {
-                                    row.append($('<td class="important">').text(task.name));
+                                    row.append($('<td class="important">'));
                                 } else {
-                                    row.append($('<td>').text(task.name));
+                                    row.append($('<td>'));
                                 }
+                                row.append($('<td>').text(task.name))
                                 row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
 
                                 if (task.status === 'Do zrobienia') {
@@ -136,7 +131,10 @@ const addDayListeners = () => {
                                     row.append($('<td class="success">').text(task.status));
                                 }
 
-                                row.append($('<td class="primary">').text('Szczegóły'));
+                                const detailsLinkCell = $('<td class="primary">');
+                                const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
+                                detailsLinkCell.append(detailsLink);
+                                row.append(detailsLinkCell);
 
                                 filteredTable.append(row);
                             }
