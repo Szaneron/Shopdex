@@ -10,7 +10,6 @@
     <title>Shopdex</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/task_detail_style.css' %}"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -60,23 +59,25 @@
 
             </div>
             <div class="buttons-container">
-                {% if task.status == 'Do zrobienia' %}
-                    <div class="action-buttons-done">
+
+                <div class="action-buttons-done">
+                    {% if task.status == 'Do zrobienia' %}
                         <form method="post">
                             {% csrf_token %}
                             <button class="task-to-complete" name="task_done" type="submit">Zadanie wykonane</button>
                         </form>
-                    </div>
-                    {% if user.userprofile.position == 'Szef' %}
-                        <div class="action-buttons">
-                            <button class="task-to-edit" id="task_edit_button" name="task_edit">Edytuj zadanie
-                            </button>
-                            <button class="task-to-delete" id="task_delete_button" name="task_delete"
-                                    onclick="confirmDeleteTask()">Usuń zadanie
-                            </button>
-                        </div>
                     {% endif %}
-                {% endif %}
+                </div>
+
+                <div class="action-buttons">
+                    {% if user.userprofile.position == 'Szef' %}
+                        <button class="task-to-edit" id="task_edit_button" name="task_edit">Edytuj zadanie
+                        </button>
+                        <button class="task-to-delete" id="task_delete_button" name="task_delete"
+                                onclick="confirmDeleteTask()">Usuń zadanie
+                        </button>
+                    {% endif %}
+                </div>
 
             </div>
         </div>
@@ -122,6 +123,7 @@
     </div>
     <!-- End of modal form content -->
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         const importnat_task = '{{ task.is_important }}'

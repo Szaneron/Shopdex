@@ -106,3 +106,50 @@ b {
 .warning {
     color: var(--color-warning);
 }
+
+
+/* swal css */
+.swal-text {
+    font-size: 1.3rem;
+}
+
+.swal-button {
+    background-color: var(--color-success);
+}
+
+.swal-icon--warning {
+    border-color: var(--color-primary);
+}
+
+.swal-icon--success {
+    border-color: var(--color-success);
+}
+
+.swal-icon--success__line {
+    background-color: var(--color-success);
+}
+
+.swal-icon--error {
+    border-color: var(--color-danger);
+}
+
+.swal-icon--error__line {
+    background-color: var(--color-danger);
+}
+
+.swal-button--cancel {
+    color: var(--color-dark);
+    background-color: #DEDDE4;
+}
+
+.swal-button--danger {
+    background-color: var(--color-danger);
+}
+
+.swal-button--danger:hover {
+    background-color: var(--color-danger);
+}
+
+.swal-overlay {
+    margin-top: -20%;
+}
