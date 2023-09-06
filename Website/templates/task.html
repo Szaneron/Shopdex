@@ -9,7 +9,6 @@
     <title>Shopdex</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/task_style.css' %}"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
 <body>
@@ -24,7 +23,7 @@
         <h1>Zadania</h1>
 
         <!-- Tasks Table -->
-        <div class="tasks-table" data-tasks="{{ tasks|safe }}">
+        <div class="tasks-table">
             <table id="tasks-table-content">
                 {% if user.userprofile.position == 'Szef' %}
                     {% if all_tasks.count == 0 %}
@@ -154,6 +153,7 @@
     </div>
     <!-- End of Right Section -->
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         const token = '{{ csrf_token }}'

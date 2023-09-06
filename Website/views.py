@@ -300,3 +300,45 @@ def task_detail_view(request, task_id):
     }
 
     return render(request, 'task_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def delivery(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    current_date = get_current_date()
+    all_delivery = Delivery.objects.filter(delivery_date=current_date).order_by('status', 'creation_time')
+
+    if request.method == 'POST':
+        selected_day = request.POST.get('selected_day')
+        selected_month_and_year = request.POST.get('selected_month')
+        selected_month, selected_year = selected_month_and_year.split(' ', 1)
+
+        months = dict(Styczeń='01', Luty='02', Marzec='03', Kwiecień='04', Maj='05', Czerwiec='06', Lipiec='07',
+                      Sierpień='08', Wrzesień='09', Październik='10', Listopad='11', Grudzień='12', )
+
+        selected_month = months[selected_month]
+        filtered_date = selected_year + '-' + selected_month + '-' + selected_day
+
+        print(filtered_date)
+        filtered_delivery = Delivery.objects.filter(delivery_date=filtered_date).order_by('status', 'creation_time')
+        delivery_data = []
+        for delivery in filtered_delivery:
+            delivery_data.append({
+                'id': delivery.id,
+                'delivery_company': delivery.delivery_company,
+                'form': delivery.form,
+                'quantity': delivery.quantity,
+                'description': delivery.description,
+                'status': delivery.status,
+            })
+
+        return JsonResponse({'filtered_delivery': delivery_data})
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'all_delivery': all_delivery,
+        'current_date': current_date,
+    }
+    return render(request, "delivery.html", context)

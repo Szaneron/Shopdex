@@ -100,7 +100,7 @@
                 {% endif %}
             </table>
             {% if all_delivery.count > 5 %}
-                <a href="#">Pokaż wszystkie ({{ all_delivery.count }})</a>
+                <a href="{% url 'delivery' %}">Pokaż wszystkie ({{ all_delivery.count }})</a>
             {% endif %}
         </div>
         <!-- End of Delivery Table -->

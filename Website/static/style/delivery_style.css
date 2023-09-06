@@ -1,0 +1,252 @@
+@import "root_style.css";
+@import "sidebar_style.css";
+
+.container {
+    display: grid;
+    height: 100%;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 16rem auto 23rem;
+}
+
+/* main */
+main {
+    margin-top: 1.4rem;
+}
+
+main .delivery-table {
+    margin-top: 1rem;
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+main .delivery-table table {
+    border-spacing: 0;
+    width: 100%;
+    min-height: 5rem;
+    text-align: center;
+}
+
+main table thead th {
+    height: 2.8rem;
+}
+
+main table tbody td {
+    height: 2.8rem;
+    border-bottom: 1px solid var(--color-light);
+    color: var(--color-dark);
+}
+
+table {
+    counter-reset: rowNumber -1;
+}
+
+table tr {
+    counter-increment: rowNumber;
+}
+
+table tr td:first-child::before {
+    content: counter(rowNumber);
+    min-width: 1em;
+    margin: 0 0.5em 0 0.5em;
+}
+
+/* end of main */
+
+/* right section */
+.right-section {
+    margin-top: calc(5.2rem - 1px);
+}
+
+.right-section .nav {
+    display: flex;
+    justify-content: end;
+}
+
+.right-section .nav button {
+    display: none;
+}
+
+.wrapper {
+    width: 100%;
+    background-color: var(--color-white);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    box-shadow: var(--box-shadow);
+}
+
+.wrapper header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header {
+    border-bottom: 3px solid var(--color-secondary)
+}
+
+header .icons {
+    display: flex;
+}
+
+header .icons span {
+    height: 2rem;
+    width: 2rem;
+    cursor: pointer;
+    color: var(--color-dark);
+    text-align: center;
+    line-height: 2rem;
+    font-size: 1.9rem;
+    user-select: none;
+    border-radius: 50%;
+}
+
+.icons span:last-child {
+    margin-right: -10px;
+}
+
+header .icons span:hover {
+    background: #f2f2f2;
+}
+
+header .current-date {
+    font-size: 1.45rem;
+    font-weight: 500;
+}
+
+
+/* calendar */
+.calendar {
+    padding-top: 20px;
+}
+
+.calendar ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    text-align: center;
+}
+
+.calendar .days {
+    margin-bottom: 20px;
+}
+
+.calendar li {
+    color: var(--color-dark);
+    width: calc(100% / 7);
+    font-size: 1.02rem;
+}
+
+.calendar .weeks li {
+    font-weight: 500;
+    cursor: default;
+}
+
+.calendar .days li {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    margin-top: 10px;
+}
+
+.days li.inactive {
+    color: var(--color-light);
+}
+
+.days li.active {
+    color: var(--color-white);
+}
+
+.days li::before {
+    position: absolute;
+    content: "";
+    left: 50%;
+    top: 50%;
+    height: 2rem;
+    width: 2rem;
+    z-index: -1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.days li.active::before {
+    background: var(--color-secondary);
+}
+
+.days li:not(.active):hover::before {
+    background: var(--color-background);
+}
+
+@media screen and (max-width: 1300px) {
+    .container {
+        grid-template-columns: 7rem auto 18rem;
+    }
+
+    main .delivery-table thead tr th:nth-child(4), th:nth-child(5) {
+        display: none;
+    }
+
+    main .delivery-table tbody tr td:nth-child(4), td:nth-child(5) {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100%;
+        height: auto;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+        padding-bottom: 2rem;
+    }
+
+    main {
+        height: fit-content;
+        margin-top: 7rem;
+        padding: 0 1rem;
+    }
+
+    main .delivery-table thead tr th:nth-child(3) {
+        display: none;
+    }
+
+    main .delivery-table tbody tr td:nth-child(3) {
+        display: none;
+    }
+
+    .right-section {
+        width: 100%;
+        margin-top: 2rem;
+        padding: 0 var(--padding-1);
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 2rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+}
