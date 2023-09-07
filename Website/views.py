@@ -3,9 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from .forms import TaskEditForm
+from .forms import TaskEditForm, DeliveryEditForm
 from .models import Task, Delivery, Day, Return
 
 
@@ -270,6 +270,7 @@ def task(request):
 @login_required(login_url='login_user')
 def task_detail_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
+    current_date = get_current_date()
     user = request.user
     task_edit_form = TaskEditForm(request.POST, instance=task)
 
@@ -295,6 +296,7 @@ def task_detail_view(request, task_id):
 
     context = {
         'task': task,
+        'current_date': current_date,
         'user': user,
         'task_edit_form': task_edit_form,
     }
@@ -307,7 +309,7 @@ def delivery(request):
     user = request.user
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
-    all_delivery = Delivery.objects.filter(delivery_date=current_date).order_by('status', 'creation_time')
+    all_delivery = Delivery.objects.filter(delivery_date=current_date).order_by('-status', 'creation_time')
 
     if request.method == 'POST':
         selected_day = request.POST.get('selected_day')
@@ -320,8 +322,7 @@ def delivery(request):
         selected_month = months[selected_month]
         filtered_date = selected_year + '-' + selected_month + '-' + selected_day
 
-        print(filtered_date)
-        filtered_delivery = Delivery.objects.filter(delivery_date=filtered_date).order_by('status', 'creation_time')
+        filtered_delivery = Delivery.objects.filter(delivery_date=filtered_date).order_by('-status', 'creation_time')
         delivery_data = []
         for delivery in filtered_delivery:
             delivery_data.append({
@@ -342,3 +343,79 @@ def delivery(request):
         'current_date': current_date,
     }
     return render(request, "delivery.html", context)
+
+
+@login_required(login_url='login_user')
+def delivery_detail_view(request, delivery_id):
+    delivery = get_object_or_404(Delivery, id=delivery_id)
+    current_date = get_current_date()
+    user = request.user
+    delivery_edit_form = DeliveryEditForm(request.POST, instance=delivery)
+
+    if request.method == 'POST':
+        if 'delivery_received' in request.POST:
+            delivery.status = 'Odebrana'
+            delivery.save()
+            messages.success(request, 'Dostawa oznaczona jako odebrana!')
+            return redirect('dashboard')
+
+        if 'delivery_not_delivered' in request.POST:
+            delivery.status = 'Nie dostarczona'
+            delivery.save()
+            miesiace = [
+                'stycznia', 'lutego', 'marca', 'kwietnia',
+                'maja', 'czerwca', 'lipca', 'sierpnia',
+                'września', 'października', 'listopada', 'grudnia'
+            ]
+            formatted_data = f"{delivery.delivery_date.day:02d} {miesiace[delivery.delivery_date.month - 1]} {delivery.delivery_date.year}"
+
+            next_day = delivery.delivery_date + timedelta(days=1)
+            next_monday = delivery.delivery_date + timedelta(days=2)
+
+            if delivery.delivery_date.strftime("%A") == "Saturday":
+                new_delivery = Delivery.objects.create(
+                    delivery_company=delivery.delivery_company,
+                    form=delivery.form,
+                    quantity=delivery.quantity,
+                    description=delivery.description,
+                    status='W drodze',  # Możesz ustawić domyślny status
+                    delivery_date=next_monday,
+                    generated_context=f'Dostawa automatycznie przeniesiona z dnia {formatted_data}.',
+                )
+                new_delivery.save()
+            else:
+                new_delivery = Delivery.objects.create(
+                    delivery_company=delivery.delivery_company,
+                    form=delivery.form,
+                    quantity=delivery.quantity,
+                    description=delivery.description,
+                    status='W drodze',  # Możesz ustawić domyślny status
+                    delivery_date=next_day,
+                    generated_context=f'Dostawa automatycznie przeniesiona z dnia {formatted_data}.',
+                )
+                new_delivery.save()
+
+            messages.success(request, 'Dostawa została automatycznie dodana do następnego dnia!')
+            return redirect('dashboard')
+
+        if 'delivery_edited' in request.POST:
+            if delivery_edit_form.is_valid():
+                delivery_edit_form.save()
+                messages.success(request, 'Dostawa została zedytowana!')
+                return redirect('delivery_detail_view', delivery_id=delivery_id)
+
+        if 'delivery_delete' in request.POST:
+            delivery.delete()
+            return redirect('dashboard')
+
+    else:
+        delivery_edit_form = DeliveryEditForm(instance=delivery)
+
+    context = {
+        'delivery': delivery,
+        'current_date': current_date,
+        'user': user,
+        'delivery_edit_form': delivery_edit_form,
+    }
+
+    return render(request, 'delivery_detail.html', context)

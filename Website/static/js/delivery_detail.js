@@ -1,5 +1,6 @@
-const active_link = document.getElementById('link_task')
+const active_link = document.getElementById('link_delivery')
 active_link.className = 'active'
+
 
 const sideMenu = document.querySelector('aside');
 const menuBtn = document.getElementById('menu-btn');
@@ -15,19 +16,10 @@ closeBtn.addEventListener('click', () => {
     sideMenu.style.display = '';
 });
 
-function check_if_task_is_important(value) {
-    const card_element = document.getElementById(`task-card-left-id`);
-    if (value === 'True') {
-        card_element.style.borderLeft = '4px solid #FF0060';
-    }
-}
-
-check_if_task_is_important(importnat_task);
-
 const editModal = document.getElementById('editModal');
 
 // Get the button that opens the modal
-const openEditModal = document.getElementById('task_edit_button');
+const openEditModal = document.getElementById('delivery_edit_button');
 
 // Get the <span> element that closes the modal
 const span = document.getElementById('close-modal');
@@ -51,11 +43,10 @@ if (openEditModal) {
     }
 }
 
-
-function confirmDeleteTask() {
+function confirmDeleteDelivery() {
     swal({
         title: "",
-        text: "Czy na pewno chcesz usunąć to zadanie?",
+        text: "Czy na pewno chcesz usunąć tą dostawę?",
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -65,21 +56,21 @@ function confirmDeleteTask() {
                 // After confirming, we delete the task using AJAX
                 $.ajax({
                     type: "POST",
-                    url: `/task/${task_id}/`,
+                    url: `/delivery/${delivery_id}/`,
                     data: {
                         csrfmiddlewaretoken: token,
-                        task_delete: "task_delete",
+                        delivery_delete: "delivery_delete",
                     },
                     success: function () {
                         window.location.href = "/dashboard/";
-                        swal("Zadanie zostało usunięte!", {
+                        swal("Dostawa została usunięta!", {
                             icon: "success",
                             timer: 3000,
                         })
                     },
                     error: function (xhr, textStatus, errorThrown) {
                         console.log(xhr.status, textStatus, errorThrown);
-                        swal("Wystąpił błąd podczas usuwania zadania.", {
+                        swal("Wystąpił błąd podczas usuwania dostawy.", {
                             icon: "error",
                             timer: 3000,
                         }).then(() => {
@@ -88,7 +79,7 @@ function confirmDeleteTask() {
                     }
                 });
             } else {
-                swal("Zadanie nie zostało usunięte.", {
+                swal("Dostawa nie została usunięta.", {
                     icon: "error",
                     timer: 3000,
                 });

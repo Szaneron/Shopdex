@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task
+from .models import Task, Delivery
 from django.forms import widgets
 
 
@@ -12,5 +12,15 @@ class TaskEditForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 10}),
             'is_important': forms.CheckboxInput(),
             'task_date': forms.DateInput(attrs={'type': 'date'}),
-            'assigned_to': forms.Select(attrs={'class': 'bootstrap-select'}),
+        }
+
+
+class DeliveryEditForm(forms.ModelForm):
+    class Meta:
+        model = Delivery
+        fields = ['delivery_company', 'form', 'quantity', 'description', 'status', 'delivery_date']
+
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 10}),
+            'delivery_date': forms.DateInput(attrs={'type': 'date'}),
         }

@@ -142,7 +142,7 @@
                     <li>Śro</li>
                     <li>Czw</li>
                     <li>Pią</li>
-                    <li>Son</li>
+                    <li>Sob</li>
                     <li>Nie</li>
                 </ul>
                 <ul class="days"></ul>
@@ -154,39 +154,8 @@
     <!-- End of Right Section -->
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         const token = '{{ csrf_token }}'
-
-        // Function to display Django messages as SweetAlert alerts
-        function displayMessages() {
-            {% for message in messages %}
-                let message_type = "{{ message.tags }}";
-                let message_text = "{{ message }}";
-
-                // Map Django message types to SweetAlert types
-                let swalType = 'info';
-                if (message_type === "success") {
-                    swalType = 'success';
-                } else if (message_type === "error") {
-                    swalType = 'error';
-                } else if (message_type === "warning") {
-                    swalType = 'warning';
-                }
-
-                // Display SweetAlert popup
-                swal({
-                    icon: swalType,
-                    title: message_text,
-                    timer: 3000, // Auto-close after 3 seconds
-                });
-            {% endfor %}
-        }
-
-        // Call the function when the page loads
-        $(document).ready(function () {
-            displayMessages();
-        });
     </script>
     <script src="../static/js/task.js"></script>
 </div>

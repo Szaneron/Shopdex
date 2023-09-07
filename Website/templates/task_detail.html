@@ -28,7 +28,6 @@
         </div>
         <h1>Szczegóły zadania</h1>
         <div class="task-content">
-            <div id="sweet-alert-container"></div>
             <div class="task-card">
                 <div class="task-card-left" id="task-card-left-id">
                     <div class="task-name"><h2> {{ task.name }}</h2></div>
@@ -37,7 +36,7 @@
                             <span>Zadanie ważne </span>
                         </div>
                     {% endif %}
-                    <div class="task-description"> {{ task.description|linebreaks }}</div>
+                    <div class="task-description"> {{ task.description|linebreaksbr }}</div>
                     <div class="task-date"> {{ task.task_date|date:"j E Y" }}</div>
                 </div>
 
@@ -46,7 +45,7 @@
                     {% if task.status == 'Do zrobienia' %}
                         <div class="task-status-todo">
                             <span class="material-icons-sharp">schedule</span>
-                            {{ task.status }}
+                            <h2>{{ task.status }}</h2>
                         </div>
                     {% elif task.status == 'Zrobione' %}
                         <div class="task-status-done">
@@ -61,7 +60,7 @@
             <div class="buttons-container">
 
                 <div class="action-buttons-done">
-                    {% if task.status == 'Do zrobienia' %}
+                    {% if task.status == 'Do zrobienia' and task.task_date == current_date.date %}
                         <form method="post">
                             {% csrf_token %}
                             <button class="task-to-complete" name="task_done" type="submit">Zadanie wykonane</button>
@@ -123,45 +122,46 @@
     </div>
     <!-- End of modal form content -->
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script>
-        const importnat_task = '{{ task.is_important }}'
-        const token = '{{ csrf_token }}'
-        const task_id = '{{ task.id}}'
-        const user_position = '{{ user.userprofile.position }}'
-
-        // Function to display Django messages as SweetAlert alerts
-        function displayMessages() {
-            {% for message in messages %}
-                let message_type = "{{ message.tags }}";
-                let message_text = "{{ message }}";
-
-                // Map Django message types to SweetAlert types
-                let swalType = 'info';
-                if (message_type === "success") {
-                    swalType = 'success';
-                } else if (message_type === "error") {
-                    swalType = 'error';
-                } else if (message_type === "warning") {
-                    swalType = 'warning';
-                }
-
-                // Display SweetAlert popup
-                swal({
-                    icon: swalType,
-                    title: message_text,
-                    timer: 3000, // Auto-close after 3 seconds
-                });
-            {% endfor %}
-        }
-
-        // Call the function when the page loads
-        $(document).ready(function () {
-            displayMessages();
-        });
-    </script>
-    <script src="{% static 'js/task_detail.js' %}"></script>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    const importnat_task = '{{ task.is_important }}'
+    const token = '{{ csrf_token }}'
+    const task_id = '{{ task.id}}'
+
+    // Function to display Django messages as SweetAlert alerts
+    function displayMessages() {
+        {% for message in messages %}
+            let message_type = "{{ message.tags }}";
+            let message_text = "{{ message }}";
+
+            // Map Django message types to SweetAlert types
+            let swalType = 'info';
+            if (message_type === "success") {
+                swalType = 'success';
+            } else if (message_type === "error") {
+                swalType = 'error';
+            } else if (message_type === "warning") {
+                swalType = 'warning';
+            }
+
+            // Display SweetAlert popup
+            swal({
+                icon: swalType,
+                title: message_text,
+                timer: 3000, // Auto-close after 3 seconds
+            });
+        {% endfor %}
+    }
+
+    // Call the function when the page loads
+    $(document).ready(function () {
+        displayMessages();
+    });
+</script>
+<script src="{% static 'js/task_detail.js' %}"></script>
+
 </body>
 </html>
