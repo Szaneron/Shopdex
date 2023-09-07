@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="action-buttons">
-                    {% if user.userprofile.position == 'Szef' %}
+                    {% if user.userprofile.position != 'Pracownik' %}
                         <div class="action-buttons-container">
                             <button class="delivery-to-edit" id="delivery_edit_button" name="delivery_edit">Edytuj
                                 zadanie

@@ -225,23 +225,7 @@ def task(request):
         selected_month = months[selected_month]
         filtered_date = selected_year + '-' + selected_month + '-' + selected_day
 
-        if user.userprofile.position == 'Szef':
-            filtered_tasks = Task.objects.filter(task_date=filtered_date).order_by('status', '-is_important',
-                                                                                   'creation_time')
-            tasks_data = []
-            for task in filtered_tasks:
-                tasks_data.append({
-                    'id': task.id,
-                    'name': task.name,
-                    'description': task.description,
-                    'status': task.status,
-                    'is_important': task.is_important,
-                    'assigned_to': task.assigned_to.user.userprofile.profile_picture.url,
-                })
-
-            return JsonResponse({'filtered_tasks': tasks_data, 'position': 'szef'})
-
-        elif user.userprofile.position == 'Pracownik':
+        if user.userprofile.position == 'Pracownik':
             filtered_tasks = Task.objects.filter(task_date=filtered_date, assigned_to__user=user).order_by('status',
                                                                                                            '-is_important',
                                                                                                            'creation_time')
@@ -256,6 +240,22 @@ def task(request):
                 })
 
             return JsonResponse({'filtered_tasks': tasks_data, 'position': 'pracownik'})
+
+        else:
+            filtered_tasks = Task.objects.filter(task_date=filtered_date).order_by('status', '-is_important',
+                                                                                   'creation_time')
+            tasks_data = []
+            for task in filtered_tasks:
+                tasks_data.append({
+                    'id': task.id,
+                    'name': task.name,
+                    'description': task.description,
+                    'status': task.status,
+                    'is_important': task.is_important,
+                    'assigned_to': task.assigned_to.user.userprofile.profile_picture.url,
+                })
+
+            return JsonResponse({'filtered_tasks': tasks_data})
 
     context = {
         'user': user,

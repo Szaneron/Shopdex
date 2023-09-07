@@ -76,7 +76,44 @@ const addDayListeners = () => {
                     } else {
                         const filteredTableThead = $('#tasks-table-content thead');
                         filteredTableThead.empty();
-                        if (data.position === "szef") {
+
+                        if (data.position === "pracownik") {
+                            const row = $('<tr></tr>');
+                            row.append($('<th>'));
+                            row.append($('<th>').text('Nazwa'));
+                            row.append($('<th>').text('Opis'));
+                            row.append($('<th>').text('Status'));
+                            row.append($('<th>').text(''));
+                            filteredTableThead.append(row);
+
+                            const filteredTable = $('#tasks-table-content tbody');
+                            filteredTable.empty();
+                            filteredTable.show();
+                            for (const task of data.filtered_tasks) {
+                                const row = $('<tr></tr>');
+
+                                if (task.is_important === true) {
+                                    row.append($('<td class="important">'));
+                                } else {
+                                    row.append($('<td>'));
+                                }
+                                row.append($('<td>').text(task.name))
+                                row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
+
+                                if (task.status === 'Do zrobienia') {
+                                    row.append($('<td class="primary">').text(task.status));
+                                } else if (task.status === 'Zrobione') {
+                                    row.append($('<td class="success">').text(task.status));
+                                }
+
+                                const detailsLinkCell = $('<td class="primary">');
+                                const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
+                                detailsLinkCell.append(detailsLink);
+                                row.append(detailsLinkCell);
+
+                                filteredTable.append(row);
+                            }
+                        } else {
                             const row = $('<tr></tr>');
                             row.append($('<th>'));
                             row.append($('<th>').text('Nazwa'));
@@ -103,43 +140,6 @@ const addDayListeners = () => {
                                 const imgTag = $('<img alt="" src="">').attr('src', task.assigned_to);
                                 const imgCell = $('<td>').append(imgTag);
                                 row.append(imgCell);
-
-                                if (task.status === 'Do zrobienia') {
-                                    row.append($('<td class="primary">').text(task.status));
-                                } else if (task.status === 'Zrobione') {
-                                    row.append($('<td class="success">').text(task.status));
-                                }
-
-                                const detailsLinkCell = $('<td class="primary">');
-                                const detailsLink = $('<a class="primary">').text('Szczegóły').attr('href', '/task/' + task.id + '/');
-                                detailsLinkCell.append(detailsLink);
-                                row.append(detailsLinkCell);
-
-                                filteredTable.append(row);
-                            }
-
-                        } else if (data.position === "pracownik") {
-                            const row = $('<tr></tr>');
-                            row.append($('<th>'));
-                            row.append($('<th>').text('Nazwa'));
-                            row.append($('<th>').text('Opis'));
-                            row.append($('<th>').text('Status'));
-                            row.append($('<th>').text(''));
-                            filteredTableThead.append(row);
-
-                            const filteredTable = $('#tasks-table-content tbody');
-                            filteredTable.empty();
-                            filteredTable.show();
-                            for (const task of data.filtered_tasks) {
-                                const row = $('<tr></tr>');
-
-                                if (task.is_important === true) {
-                                    row.append($('<td class="important">'));
-                                } else {
-                                    row.append($('<td>'));
-                                }
-                                row.append($('<td>').text(task.name))
-                                row.append($('<td>').text(task.description.length > 70 ? task.description.substring(0, 70) + "..." : task.description));
 
                                 if (task.status === 'Do zrobienia') {
                                     row.append($('<td class="primary">').text(task.status));

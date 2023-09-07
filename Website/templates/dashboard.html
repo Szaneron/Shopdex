@@ -31,16 +31,7 @@
                     </span>
                 </div>
                 <div>
-                    {% if user.userprofile.position == 'Szef' %}
-                        <div class="bar_card_content">
-                            <h2>{{ progress_bar_data.percentage_done }}%</h2>
-                            <span>Wykonano {{ progress_bar_data.all_done }} z {{ progress_bar_data.all_to_do }}</span>
-                        </div>
-                        <div class="progress_bar_empty">
-                            <div class="progress_bar_success"
-                                 style="--width: {{ progress_bar_data.percentage_done }}%"></div>
-                        </div>
-                    {% elif user.userprofile.position == 'Pracownik' %}
+                    {% if user.userprofile.position == 'Pracownik' %}
                         <div class="bar_card_content">
                             <h2>{{ progress_bar_data_for_user.percentage_done }}%</h2>
                             <span>Wykonano {{ progress_bar_data_for_user.all_done }} z {{ progress_bar_data_for_user.all_to_do }}</span>
@@ -50,6 +41,15 @@
                             <div class="progress_bar_success"
                                  style="--width: {{ progress_bar_data_for_user.percentage_done }}%">
                             </div>
+                        </div>
+                    {% else %}
+                        <div class="bar_card_content">
+                            <h2>{{ progress_bar_data.percentage_done }}%</h2>
+                            <span>Wykonano {{ progress_bar_data.all_done }} z {{ progress_bar_data.all_to_do }}</span>
+                        </div>
+                        <div class="progress_bar_empty">
+                            <div class="progress_bar_success"
+                                 style="--width: {{ progress_bar_data.percentage_done }}%"></div>
                         </div>
                     {% endif %}
                 </div>
@@ -113,7 +113,46 @@
         <div class="tasks-table">
             <h2>Zadania</h2>
             <table>
-                {% if user.userprofile.position == 'Szef' %}
+                {% if user.userprofile.position == 'Pracownik' %}
+                    {% if all_tasks_for_user.count == 0 %}
+                        <thead>
+                        <tr>
+                            <th>Brak zadań</th>
+                        </tr>
+                        </thead>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Nazwa</th>
+                            <th>Opis</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in all_tasks_for_user_dashboard %}
+                            <tr>
+                                {% if task.is_important %}
+                                    <td class="important"></td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                <td>{{ task.name }}</td>
+                                <td>{{ task.description|truncatechars:70 }}</td>
+                                {% if task.status == "Do zrobienia" %}
+                                    <td class="primary">{{ task.status }}</td>
+                                {% elif task.status == "Zrobione" %}
+                                    <td class="success">{{ task.status }}</td>
+                                {% endif %}
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
+                {% else %}
                     {% if all_tasks.count == 0 %}
                         <thead>
                         <tr>
@@ -154,54 +193,15 @@
                         {% endfor %}
                         </tbody>
                     {% endif %}
-                {% elif user.userprofile.position == 'Pracownik' %}
-                    {% if all_tasks_for_user.count == 0 %}
-                        <thead>
-                        <tr>
-                            <th>Brak zadań</th>
-                        </tr>
-                        </thead>
-                    {% else %}
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th>Nazwa</th>
-                            <th>Opis</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for task in all_tasks_for_user_dashboard %}
-                            <tr>
-                                {% if task.is_important %}
-                                    <td class="important"></td>
-                                {% else %}
-                                    <td></td>
-                                {% endif %}
-                                <td>{{ task.name }}</td>
-                                <td>{{ task.description|truncatechars:70 }}</td>
-                                {% if task.status == "Do zrobienia" %}
-                                    <td class="primary">{{ task.status }}</td>
-                                {% elif task.status == "Zrobione" %}
-                                    <td class="success">{{ task.status }}</td>
-                                {% endif %}
-                                <td class="primary">
-                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    {% endif %}
                 {% endif %}
             </table>
-            {% if user.userprofile.position == 'Szef' %}
-                {% if all_tasks.count > 5 %}
-                    <a href="{% url 'task' %}">Pokaż wszystkie ({{ all_tasks.count }})</a>
-                {% endif %}
-            {% elif user.userprofile.position == 'Pracownik' %}
+            {% if user.userprofile.position == 'Pracownik' %}
                 {% if all_tasks_for_user.count > 5 %}
                     <a href="{% url 'task' %}">Pokaż wszystkie ({{ all_tasks_for_user.count }})</a>
+                {% endif %}
+            {% else %}
+                {% if all_tasks.count > 5 %}
+                    <a href="{% url 'task' %}">Pokaż wszystkie ({{ all_tasks.count }})</a>
                 {% endif %}
             {% endif %}
         </div>
@@ -324,7 +324,7 @@
                 } else if (message_type === "warning") {
                     swalType = 'warning';
                 }
-                
+
                 // Display SweetAlert popup
                 swal({
                     icon: swalType,

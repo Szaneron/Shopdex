@@ -13,7 +13,7 @@ class UserProfile(models.Model):
     - profile_picture (ImageField, optional): Profile picture of the user.
     - assigned_tasks (PositiveIntegerField, default=0): Number of assigned tasks.
     - completed_tasks (PositiveIntegerField, default=0): Number of completed tasks.
-    - position (CharField): User's position, choices: "Pracownik" or "Szef".
+    - position (CharField): User's position, choices: "Pracownik" or "Szef" or "Admin".
 
     Methods:
     - __str__: Returns the string representation of the user profile.
@@ -23,6 +23,7 @@ class UserProfile(models.Model):
     POSITION_CHOICES = [
         ('Pracownik', 'Pracownik'),
         ('Szef', 'Szef'),
+        ('Admin', 'Admin'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True)

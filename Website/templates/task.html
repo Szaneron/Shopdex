@@ -25,7 +25,47 @@
         <!-- Tasks Table -->
         <div class="tasks-table">
             <table id="tasks-table-content">
-                {% if user.userprofile.position == 'Szef' %}
+                {% if user.userprofile.position == 'Pracownik' %}
+                    {% if all_tasks_for_user.count == 0 %}
+                        <thead>
+                        <tr>
+                            <th>Brak zadań</th>
+                        </tr>
+                        </thead>
+                        <tbody style="display: none"></tbody>
+                    {% else %}
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Nazwa</th>
+                            <th>Opis</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in all_tasks_for_user %}
+                            <tr>
+                                {% if task.is_important %}
+                                    <td class="important"></td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                <td>{{ task.name }}</td>
+                                <td>{{ task.description|truncatechars:70 }}</td>
+                                {% if task.status == "Do zrobienia" %}
+                                    <td class="primary">{{ task.status }}</td>
+                                {% elif task.status == "Zrobione" %}
+                                    <td class="success">{{ task.status }}</td>
+                                {% endif %}
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endif %}
+                {% else %}
                     {% if all_tasks.count == 0 %}
                         <thead>
                         <tr>
@@ -56,46 +96,6 @@
                                 <td>{{ task.description|truncatechars:70 }}</td>
                                 <td><img src="{{ task.assigned_to.user.userprofile.profile_picture.url }}" alt="">
                                 </td>
-                                {% if task.status == "Do zrobienia" %}
-                                    <td class="primary">{{ task.status }}</td>
-                                {% elif task.status == "Zrobione" %}
-                                    <td class="success">{{ task.status }}</td>
-                                {% endif %}
-                                <td class="primary">
-                                    <a class="primary" href="{% url 'task_detail_view' task_id=task.id %}">Szczegóły</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    {% endif %}
-                {% elif user.userprofile.position == 'Pracownik' %}
-                    {% if all_tasks_for_user.count == 0 %}
-                        <thead>
-                        <tr>
-                            <th>Brak zadań</th>
-                        </tr>
-                        </thead>
-                        <tbody style="display: none"></tbody>
-                    {% else %}
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th>Nazwa</th>
-                            <th>Opis</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for task in all_tasks_for_user %}
-                            <tr>
-                                {% if task.is_important %}
-                                    <td class="important"></td>
-                                {% else %}
-                                    <td></td>
-                                {% endif %}
-                                <td>{{ task.name }}</td>
-                                <td>{{ task.description|truncatechars:70 }}</td>
                                 {% if task.status == "Do zrobienia" %}
                                     <td class="primary">{{ task.status }}</td>
                                 {% elif task.status == "Zrobione" %}

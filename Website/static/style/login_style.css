@@ -165,6 +165,8 @@
     letter-spacing: 1px;
     text-align: center;
     cursor: pointer;
+    background-color: var(--color-secondary);
+    color: var(--color-white);
     box-shadow: var(--box-shadow);
 }
 
