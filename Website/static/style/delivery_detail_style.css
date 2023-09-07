@@ -25,7 +25,7 @@ main .nav button {
     display: none;
 }
 
-.task-content {
+.delivery-content {
     margin-top: 1rem;
     margin-bottom: 1rem;
     width: 100%;
@@ -34,48 +34,63 @@ main .nav button {
     background-color: var(--color-white);
 }
 
-.task-card {
+.delivery-card {
     display: grid;
     grid-template-columns: 60% 40%;
 }
 
-.task-card-left {
+.delivery-card-left {
     padding: var(--card-padding);
 }
 
-.task-name {
+.delivery-delivery-company {
     border-bottom: 2px solid var(--color-secondary);
 }
 
-.task-important {
+.delivery-form {
     margin-top: 0.5rem;
-    color: var(--color-danger);
-    font-weight: 500;
+    color: var(--color-primary);
     font-size: 1.1rem;
+    font-weight: 500;
 }
 
-.task-description {
+.delivery-generated-context {
+    color: var(--color-danger);
+    font-weight: 500;
+}
+
+.delivery-description {
     border-bottom: 2px solid var(--color-secondary);
     margin-top: 2rem;
 }
 
-.task-date {
+.delivery-date {
     margin-top: 0.5rem;
     text-align: right;
 }
 
-.task-card-right {
+.delivery-card-right {
     padding: var(--card-padding);
 }
 
-.task-assignment img {
-    margin: auto;
-    width: 8rem;
-    height: 8rem;
-    border-radius: 50%;
+.delivery-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
 }
 
-.task-status-todo {
+.delivery-icon span {
+    font-size: 4.5rem;
+    border-bottom: 2px solid var(--color-secondary);
+}
+
+.delivery-icon img {
+    width: 8rem;
+    height: 8rem;
+}
+
+.delivery-status-on-the-way {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -90,8 +105,7 @@ main .nav button {
     margin: 1.5rem auto;
 }
 
-
-.task-status-done {
+.delivery-status-received {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -105,14 +119,34 @@ main .nav button {
     margin: 1.5rem auto;
 }
 
+.delivery-status-not-delivered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-white);;
+    width: fit-content;
+    padding: 0.5rem 1.5rem 0.5rem 1.5rem;
+    border-radius: var(--card-border-radius);
+    background-color: var(--color-danger);
+    text-align: center;
+    margin: 1.5rem auto;
+}
+
 .buttons-container {
     margin-top: 2rem;
     display: grid;
     grid-template-columns: 60% 40%;
 }
 
-.task-to-complete {
-    width: 10rem;
+.action-buttons-status form {
+    display: flex;
+    padding-left: 1.8rem;
+    gap: 1rem;
+}
+
+.delivery-received {
+    width: 12rem;
     font-weight: 500;
     color: var(--color-white);
     background-color: var(--color-success);
@@ -121,18 +155,25 @@ main .nav button {
     cursor: pointer;
 }
 
-.action-buttons-done {
-    padding-left: 1.8rem;
+.delivery-not-delivered {
+    width: 12rem;
+    font-weight: 500;
+    color: var(--color-white);
+    background-color: var(--color-danger);
+    border-radius: var(--border-radius-1);
+    padding: 1rem;
+    cursor: pointer;
 }
 
-.action-buttons {
+.action-buttons-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
 }
 
-.task-to-edit {
-    width: 10rem;
+.delivery-to-edit {
+    width: 12rem;
+    height: 45px;
     font-weight: 500;
     color: #939397;
     background-color: var(--color-white);
@@ -142,13 +183,9 @@ main .nav button {
     cursor: pointer;
 }
 
-.task-to-edit:hover {
-    background-color: #939397;
-    color: var(--color-white);
-}
-
-.task-to-delete {
-    width: 10rem;
+.delivery-to-delete {
+    width: 12rem;
+    height: 45px;
     font-weight: 500;
     color: var(--color-danger);
     background-color: var(--color-white);
@@ -158,7 +195,12 @@ main .nav button {
     cursor: pointer;
 }
 
-.task-to-delete:hover {
+.delivery-to-edit:hover {
+    background-color: #939397;
+    color: var(--color-white);
+}
+
+.delivery-to-delete:hover {
     background-color: var(--color-danger);
     color: var(--color-white);
 }
@@ -195,11 +237,6 @@ main .nav button {
     margin: 1.3rem 0 1.3rem 0;
 }
 
-.form-group-checkbox {
-    display: flex;
-    gap: 1rem;
-}
-
 /* Close button */
 .close-form {
     position: absolute;
@@ -221,6 +258,15 @@ main .nav button {
     color: var(--color-dark);
 }
 
+.form-control-description {
+    width: 100%;
+    font-weight: 500;
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-dark);
+}
+
 select {
     appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -229,15 +275,6 @@ select {
     background-position: right 0.7rem top 50%;
     background-size: 0.65rem auto;
     padding: 5px;
-}
-
-.form-control-description {
-    width: 100%;
-    font-weight: 500;
-    padding: 1rem;
-    border-radius: 1rem;
-    border: 1px solid var(--color-secondary);
-    color: var(--color-dark);
 }
 
 .send-element {
@@ -264,12 +301,34 @@ select {
         grid-template-columns: 7rem auto;
     }
 
-    .task-card {
+    .delivery-card {
         grid-template-columns: 50% 50%;
     }
 
     .buttons-container {
         grid-template-columns: 50% 50%;
+    }
+
+    .action-buttons-status {
+        display: flex;
+        justify-content: center;
+    }
+
+    .action-buttons-status form {
+        display: grid;
+        grid-template-columns: 1fr;
+        padding: 0;
+        margin: auto;
+    }
+
+    .action-buttons-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .delivery-received {
+        /*margin-bottom: 1rem;*/
     }
 
     .modal-content {
@@ -320,7 +379,7 @@ select {
         font-size: 2rem;
     }
 
-    .task-card {
+    .delivery-card {
         grid-template-columns: 1fr;
     }
 
@@ -328,24 +387,7 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .action-buttons-done {
-        padding-left: 0;
-        display: flex;
-        justify-content: center;
+    .action-buttons-status {
         margin-bottom: 1rem;
-    }
-
-    .action-buttons {
-        display: block;
-        text-align: center;
-    }
-
-    .action-buttons button {
-        margin-bottom: 1rem;
-    }
-
-    .modal-content {
-        margin-top: 2.5rem;
-        width: 85%;
     }
 }

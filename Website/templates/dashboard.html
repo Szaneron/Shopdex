@@ -71,6 +71,7 @@
                 {% else %}
                     <thead>
                     <tr>
+                        <th></th>
                         <th>Dostawca</th>
                         <th>Forma</th>
                         <th>Ilość</th>
@@ -82,6 +83,7 @@
                     <tbody>
                     {% for delivery in delivery_for_dashboard %}
                         <tr>
+                            <td></td>
                             <td>{{ delivery.delivery_company }}</td>
                             <td>{{ delivery.form }}</td>
                             <td>{{ delivery.quantity }}</td>
@@ -93,14 +95,16 @@
                             {% elif delivery.status == "Nie dostarczona" %}
                                 <td class="danger">{{ delivery.status }}</td>
                             {% endif %}
-                            <td class="primary">Szczegóły</td>
+                            <td class="primary">
+                                <a class="primary" href="{% url 'delivery_detail_view' delivery_id=delivery.id %}">Szczegóły</a>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 {% endif %}
             </table>
             {% if all_delivery.count > 5 %}
-                <a href="#">Pokaż wszystkie ({{ all_delivery.count }})</a>
+                <a href="{% url 'delivery' %}">Pokaż wszystkie ({{ all_delivery.count }})</a>
             {% endif %}
         </div>
         <!-- End of Delivery Table -->
@@ -320,7 +324,7 @@
                 } else if (message_type === "warning") {
                     swalType = 'warning';
                 }
-
+                
                 // Display SweetAlert popup
                 swal({
                     icon: swalType,

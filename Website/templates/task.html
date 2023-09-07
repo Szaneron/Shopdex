@@ -9,7 +9,6 @@
     <title>Shopdex</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/task_style.css' %}"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
 <body>
@@ -24,7 +23,7 @@
         <h1>Zadania</h1>
 
         <!-- Tasks Table -->
-        <div class="tasks-table" data-tasks="{{ tasks|safe }}">
+        <div class="tasks-table">
             <table id="tasks-table-content">
                 {% if user.userprofile.position == 'Szef' %}
                     {% if all_tasks.count == 0 %}
@@ -143,7 +142,7 @@
                     <li>Śro</li>
                     <li>Czw</li>
                     <li>Pią</li>
-                    <li>Son</li>
+                    <li>Sob</li>
                     <li>Nie</li>
                 </ul>
                 <ul class="days"></ul>
@@ -154,39 +153,9 @@
     </div>
     <!-- End of Right Section -->
 
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         const token = '{{ csrf_token }}'
-
-        // Function to display Django messages as SweetAlert alerts
-        function displayMessages() {
-            {% for message in messages %}
-                let message_type = "{{ message.tags }}";
-                let message_text = "{{ message }}";
-
-                // Map Django message types to SweetAlert types
-                let swalType = 'info';
-                if (message_type === "success") {
-                    swalType = 'success';
-                } else if (message_type === "error") {
-                    swalType = 'error';
-                } else if (message_type === "warning") {
-                    swalType = 'warning';
-                }
-
-                // Display SweetAlert popup
-                swal({
-                    icon: swalType,
-                    title: message_text,
-                    timer: 3000, // Auto-close after 3 seconds
-                });
-            {% endfor %}
-        }
-
-        // Call the function when the page loads
-        $(document).ready(function () {
-            displayMessages();
-        });
     </script>
     <script src="../static/js/task.js"></script>
 </div>

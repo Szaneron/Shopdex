@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/delivery_style.css' %}"/>
+
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar Section -->
+    {% include  "sidebar.html" %}
+    <!-- End of Sidebar Section-->
+
+    <!-- Main content -->
+    <main>
+        <h1>Dostawy</h1>
+
+        <!-- Delivery Table -->
+        <div class="delivery-table">
+            <table id="delivery-table-content">
+                {% if all_delivery.count == 0 %}
+                    <thead>
+                    <tr>
+                        <th>Brak zadań</th>
+                    </tr>
+                    </thead>
+                    <tbody style="display: none"></tbody>
+                {% else %}
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Dostawca</th>
+                        <th>Forma</th>
+                        <th>Ilość</th>
+                        <th>Opis</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for delivery in all_delivery %}
+                        <tr>
+                            <td></td>
+                            <td>{{ delivery.delivery_company }}</td>
+                            <td>{{ delivery.form }}</td>
+                            <td>{{ delivery.quantity }}</td>
+                            <td>{{ delivery.description|truncatechars:70 }}</td>
+
+                            {% if delivery.status == "W drodze" %}
+                                <td class="primary">{{ delivery.status }}</td>
+                            {% elif delivery.status == "Odebrana" %}
+                                <td class="success">{{ delivery.status }}</td>
+                            {% elif delivery.status == "Nie dostarczona" %}
+                                <td class="danger">{{ delivery.status }}</td>
+                            {% endif %}
+                            <td class="primary">
+                                <a class="primary" href="{% url 'delivery_detail_view' delivery_id=delivery.id %}">Szczegóły</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
+            </table>
+        </div>
+        <!-- End of Delivery Table -->
+    </main>
+    <!-- End of Main Content -->
+
+    <!-- Right Section -->
+    <div class="right-section">
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="wrapper">
+            <header>
+                <p class="current-date" id="selected-month"></p>
+                <div class="icons">
+                    <span id="prev" class="material-icons-sharp">chevron_left</span>
+                    <span id="next" class="material-icons-sharp">chevron_right</span>
+                </div>
+            </header>
+            <div class="calendar">
+                <ul class="weeks">
+                    <li>Pon</li>
+                    <li>Wto</li>
+                    <li>Śro</li>
+                    <li>Czw</li>
+                    <li>Pią</li>
+                    <li>Sob</li>
+                    <li>Nie</li>
+                </ul>
+                <ul class="days"></ul>
+            </div>
+        </div>
+        <!-- End of Calendar Section -->
+
+    </div>
+    <!-- End of Right Section -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const token = '{{ csrf_token }}'
+    </script>
+    <script src="../static/js/delivery.js"></script>
+</div>
+
+</body>
+</html>
