@@ -165,7 +165,7 @@ class Return(models.Model):
 
     name = models.CharField(max_length=100)
     product_list = models.TextField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Do spakowania')
     return_date = models.DateField(default=timezone.now)
     creation_time = models.DateTimeField(default=timezone.now)
 

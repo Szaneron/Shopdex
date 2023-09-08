@@ -77,8 +77,9 @@ def dashboard(request):
     all_delivery = Delivery.objects.filter(delivery_date=current_date).order_by('-status', 'creation_time')
     delivery_for_dashboard = all_delivery[:5]
 
-    all_returns = Return.objects.filter(return_date=current_date).order_by('-status', 'creation_time')
-    returns_for_dashboard = all_returns[:3]
+    all_returns = Return.objects.filter(status__in=["Do spakowania", "Przygotowany"]).order_by('status',
+                                                                                               'creation_time')
+    returns_for_dashboard = all_returns[:2]
 
     def get_progress_bar_data(all_tasks, all_delivery, all_returns):
         """
@@ -103,7 +104,7 @@ def dashboard(request):
         all_to_do = all_tasks.count() + all_delivery.count() + all_returns.count()
         progress_tasks_done = all_tasks.filter(status="Zrobione")
         progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
-        progress_returns_done = all_returns.filter(status="Odebrany")
+        progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
         all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
 
         def calculate_percentage(x, y):
@@ -146,7 +147,7 @@ def dashboard(request):
         all_to_do = all_tasks_for_user.count() + all_delivery.count() + all_returns.count()
         progress_tasks_done = all_tasks_for_user.filter(status="Zrobione")
         progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
-        progress_returns_done = all_returns.filter(status="Odebrany")
+        progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
         all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
 
         def calculate_percentage(x, y):
