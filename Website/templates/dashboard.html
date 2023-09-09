@@ -279,7 +279,7 @@
                     {% endif %}
                 </table>
                 {% if all_returns.count > 2 %}
-                    <a href="#">Pokaż wszystkie ({{ all_returns.count }})</a>
+                    <a href="{% url 'returns' %}">Pokaż wszystkie ({{ all_returns.count }})</a>
                 {% endif %}
             </div>
             <!-- End of Returns Table -->

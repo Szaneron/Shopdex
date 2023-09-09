@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime, timedelta
-
+from django.core.paginator import Paginator
 from .forms import TaskEditForm, DeliveryEditForm
 from .models import Task, Delivery, Day, Return
 
@@ -420,3 +420,34 @@ def delivery_detail_view(request, delivery_id):
     }
 
     return render(request, 'delivery_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def returns(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    current_date = get_current_date()
+
+    active_returns = Return.objects.filter(status__in=["Do spakowania", "Przygotowany"]).order_by('status',
+                                                                                                  'return_date')
+
+    received_returns = Return.objects.filter(status="Odebrany").order_by('status', '-return_date')
+
+    paginator_received = Paginator(received_returns, 5)  # Show 5 items per page
+    page_number_received = request.GET.get('page_received')
+    page_received = paginator_received.get_page(page_number_received)
+
+    paginator_active = Paginator(active_returns, 5)  # Show 5 items per page
+    page_number_active = request.GET.get('page_active')
+    page_active = paginator_active.get_page(page_number_active)
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'active_returns': active_returns,
+        'received_returns': received_returns,
+        'current_date': current_date,
+        'page_received': page_received,
+        'page_active': page_active,
+    }
+    return render(request, "return.html", context)
