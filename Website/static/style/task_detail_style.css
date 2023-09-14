@@ -39,29 +39,36 @@ main .nav button {
     grid-template-columns: 60% 40%;
 }
 
+.task-heading {
+    display: flex;
+    border-bottom: 2px solid var(--color-secondary);
+    margin: 1.8rem 1.8rem 0 1.8rem;
+}
+
 .task-card-left {
     padding: var(--card-padding);
 }
 
-.task-name {
-    border-bottom: 2px solid var(--color-secondary);
-}
 
 .task-important {
-    margin-top: 0.5rem;
     color: var(--color-danger);
     font-weight: 500;
     font-size: 1.1rem;
 }
 
-.task-description {
+.task-card-left h3 {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 500;
     border-bottom: 2px solid var(--color-secondary);
-    margin-top: 2rem;
+    margin: 1.8rem 0 0.5rem 0;
 }
 
 .task-date {
-    margin-top: 0.5rem;
+    border-top: 2px solid var(--color-secondary);
     text-align: right;
+    padding-top: 0.2rem;
+    margin: 0 1.8rem 0 1.8rem;
 }
 
 .task-card-right {
@@ -87,7 +94,7 @@ main .nav button {
     background-color: var(--color-primary);
     text-align: center;
     font-size: 1rem;
-    margin: 1.5rem auto;
+    margin: 1.5rem auto 0 auto;
 }
 
 
@@ -106,61 +113,80 @@ main .nav button {
 }
 
 .buttons-container {
-    margin-top: 2rem;
+    padding: var(--card-padding);
     display: grid;
     grid-template-columns: 60% 40%;
 }
 
+.buttons-left form {
+    display: flex;
+    gap: 1rem;
+}
+
+.buttons-right {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
 .task-to-complete {
-    width: 10rem;
+    width: 12rem;
     font-weight: 500;
     color: var(--color-white);
     background-color: var(--color-success);
     border-radius: var(--border-radius-1);
     padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
-.action-buttons-done {
-    padding-left: 1.8rem;
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+.task-to-complete:hover {
+    top: -3px;
+    box-shadow: var(--box-shadow);
 }
 
 .task-to-edit {
-    width: 10rem;
+    width: 12rem;
+    height: 45px;
     font-weight: 500;
     color: #939397;
     background-color: var(--color-white);
     border: 2px solid #939397;
     border-radius: var(--border-radius-1);
-    padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
 .task-to-edit:hover {
     background-color: #939397;
     color: var(--color-white);
+    top: -3px;
+    box-shadow: var(--box-shadow);
 }
 
 .task-to-delete {
-    width: 10rem;
+    width: 12rem;
+    height: 45px;
     font-weight: 500;
     color: var(--color-danger);
     background-color: var(--color-white);
     border: 2px solid var(--color-danger);
     border-radius: var(--border-radius-1);
-    padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
 .task-to-delete:hover {
     background-color: var(--color-danger);
     color: var(--color-white);
+    top: -3px;
+    box-shadow: var(--box-shadow);
 }
 
 /* Modal */
@@ -226,9 +252,8 @@ select {
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-color: var(--color-white);
-    background-position: right 0.7rem top 50%;
+    background-position: right 1.2rem top 50%;
     background-size: 0.65rem auto;
-    padding: 5px;
 }
 
 .form-control-description {
@@ -270,6 +295,12 @@ select {
 
     .buttons-container {
         grid-template-columns: 50% 50%;
+    }
+
+    .buttons-right {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
     }
 
     .modal-content {
@@ -328,24 +359,16 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .action-buttons-done {
-        padding-left: 0;
+    .buttons-left {
         display: flex;
         justify-content: center;
         margin-bottom: 1rem;
     }
 
-    .action-buttons {
-        display: block;
-        text-align: center;
-    }
-
-    .action-buttons button {
-        margin-bottom: 1rem;
-    }
-
     .modal-content {
+        max-height: 85% !important;
+        overflow-y: scroll !important;
         margin-top: 2.5rem;
-        width: 85%;
+        width: 90%;
     }
 }
