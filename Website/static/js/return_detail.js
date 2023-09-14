@@ -42,3 +42,48 @@ if (openEditModal) {
         }
     }
 }
+
+
+function confirmDeleteReturn() {
+    swal({
+        title: "",
+        text: "Czy na pewno chcesz usunąć ten zwrot?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+        .then((willDelete) => {
+            if (willDelete) {
+                // After confirming, we delete the task using AJAX
+                $.ajax({
+                    type: "POST",
+                    url: `/return/${return_id}/`,
+                    data: {
+                        csrfmiddlewaretoken: token,
+                        return_delete: "return_delete",
+                    },
+                    success: function () {
+                        window.location.href = "/dashboard/";
+                        swal("Zwrot został usunięty!", {
+                            icon: "success",
+                            timer: 3000,
+                        })
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log(xhr.status, textStatus, errorThrown);
+                        swal("Wystąpił błąd podczas usuwania zwrotu.", {
+                            icon: "error",
+                            timer: 3000,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                });
+            } else {
+                swal("Zwrot nie został usunięty.", {
+                    icon: "error",
+                    timer: 3000,
+                });
+            }
+        });
+}

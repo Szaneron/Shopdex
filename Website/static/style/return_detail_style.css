@@ -48,7 +48,7 @@ main .nav button {
     margin: 1.8rem 1.8rem 0 1.8rem;
 }
 
-.return-receiving-company span {
+.receiving-company-name {
     font-weight: 550;
     font-size: 1.1rem;
 }
@@ -343,4 +343,94 @@ select {
     text-align: center;
     cursor: pointer;
     box-shadow: var(--box-shadow);
+}
+
+@media screen and (max-width: 1300px) {
+    .container {
+        grid-template-columns: 7rem auto;
+    }
+
+    .return-card {
+        grid-template-columns: 50% 50%;
+    }
+
+    .buttons-container {
+        grid-template-columns: 50% 50%;
+    }
+
+    .buttons-left form {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .buttons-right {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .modal-content {
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100%;
+        height: auto;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+        padding-bottom: 2rem;
+    }
+
+    main {
+        width: 100%;
+        height: fit-content;
+        margin-top: 7rem;
+        padding: 0 1rem;
+    }
+
+    main .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    main .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 2rem;
+    }
+
+    main .nav button span {
+        font-size: 2rem;
+    }
+
+    .return-card {
+        grid-template-columns: 1fr;
+    }
+
+    .buttons-container {
+        grid-template-columns: 1fr;
+    }
+
+    .buttons-left form {
+        margin-bottom: 1rem;
+    }
+
+    .receiving-company-span {
+        display: none;
+    }
 }

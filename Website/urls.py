@@ -13,5 +13,4 @@ urlpatterns = [
     path('delivery/<int:delivery_id>/', delivery_detail_view, name='delivery_detail_view'),
     path('return/', returns, name='returns'),
     path('return/<int:return_id>/', returns_detail_view, name='returns_detail_view'),
-
 ]

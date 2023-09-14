@@ -349,10 +349,6 @@ select {
         justify-items: center;
     }
 
-    .delivery-received {
-        /*margin-bottom: 1rem;*/
-    }
-
     .modal-content {
         width: 70%;
     }

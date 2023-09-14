@@ -33,7 +33,8 @@
                     <h2> {{ return_detail.name }}</h2>
                 </div>
                 <div class="return-receiving-company">
-                    Firma odbierająca: <span>{{ return_detail.receiving_company }}</span>
+                    <span class="receiving-company-span">Firma odbierająca:</span> <span
+                        class="receiving-company-name">{{ return_detail.receiving_company }}</span>
                 </div>
             </div>
             <div class="return-card">
@@ -90,7 +91,7 @@
                             {% csrf_token %}
                             <button class="return-packed" name="return_packed" type="submit">Zwrot przygotowany
                             </button>
-                            <button class="generate-notice" name="generate_notice" type="submit">Generuj awizo
+                            <button class="generate-notice" name="generate_notice" type="submit">Pobierz awizo
                             </button>
                         </form>
                     {% elif return_detail.status == 'Przygotowany' %}
@@ -98,13 +99,13 @@
                             {% csrf_token %}
                             <button class="return-received" name="return_received" type="submit">Zwrot odebrany
                             </button>
-                            <button class="generate-notice" name="generate_notice" type="submit">Generuj awizo
+                            <button class="generate-notice" name="generate_notice" type="submit">Pobierz awizo
                             </button>
                         </form>
                     {% elif return_detail.status == 'Odebrany' %}
                         <form method="post">
                             {% csrf_token %}
-                            <button class="generate-notice" name="generate_notice" type="submit">Generuj awizo
+                            <button class="generate-notice" name="generate_notice" type="submit">Pobierz awizo
                             </button>
                         </form>
                     {% endif %}
@@ -112,7 +113,7 @@
 
                 <div class="buttons-right">
                     {% if user.userprofile.position != 'Pracownik' %}
-                        <button class="return-to-edit" id="return_edit_button" name="return_edit">Edytuj
+                        <button class="return-to-edit" id="return_edit_button" name="return_edited">Edytuj
                             zwrot
                         </button>
                         <button class="return-to-delete" id="return_delete_button" name="return_delete"
@@ -187,7 +188,7 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     const token = '{{ csrf_token }}'
-    const delivery_id = '{{ delivery.id}}'
+    const return_id = '{{ return_detail.id}}'
 
     // Function to display Django messages as SweetAlert alerts
     function displayMessages() {

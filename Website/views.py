@@ -1,12 +1,17 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
+
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm
 from .models import Task, Delivery, Day, Return
+from reportlab.lib.pagesizes import A6, landscape
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 
 def get_current_date():
@@ -460,17 +465,88 @@ def returns_detail_view(request, return_id):
     user = request.user
     return_edit_form = ReturnEditForm(request.POST, instance=return_detail)
 
+    def generate_return_pdf(return_id):
+        """
+        Generate a PDF file for a given return based on its ID.
+
+        :param return_id: The ID of the return for which the PDF file should be generated.
+        :type return_id: int
+        :return: HttpResponse containing the PDF file with return data.
+        :rtype: HttpResponse
+        """
+        return_data = get_object_or_404(Return, id=return_id)
+        package_quantity = return_data.package_quantity
+
+        # Add a font to PDF
+        pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
+        pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="return_{return_id}.pdf"'
+
+        # Creating a PDF file with ReportLab
+        c = canvas.Canvas(response, pagesize=landscape(A6))
+
+        for package_number in range(1, package_quantity + 1):
+            c.setFont("Poppins_bold", 15)
+            c.drawString(50, 250, 'Awizo: ')
+            c.setFont("Poppins_light", 15)
+            c.drawString(100, 250, return_data.notice)
+
+            c.setFont("Poppins_bold", 15)
+            c.drawString(50, 200, 'Hurtownia: ')
+            c.setFont("Poppins_light", 15)
+            c.drawString(134, 200, return_data.wholesale)
+
+            c.setFont("Poppins_bold", 15)
+            c.drawString(50, 150, 'Data: ')
+            c.setFont("Poppins_light", 15)
+            c.drawString(93, 150, return_data.return_date.strftime('%d/%m/%Y'))
+
+            c.setFont("Poppins_bold", 15)
+            c.drawString(50, 100, 'Uwagi: ')
+            c.setFont("Poppins_light", 15)
+            c.drawString(103, 100, return_data.notes)
+
+            c.setFont("Poppins_bold", 15)
+            c.drawString(50, 50, 'Ilość paczek: ')
+            c.setFont("Poppins_light", 15)
+            c.drawString(150, 50, f'{package_number}/{package_quantity}')
+
+            if package_number < package_quantity:
+                c.showPage()  # Switch to next page
+
+        c.save()
+
+        return response
+
     if request.method == 'POST':
         if 'return_packed' in request.POST:
             return_detail.status = 'Przygotowany'
             return_detail.save()
             messages.success(request, 'Zwrot oznaczony jako przygotowany!')
             return redirect('dashboard')
+
         if 'return_received' in request.POST:
             return_detail.status = 'Odebrany'
             return_detail.save()
             messages.success(request, 'Zwrot oznaczony jako odebrany!')
             return redirect('dashboard')
+
+        if 'generate_notice' in request.POST:
+            return_pdf_response = generate_return_pdf(return_id)
+            return return_pdf_response
+
+        if 'return_edited' in request.POST:
+            if return_edit_form.is_valid():
+                return_edit_form.save()
+                messages.success(request, 'Zwrot został zedytowany!')
+                return redirect('returns_detail_view', return_id=return_id)
+
+        if 'return_delete' in request.POST:
+            return_detail.delete()
+            return redirect('dashboard')
+
     else:
         return_edit_form = ReturnEditForm(instance=return_detail)
 
