@@ -1,6 +1,5 @@
 from django import forms
-from .models import Task, Delivery
-from django.forms import widgets
+from .models import Task, Delivery, Return
 
 
 class TaskEditForm(forms.ModelForm):
@@ -23,4 +22,17 @@ class DeliveryEditForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 10}),
             'delivery_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class ReturnEditForm(forms.ModelForm):
+    class Meta:
+        model = Return
+        fields = ['name', 'description', 'status', 'return_date', 'receiving_company', 'notice', 'wholesale', 'notes',
+                  'package_quantity']
+
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 10}),
+            'notes': forms.Textarea(attrs={'rows': 10}),
+            'return_date': forms.DateInput(attrs={'type': 'date'}),
         }

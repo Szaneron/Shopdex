@@ -164,10 +164,16 @@ class Return(models.Model):
     ]
 
     name = models.CharField(max_length=100)
-    product_list = models.TextField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Do spakowania')
     return_date = models.DateField(default=timezone.now)
     creation_time = models.DateTimeField(default=timezone.now)
+    # Nowe pola
+    receiving_company = models.CharField(max_length=50)
+    notice = models.CharField(max_length=50)
+    wholesale = models.CharField(max_length=50)
+    notes = models.TextField()
+    package_quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"{self.name} - {self.return_date}"

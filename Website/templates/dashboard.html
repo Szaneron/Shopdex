@@ -272,14 +272,16 @@
                                 {% elif return.status == "Odebrany" %}
                                     <td class="success">{{ return.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     {% endif %}
                 </table>
                 {% if all_returns.count > 2 %}
-                    <a href="#">Pokaż wszystkie ({{ all_returns.count }})</a>
+                    <a href="{% url 'returns' %}">Pokaż wszystkie ({{ all_returns.count }})</a>
                 {% endif %}
             </div>
             <!-- End of Returns Table -->

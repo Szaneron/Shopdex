@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/return_style.css' %}"/>
+
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar Section -->
+    {% include  "sidebar.html" %}
+    <!-- End of Sidebar Section-->
+
+    <!-- Main content -->
+    <main>
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
+        <h1>Zwroty</h1>
+
+        <!-- Active-retruns Table -->
+        <div class="active-retruns-table">
+            <h2>Aktywne zwroty</h2>
+            <table id="active-retruns-table-content">
+                {% if active_returns.count == 0 %}
+                    <thead>
+                    <tr>
+                        <th>Brak aktywnych zwrotów</th>
+                    </tr>
+                    </thead>
+                    <tbody style="display: none"></tbody>
+                {% else %}
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nazwa</th>
+                        <th>Opis</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for return in page_active %}
+                        <tr>
+                            <td>{{ page_active.start_index|add:forloop.counter0 }}</td>
+                            <td>{{ return.name }}</td>
+                            <td>{{ return.description|truncatechars:70 }}</td>
+                            {% if return.status == "Do spakowania" %}
+                                <td class="primary">{{ return.status }}</td>
+                            {% elif return.status == "Przygotowany" %}
+                                <td class="secondary">{{ return.status }}</td>
+                            {% elif return.status == "Odebrany" %}
+                                <td class="success">{{ return.status }}</td>
+                            {% endif %}
+                            <td>{{ return.return_date }}</td>
+                            <td class="primary">
+                                <a class="primary"
+                                   href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
+            </table>
+        </div>
+        <!-- End of Active-retruns Table -->
+
+        <!-- Active-retruns pagiantion bar -->
+        {% if page_active.paginator.num_pages > 1 %}
+            <div class="pagination-container">
+                <ul class="pagination">
+                    {% if page_active.has_previous %}
+                        <li><a href="?page_active=1">&laquo;&laquo;</a></li>
+                        <li><a href="?page_active={{ page_active.previous_page_number }}">&laquo;</a></li>
+                    {% endif %}
+
+                    {% for i in page_active.paginator.page_range %}
+                        {% if page_active.number == i %}
+                            <li class="active"><span>{{ i }}</span></li>
+                        {% else %}
+                            <li><a href="?page_active={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_active.has_next %}
+                        <li><a href="?page_active={{ page_active.next_page_number }}">&raquo;</a></li>
+                        <li><a href="?page_active={{ page_active.paginator.num_pages }}">&raquo;&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+        <!-- End of Active-retruns pagiantion bar -->
+
+        <!-- Received retruns Table -->
+        <div class="received-retruns-table">
+            <h2>Odebrane zwroty</h2>
+            <table id="received-retruns-table-content">
+                {% if received_returns.count == 0 %}
+                    <thead>
+                    <tr>
+                        <th>Brak odebranych zwrotów</th>
+                    </tr>
+                    </thead>
+                    <tbody style="display: none"></tbody>
+                {% else %}
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nazwa</th>
+                        <th>Opis</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for return in page_received %}
+                        <tr>
+                            <td>{{ page_received.start_index|add:forloop.counter0 }}</td>
+                            <td>{{ return.name }}</td>
+                            <td>{{ return.description|truncatechars:70 }}</td>
+                            {% if return.status == "Do spakowania" %}
+                                <td class="primary">{{ return.status }}</td>
+                            {% elif return.status == "Przygotowany" %}
+                                <td class="secondary">{{ return.status }}</td>
+                            {% elif return.status == "Odebrany" %}
+                                <td class="success">{{ return.status }}</td>
+                            {% endif %}
+                            <td>{{ return.return_date }}</td>
+                            <td class="primary">
+                                <a class="primary"
+                                   href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
+            </table>
+        </div>
+        <!-- End of Received retruns Table -->
+
+        <!-- Recived-retruns pagiantion bar -->
+        {% if page_received.paginator.num_pages > 1 %}
+            <div class="pagination-container">
+                <ul class="pagination">
+                    {% if page_received.has_previous %}
+                        <li><a href="?page_received=1">&laquo;&laquo;</a></li>
+                        <li><a href="?page_received={{ page_received.previous_page_number }}">&laquo;</a></li>
+                    {% endif %}
+
+                    {% for i in page_received.paginator.page_range %}
+                        {% if page_received.number == i %}
+                            <li class="active"><span>{{ i }}</span></li>
+                        {% else %}
+                            <li><a href="?page_received={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_received.has_next %}
+                        <li><a href="?page_received={{ page_received.next_page_number }}">&raquo;</a></li>
+                        <li><a href="?page_received={{ page_received.paginator.num_pages }}">&raquo;&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+        <!-- End of Recived-retruns pagiantion bar -->
+    </main>
+    <!-- End of Main content -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="../static/js/return.js"></script>
+</body>
+</html>

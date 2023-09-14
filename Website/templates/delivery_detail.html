@@ -29,15 +29,20 @@
         </div>
         <h1>Szczegóły dostawy</h1>
         <div class="delivery-content">
+
+            <div class="delivery-heading">
+                <div class="delivery-delivery-company"><h2> {{ delivery.delivery_company }}</h2></div>
+            </div>
+
             <div class="delivery-card">
                 <div class="delivery-card-left" id="delivery-card-left-id">
-                    <div class="delivery-delivery-company"><h2> {{ delivery.delivery_company }}</h2></div>
                     <div class="delivery-form"> {{ delivery.form }}</div>
                     {% if delivery.generated_context %}
                         <div class="delivery-generated-context"> {{ delivery.generated_context }}</div>
                     {% endif %}
+
+                    <h3>Opis</h3>
                     <div class="delivery-description"> {{ delivery.description|linebreaksbr }}</div>
-                    <div class="delivery-date"> {{ delivery.delivery_date|date:"j E Y" }}</div>
                 </div>
 
                 <div class="delivery-card-right">
@@ -67,8 +72,11 @@
                         </div>
                     {% endif %}
                 </div>
-
             </div>
+            <div class="delivery-date">
+                {{ delivery.delivery_date|date:"j E Y" }}
+            </div>
+
             <div class="buttons-container">
 
                 <div class="action-buttons-status">

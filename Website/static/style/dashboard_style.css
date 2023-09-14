@@ -260,6 +260,11 @@ main .tasks-table a {
     font-weight: 600;
 }
 
+.right-section .returns .returns-table td a {
+    all: unset;
+    cursor: pointer;
+}
+
 .right-section .nav {
     display: flex;
     justify-content: end;

@@ -34,6 +34,12 @@ main .nav button {
     background-color: var(--color-white);
 }
 
+.delivery-heading {
+    display: flex;
+    border-bottom: 2px solid var(--color-secondary);
+    margin: 1.8rem 1.8rem 0 1.8rem;
+}
+
 .delivery-card {
     display: grid;
     grid-template-columns: 60% 40%;
@@ -43,12 +49,15 @@ main .nav button {
     padding: var(--card-padding);
 }
 
-.delivery-delivery-company {
+.delivery-card-left h3 {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 500;
     border-bottom: 2px solid var(--color-secondary);
+    margin: 1.8rem 0 0.5rem 0;
 }
 
 .delivery-form {
-    margin-top: 0.5rem;
     color: var(--color-primary);
     font-size: 1.1rem;
     font-weight: 500;
@@ -59,14 +68,11 @@ main .nav button {
     font-weight: 500;
 }
 
-.delivery-description {
-    border-bottom: 2px solid var(--color-secondary);
-    margin-top: 2rem;
-}
-
 .delivery-date {
-    margin-top: 0.5rem;
+    border-top: 2px solid var(--color-secondary);
     text-align: right;
+    padding-top: 0.2rem;
+    margin: 0 1.8rem 0 1.8rem;
 }
 
 .delivery-card-right {
@@ -77,7 +83,7 @@ main .nav button {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .delivery-icon span {
@@ -102,7 +108,7 @@ main .nav button {
     background-color: var(--color-primary);
     text-align: center;
     font-size: 1rem;
-    margin: 1.5rem auto;
+    margin: 1.5rem auto 0 auto;
 }
 
 .delivery-status-received {
@@ -116,7 +122,7 @@ main .nav button {
     border-radius: var(--card-border-radius);
     background-color: var(--color-success);
     text-align: center;
-    margin: 1.5rem auto;
+    margin: 1.5rem auto 0 auto;
 }
 
 .delivery-status-not-delivered {
@@ -130,7 +136,7 @@ main .nav button {
     border-radius: var(--card-border-radius);
     background-color: var(--color-danger);
     text-align: center;
-    margin: 1.5rem auto;
+    margin: 1.5rem auto 0 auto;
 }
 
 .buttons-container {
@@ -153,7 +159,11 @@ main .nav button {
     border-radius: var(--border-radius-1);
     padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
+
 
 .delivery-not-delivered {
     width: 12rem;
@@ -163,6 +173,9 @@ main .nav button {
     border-radius: var(--border-radius-1);
     padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
 .action-buttons-container {
@@ -179,8 +192,10 @@ main .nav button {
     background-color: var(--color-white);
     border: 2px solid #939397;
     border-radius: var(--border-radius-1);
-    padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
 .delivery-to-delete {
@@ -191,8 +206,15 @@ main .nav button {
     background-color: var(--color-white);
     border: 2px solid var(--color-danger);
     border-radius: var(--border-radius-1);
-    padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
+}
+
+.delivery-received:hover, .delivery-not-delivered:hover, .delivery-to-edit:hover, .delivery-to-delete:hover {
+    top: -3px;
+    box-shadow: var(--box-shadow);
 }
 
 .delivery-to-edit:hover {
@@ -325,10 +347,6 @@ select {
         display: grid;
         grid-template-columns: 1fr;
         justify-items: center;
-    }
-
-    .delivery-received {
-        /*margin-bottom: 1rem;*/
     }
 
     .modal-content {

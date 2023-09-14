@@ -1,0 +1,226 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/return_detail_style.css' %}"/>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar Section -->
+    {% include  "sidebar.html" %}
+    <!-- End of Sidebar Section-->
+
+    <!-- Main content -->
+    <main>
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
+        <h1>Szczegóły zwrotu</h1>
+        <div class="return-container">
+            <div class="return-heading">
+                <div class="return-name">
+                    <h2> {{ return_detail.name }}</h2>
+                </div>
+                <div class="return-receiving-company">
+                    <span class="receiving-company-span">Firma odbierająca:</span> <span
+                        class="receiving-company-name">{{ return_detail.receiving_company }}</span>
+                </div>
+            </div>
+            <div class="return-card">
+                <div class="return-card-left">
+                    <h3>Opis</h3>
+                    <div class="return-description"> {{ return_detail.description|linebreaksbr }}</div>
+                    <div class="return-info">
+                        <h3>Informacje do druku</h3>
+                        <div class="return-notice">
+                            <b>Awizo:</b> {{ return_detail.notice }}
+                        </div>
+                        <div class="return-wholesale">
+                            <b>Hurtownia:</b> {{ return_detail.wholesale }}
+                        </div>
+                        <div class="return-date-info">
+                            <b>Data:</b> {{ return_detail.return_date|date:"d/m/Y" }}
+                        </div>
+                        <div class="return-notes">
+                            <b>Uwagi:</b> {{ return_detail.notes }}
+                        </div>
+                        <div class="return-package_quantity">
+                            <b>Liczba paczek:</b> {{ return_detail.package_quantity }}
+                        </div>
+                    </div>
+                </div>
+                <div class="return-card-right">
+                    <div class="right-content">
+                        <img src="{% static 'images/return_images/return.png' %}" alt="">
+
+                        {% if return_detail.status == 'Do spakowania' %}
+                            <div class="return-status-to-pack">
+                                <span class="material-icons-sharp">schedule</span>
+                                <h2>{{ return_detail.status }}</h2>
+                            </div>
+                        {% elif return_detail.status == 'Przygotowany' %}
+                            <div class="return-status-prepared">
+                                <span class="material-icons-sharp">done</span>
+                                <h2>{{ return_detail.status }}</h2>
+                            </div>
+                        {% elif return_detail.status == 'Odebrany' %}
+                            <div class="return-status-received">
+                                <span class="material-icons-sharp">local_shipping</span>
+                                <h2>{{ return_detail.status }}</h2>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="return-date"> {{ return_detail.return_date|date:"j E Y" }}</div>
+            <div class="buttons-container">
+                <div class="buttons-left">
+                    {% if return_detail.status == 'Do spakowania' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="return-packed" name="return_packed" type="submit">Zwrot przygotowany
+                            </button>
+                            <button class="generate-notice" name="generate_notice" type="submit">Pobierz awizo
+                            </button>
+                        </form>
+                    {% elif return_detail.status == 'Przygotowany' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="return-received" name="return_received" type="submit">Zwrot odebrany
+                            </button>
+                            <button class="generate-notice" name="generate_notice" type="submit">Pobierz awizo
+                            </button>
+                        </form>
+                    {% elif return_detail.status == 'Odebrany' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="generate-notice" name="generate_notice" type="submit">Pobierz awizo
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <div class="buttons-right">
+                    {% if user.userprofile.position != 'Pracownik' %}
+                        <button class="return-to-edit" id="return_edit_button" name="return_edited">Edytuj
+                            zwrot
+                        </button>
+                        <button class="return-to-delete" id="return_delete_button" name="return_delete"
+                                onclick="confirmDeleteReturn()">Usuń zwrot
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- End of Main content -->
+
+    <!-- Start modal form content -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Edycja dostawy</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-content">
+                    <div class="form-content-left">
+                        <div class="form-group">
+                            <label class="control-label">Nazwa</label>
+                            {% render_field return_edit_form.name class="form-control" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Opis</label>
+                            {% render_field return_edit_form.description class="form-control-description" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Status</label>
+                            {% render_field return_edit_form.status class="form-control" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Data dostawy</label>
+                            {% render_field return_edit_form.return_date class="form-control" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Firma odbierająca</label>
+                            {% render_field return_edit_form.receiving_company class="form-control" %}
+                        </div>
+                    </div>
+                    <div class="form-content-right">
+                        <div class="form-group">
+                            <label class="control-label">Awizo</label>
+                            {% render_field return_edit_form.notice class="form-control" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Hurtownia</label>
+                            {% render_field return_edit_form.wholesale class="form-control" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Uwagi</label>
+                            {% render_field return_edit_form.notes class="form-control-description" %}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Ilość paczek</label>
+                            {% render_field return_edit_form.package_quantity class="form-control" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="send-element">
+                    <button class="send-form" name="return_edited" type="submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal form content -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    const token = '{{ csrf_token }}'
+    const return_id = '{{ return_detail.id}}'
+
+    // Function to display Django messages as SweetAlert alerts
+    function displayMessages() {
+        {% for message in messages %}
+            let message_type = "{{ message.tags }}";
+            let message_text = "{{ message }}";
+
+            // Map Django message types to SweetAlert types
+            let swalType = 'info';
+            if (message_type === "success") {
+                swalType = 'success';
+            } else if (message_type === "error") {
+                swalType = 'error';
+            } else if (message_type === "warning") {
+                swalType = 'warning';
+            }
+
+            // Display SweetAlert popup
+            swal({
+                icon: swalType,
+                title: message_text,
+                timer: 3000, // Auto-close after 3 seconds
+            });
+        {% endfor %}
+    }
+
+    // Call the function when the page loads
+    $(document).ready(function () {
+        displayMessages();
+    });
+</script>
+<script src="{% static 'js/return_detail.js' %}"></script>
+
+</body>
+</html>
