@@ -12,6 +12,7 @@
 }
 
 /* main */
+
 main {
     margin-top: 1.4rem;
 }
@@ -25,7 +26,7 @@ main .nav button {
     display: none;
 }
 
-.delivery-content {
+.return-container {
     margin-top: 1rem;
     margin-bottom: 1rem;
     width: 100%;
@@ -34,63 +35,64 @@ main .nav button {
     background-color: var(--color-white);
 }
 
-.delivery-card {
+.return-card {
     display: grid;
     grid-template-columns: 60% 40%;
 }
 
-.delivery-card-left {
+.return-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--color-secondary);
+    margin: 1.8rem 1.8rem 0 1.8rem;
+}
+
+.return-receiving-company span {
+    font-weight: 550;
+    font-size: 1.1rem;
+}
+
+.return-card-left, .return-card-right {
     padding: var(--card-padding);
 }
 
-.delivery-delivery-company {
-    border-bottom: 2px solid var(--color-secondary);
-}
-
-.delivery-form {
-    margin-top: 0.5rem;
-    color: var(--color-primary);
+.return-card-left h3 {
+    display: inline-block;
     font-size: 1.1rem;
     font-weight: 500;
-}
-
-.delivery-generated-context {
-    color: var(--color-danger);
-    font-weight: 500;
-}
-
-.delivery-description {
     border-bottom: 2px solid var(--color-secondary);
-    margin-top: 2rem;
+    margin-bottom: 0.5rem;
 }
 
-.delivery-date {
-    margin-top: 0.5rem;
-    text-align: right;
+.return-notice b, .return-wholesale b, .return-date-info b, .return-notes b, .return-package_quantity b {
+    font-weight: 550;
 }
 
-.delivery-card-right {
-    padding: var(--card-padding);
-}
-
-.delivery-icon {
+.return-card-right {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 2rem;
+    justify-content: center;
 }
 
-.delivery-icon span {
-    font-size: 4.5rem;
-    border-bottom: 2px solid var(--color-secondary);
-}
-
-.delivery-icon img {
+.return-card-right img {
     width: 8rem;
     height: 8rem;
+    margin: auto;
 }
 
-.delivery-status-on-the-way {
+.return-date {
+    border-top: 2px solid var(--color-secondary);
+    text-align: right;
+    padding-top: 0.2rem;
+    margin: 0 1.8rem 0 1.8rem;
+}
+
+.return-info {
+    margin-top: 1.8rem;
+}
+
+.return-status-to-pack {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -105,7 +107,22 @@ main .nav button {
     margin: 1.5rem auto;
 }
 
-.delivery-status-received {
+.return-status-prepared {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-white);;
+    width: fit-content;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    border-radius: var(--card-border-radius);
+    background-color: var(--color-secondary);
+    text-align: center;
+    font-size: 1rem;
+    margin: 1.5rem auto;
+}
+
+.return-status-received {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -115,37 +132,46 @@ main .nav button {
     padding: 0.5rem 1.5rem 0.5rem 1.5rem;
     border-radius: var(--card-border-radius);
     background-color: var(--color-success);
-    text-align: center;
-    margin: 1.5rem auto;
-}
-
-.delivery-status-not-delivered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-    color: var(--color-white);;
-    width: fit-content;
-    padding: 0.5rem 1.5rem 0.5rem 1.5rem;
-    border-radius: var(--card-border-radius);
-    background-color: var(--color-danger);
     text-align: center;
     margin: 1.5rem auto;
 }
 
 .buttons-container {
-    margin-top: 2rem;
+    padding: var(--card-padding);
     display: grid;
     grid-template-columns: 60% 40%;
 }
 
-.action-buttons-status form {
+.buttons-left form {
     display: flex;
-    padding-left: 1.8rem;
     gap: 1rem;
 }
 
-.delivery-received {
+.buttons-right {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.return-packed {
+    width: 12rem;
+    font-weight: 500;
+    color: var(--color-white);
+    background-color: var(--color-secondary);
+    border-radius: var(--border-radius-1);
+    padding: 1rem;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
+}
+
+.return-packed:hover {
+    top: -5px;
+    box-shadow: var(--box-shadow);
+}
+
+.return-received {
     width: 12rem;
     font-weight: 500;
     color: var(--color-white);
@@ -153,25 +179,35 @@ main .nav button {
     border-radius: var(--border-radius-1);
     padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
-.delivery-not-delivered {
+.return-received:hover {
+    top: -2px;
+    box-shadow: var(--box-shadow);
+}
+
+.generate-notice {
     width: 12rem;
     font-weight: 500;
     color: var(--color-white);
-    background-color: var(--color-danger);
+    background-color: var(--color-primary);
     border-radius: var(--border-radius-1);
     padding: 1rem;
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
-.action-buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+.generate-notice:hover {
+    top: -5px;
+    box-shadow: var(--box-shadow);
 }
 
-.delivery-to-edit {
+.return-to-edit {
     width: 12rem;
     height: 45px;
     font-weight: 500;
@@ -180,9 +216,12 @@ main .nav button {
     border: 2px solid #939397;
     border-radius: var(--border-radius-1);
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
-.delivery-to-delete {
+.return-to-delete {
     width: 12rem;
     height: 45px;
     font-weight: 500;
@@ -191,16 +230,23 @@ main .nav button {
     border: 2px solid var(--color-danger);
     border-radius: var(--border-radius-1);
     cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
 }
 
-.delivery-to-edit:hover {
+.return-to-edit:hover {
     background-color: #939397;
     color: var(--color-white);
+    top: -5px;
+    box-shadow: var(--box-shadow);
 }
 
-.delivery-to-delete:hover {
+.return-to-delete:hover {
     background-color: var(--color-danger);
     color: var(--color-white);
+    top: -5px;
+    box-shadow: var(--box-shadow);
 }
 
 /* Modal */
@@ -219,12 +265,17 @@ main .nav button {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 30%;
     transform: translate(-50%, -50%);
     background-color: var(--color-white);
     padding: 2rem;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.form-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
 }
 
 .modal-content h2 {
@@ -292,100 +343,4 @@ select {
     text-align: center;
     cursor: pointer;
     box-shadow: var(--box-shadow);
-}
-
-@media screen and (max-width: 1300px) {
-    .container {
-        grid-template-columns: 7rem auto;
-    }
-
-    .delivery-card {
-        grid-template-columns: 50% 50%;
-    }
-
-    .buttons-container {
-        grid-template-columns: 50% 50%;
-    }
-
-    .action-buttons-status {
-        display: flex;
-        justify-content: center;
-    }
-
-    .action-buttons-status form {
-        display: grid;
-        grid-template-columns: 1fr;
-        padding: 0;
-        margin: auto;
-    }
-
-    .action-buttons-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        justify-items: center;
-    }
-
-    .delivery-received {
-        /*margin-bottom: 1rem;*/
-    }
-
-    .modal-content {
-        width: 70%;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .container {
-        width: 100%;
-        height: auto;
-        grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
-        padding-bottom: 2rem;
-    }
-
-    main {
-        width: 100%;
-        height: fit-content;
-        margin-top: 7rem;
-        padding: 0 1rem;
-    }
-
-    main .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        align-items: center;
-        background-color: var(--color-white);
-        padding: 0 var(--padding-1);
-        height: 4.6rem;
-        width: 100%;
-        z-index: 2;
-        box-shadow: 0 1rem 1rem var(--color-light);
-        margin: 0;
-    }
-
-    main .nav button {
-        display: inline-block;
-        background-color: transparent;
-        cursor: pointer;
-        color: var(--color-dark);
-        position: absolute;
-        left: 2rem;
-    }
-
-    main .nav button span {
-        font-size: 2rem;
-    }
-
-    .delivery-card {
-        grid-template-columns: 1fr;
-    }
-
-    .buttons-container {
-        grid-template-columns: 1fr;
-    }
-
-    .action-buttons-status {
-        margin-bottom: 1rem;
-    }
 }

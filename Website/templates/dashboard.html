@@ -272,7 +272,9 @@
                                 {% elif return.status == "Odebrany" %}
                                     <td class="success">{{ return.status }}</td>
                                 {% endif %}
-                                <td class="primary">Szczegóły</td>
+                                <td class="primary">
+                                    <a class="primary" href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

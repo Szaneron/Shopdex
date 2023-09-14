@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
-from .forms import TaskEditForm, DeliveryEditForm
+from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm
 from .models import Task, Delivery, Day, Return
 
 
@@ -451,3 +451,34 @@ def returns(request):
         'page_active': page_active,
     }
     return render(request, "return.html", context)
+
+
+@login_required(login_url='login_user')
+def returns_detail_view(request, return_id):
+    return_detail = get_object_or_404(Return, id=return_id)
+    current_date = get_current_date()
+    user = request.user
+    return_edit_form = ReturnEditForm(request.POST, instance=return_detail)
+
+    if request.method == 'POST':
+        if 'return_packed' in request.POST:
+            return_detail.status = 'Przygotowany'
+            return_detail.save()
+            messages.success(request, 'Zwrot oznaczony jako przygotowany!')
+            return redirect('dashboard')
+        if 'return_received' in request.POST:
+            return_detail.status = 'Odebrany'
+            return_detail.save()
+            messages.success(request, 'Zwrot oznaczony jako odebrany!')
+            return redirect('dashboard')
+    else:
+        return_edit_form = ReturnEditForm(instance=return_detail)
+
+    context = {
+        'return_detail': return_detail,
+        'current_date': current_date,
+        'user': user,
+        'return_edit_form': return_edit_form,
+    }
+
+    return render(request, 'return_detail.html', context)

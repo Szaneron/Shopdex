@@ -56,7 +56,7 @@
                         <tr>
                             <td>{{ page_active.start_index|add:forloop.counter0 }}</td>
                             <td>{{ return.name }}</td>
-                            <td>{{ return.product_list|truncatechars:70 }}</td>
+                            <td>{{ return.description|truncatechars:70 }}</td>
                             {% if return.status == "Do spakowania" %}
                                 <td class="primary">{{ return.status }}</td>
                             {% elif return.status == "Przygotowany" %}
@@ -66,7 +66,8 @@
                             {% endif %}
                             <td>{{ return.return_date }}</td>
                             <td class="primary">
-                                <a class="primary" href="#">Szczegóły</a>
+                                <a class="primary"
+                                   href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -129,7 +130,7 @@
                         <tr>
                             <td>{{ page_received.start_index|add:forloop.counter0 }}</td>
                             <td>{{ return.name }}</td>
-                            <td>{{ return.product_list|truncatechars:70 }}</td>
+                            <td>{{ return.description|truncatechars:70 }}</td>
                             {% if return.status == "Do spakowania" %}
                                 <td class="primary">{{ return.status }}</td>
                             {% elif return.status == "Przygotowany" %}
@@ -139,7 +140,8 @@
                             {% endif %}
                             <td>{{ return.return_date }}</td>
                             <td class="primary">
-                                <a class="primary" href="#">Szczegóły</a>
+                                <a class="primary"
+                                   href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
                             </td>
                         </tr>
                     {% endfor %}
