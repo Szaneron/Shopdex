@@ -213,7 +213,7 @@ main .nav button {
 }
 
 .delivery-received:hover, .delivery-not-delivered:hover, .delivery-to-edit:hover, .delivery-to-delete:hover {
-    top: -2px;
+    top: -3px;
     box-shadow: var(--box-shadow);
 }
 

@@ -167,7 +167,7 @@ main .nav button {
 }
 
 .return-packed:hover {
-    top: -2px;
+    top: -3px;
     box-shadow: var(--box-shadow);
 }
 
