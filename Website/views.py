@@ -44,6 +44,9 @@ def get_employee_rating(user):
 
 
 def login_user(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
