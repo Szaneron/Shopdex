@@ -177,3 +177,29 @@ class Return(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.return_date}"
+
+
+class OrderItem(models.Model):
+    """
+    Model representing an item to be ordered by the company.
+
+    Fields:
+    1. name (CharField): Name of the item.
+    2. description (TextField): Description of the item.
+    3. status (CharField): Status of the order item, available choices defined in STATUS_CHOICES.
+    4. creation_time (DateTimeField): Date and time when the order item was created.
+    """
+
+    STATUS_CHOICES = [
+        ('Do zamówienia', 'Do zamówienia'),
+        ('Zamówiony', 'Zamówiony'),
+        ('Niedostępny', 'Niedostępny'),
+    ]
+
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Do zamówienia')
+    creation_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name
