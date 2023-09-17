@@ -6,8 +6,9 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
-from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm
-from .models import Task, Delivery, Day, Return
+from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm
+from .models import Task, Delivery, Day, Return, OrderItem
+
 from reportlab.lib.pagesizes import A6, landscape
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
@@ -558,6 +559,96 @@ def returns_detail_view(request, return_id):
         'current_date': current_date,
         'user': user,
         'return_edit_form': return_edit_form,
+    }
+
+    return render(request, 'return_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def order_item(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    current_date = get_current_date()
+    create_order_item_form = OrderItemCreateForm(request.POST)
+
+    items_to_order = OrderItem.objects.all().order_by('status', 'creation_time')
+
+    paginator = Paginator(items_to_order, 10)  # Show 10 items per page
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    if request.method == 'POST':
+        if 'create_order_item' in request.POST:
+            form = OrderItemCreateForm(request.POST)
+            if form.is_valid():
+                form.save()  # Save the new OrderItem
+                messages.success(request, 'Przedmiot został dodany!')
+                return redirect('order_item')
+
+        if 'change_status' in request.POST:
+            item_id = request.POST.get('item_id')
+            new_status = request.POST.get('new_status')
+            # Retrieve the OrderItem
+            item = OrderItem.objects.get(id=item_id)
+            item.status = new_status
+            item.save()
+
+    else:
+        create_order_item_form = OrderItemCreateForm()
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'items_to_order': items_to_order,
+        'current_date': current_date,
+        'page': page,
+        'create_order_item_form': create_order_item_form,
+    }
+    return render(request, "order_item.html", context)
+
+
+@login_required(login_url='login_user')
+def order_item_detail_view(request, return_id):
+    order_item_detail = get_object_or_404(Return, id=return_id)
+    current_date = get_current_date()
+    user = request.user
+    order_item_edit_form = OrderItemEditForm(request.POST, instance=order_item_detail)
+
+    if request.method == 'POST':
+        if 'return_packed' in request.POST:
+            pass
+            # return_detail.status = 'Przygotowany'
+            # return_detail.save()
+            # messages.success(request, 'Zwrot oznaczony jako przygotowany!')
+            # return redirect('dashboard')
+
+        if 'return_received' in request.POST:
+            pass
+            # return_detail.status = 'Odebrany'
+            # return_detail.save()
+            # messages.success(request, 'Zwrot oznaczony jako odebrany!')
+            # return redirect('dashboard')
+
+        if 'return_edited' in request.POST:
+            pass
+            # if return_edit_form.is_valid():
+            #     return_edit_form.save()
+            #     messages.success(request, 'Zwrot został zedytowany!')
+            #     return redirect('returns_detail_view', return_id=return_id)
+
+        if 'return_delete' in request.POST:
+            pass
+            # return_detail.delete()
+            # return redirect('dashboard')
+
+    else:
+        order_item_edit_form = OrderItemEditForm(instance=order_item_detail)
+
+    context = {
+        'order_item_detail': order_item_detail,
+        'current_date': current_date,
+        'user': user,
+        'order_item_edit_form': order_item_edit_form,
     }
 
     return render(request, 'return_detail.html', context)

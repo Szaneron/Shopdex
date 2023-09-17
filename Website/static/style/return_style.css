@@ -29,7 +29,7 @@ main .nav button {
 main h2 {
     display: inline-block;
     border-bottom: 2px solid var(--color-secondary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .active-retruns-table {
@@ -37,7 +37,7 @@ main h2 {
 }
 
 .received-retruns-table {
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 main .active-retruns-table, .received-retruns-table {
@@ -159,7 +159,6 @@ main table tbody td {
         width: 100%;
         height: auto;
         grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
         padding-bottom: 2rem;
     }
 

@@ -199,7 +199,6 @@ header .current-date {
         width: 100%;
         height: auto;
         grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
         padding-bottom: 2rem;
     }
 

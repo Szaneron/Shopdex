@@ -358,7 +358,7 @@ main .tasks-table a {
     }
 
     main .progress_bar .progress_bar_card .progress_bar_empty {
-        width: 15rem;
+        width: 17rem;
     }
 
     main .delivery-table {
@@ -390,8 +390,8 @@ main .tasks-table a {
 @media screen and (max-width: 768px) {
     .container {
         width: 100%;
+        height: auto;
         grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
     }
 
     main {
@@ -399,28 +399,30 @@ main .tasks-table a {
         padding: 0 1rem;
     }
 
-    main .delivery-table thead tr th:nth-child(3), th:nth-child(4) {
+    main .progress_bar .progress_bar_card .progress_bar_empty {
+        width: 13rem;
+    }
+
+    .delivery-table thead tr th:nth-child(3), .delivery-table thead tr th:nth-child(4) {
         display: none;
     }
 
-    main .delivery-table tbody tr td:nth-child(3), td:nth-child(4) {
+    .delivery-table tbody tr td:nth-child(3), .delivery-table tbody tr td:nth-child(4) {
         display: none;
     }
 
-    main .delivery-table {
-        position: relative;
-        margin: 3rem 0 0 0;
-        width: 100%;
+    .tasks-table thead tr th:nth-child(4) {
+        display: none;
     }
 
-    main .delivery-table table {
-        width: 100%;
-        margin: 0;
+    .tasks-table tbody tr td:nth-child(4) {
+        display: none;
     }
 
     .right-section {
-        width: 94%;
-        margin: 0 auto 4rem;
+        width: 100%;
+        margin: auto;
+        padding: 0 1rem;
     }
 
     .right-section .nav {
