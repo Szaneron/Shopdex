@@ -192,8 +192,8 @@ class OrderItem(models.Model):
 
     STATUS_CHOICES = [
         ('Do zamówienia', 'Do zamówienia'),
-        ('Zamówiony', 'Zamówiony'),
-        ('Niedostępny', 'Niedostępny'),
+        ('Zamówione', 'Zamówione'),
+        ('Niedostępne', 'Niedostępne'),
     ]
 
     name = models.CharField(max_length=100)

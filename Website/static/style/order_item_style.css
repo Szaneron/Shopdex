@@ -312,6 +312,10 @@ select {
     tbody tr td:nth-child(3) {
         display: none;
     }
+
+    .modal-content {
+        width: 60%;
+    }
 }
 
 @media screen and (max-width: 768px) {
@@ -368,5 +372,12 @@ select {
 
     main .nav button span {
         font-size: 2rem;
+    }
+
+    .modal-content {
+        max-height: 85% !important;
+        overflow-y: scroll !important;
+        margin-top: 2.5rem;
+        width: 90%;
     }
 }

@@ -43,11 +43,9 @@ main .nav button {
 .delivery-card {
     display: grid;
     grid-template-columns: 60% 40%;
-}
-
-.delivery-card-left {
     padding: var(--card-padding);
 }
+
 
 .delivery-card-left h3 {
     display: inline-block;
@@ -73,10 +71,6 @@ main .nav button {
     text-align: right;
     padding-top: 0.2rem;
     margin: 0 1.8rem 0 1.8rem;
-}
-
-.delivery-card-right {
-    padding: var(--card-padding);
 }
 
 .delivery-icon {
@@ -140,14 +134,13 @@ main .nav button {
 }
 
 .buttons-container {
-    margin-top: 2rem;
+    padding: var(--card-padding);
     display: grid;
     grid-template-columns: 60% 40%;
 }
 
-.action-buttons-status form {
+.buttons-left form {
     display: flex;
-    padding-left: 1.8rem;
     gap: 1rem;
 }
 
@@ -178,7 +171,7 @@ main .nav button {
     transition: top ease 0.5s;
 }
 
-.action-buttons-container {
+.buttons-right {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -331,19 +324,13 @@ select {
         grid-template-columns: 50% 50%;
     }
 
-    .action-buttons-status {
-        display: flex;
-        justify-content: center;
-    }
-
-    .action-buttons-status form {
+    .buttons-left form {
         display: grid;
         grid-template-columns: 1fr;
-        padding: 0;
-        margin: auto;
+        justify-items: center;
     }
 
-    .action-buttons-container {
+    .buttons-right {
         display: grid;
         grid-template-columns: 1fr;
         justify-items: center;
@@ -359,7 +346,6 @@ select {
         width: 100%;
         height: auto;
         grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
         padding-bottom: 2rem;
     }
 
@@ -399,13 +385,21 @@ select {
 
     .delivery-card {
         grid-template-columns: 1fr;
+        gap: 1.8rem;
     }
 
     .buttons-container {
         grid-template-columns: 1fr;
     }
 
-    .action-buttons-status {
+    .buttons-left form {
         margin-bottom: 1rem;
+    }
+
+    .modal-content {
+        max-height: 85% !important;
+        overflow-y: scroll !important;
+        margin-top: 2.5rem;
+        width: 90%;
     }
 }

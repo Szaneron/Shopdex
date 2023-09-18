@@ -1,4 +1,4 @@
-const active_link = document.getElementById('link_return')
+const active_link = document.getElementById('link_order_item')
 active_link.className = 'active'
 
 const sideMenu = document.querySelector('aside');
@@ -15,11 +15,10 @@ closeBtn.addEventListener('click', () => {
     sideMenu.style.display = '';
 });
 
-
 const editModal = document.getElementById('editModal');
 
 // Get the button that opens the modal
-const openEditModal = document.getElementById('return_edit_button');
+const openEditModal = document.getElementById('order_item_edit_button');
 
 // Get the <span> element that closes the modal
 const span = document.getElementById('close-modal');
@@ -43,11 +42,16 @@ if (openEditModal) {
     }
 }
 
+const form_group_to_hide = document.getElementById('to-hide');
 
-function confirmDeleteReturn() {
+if (user_position === 'Pracownik') {
+    form_group_to_hide.style.display = 'none';
+}
+
+function confirmDeleteOrderItem() {
     swal({
         title: "",
-        text: "Czy na pewno chcesz usunąć ten zwrot?",
+        text: "Czy na pewno chcesz usunąć ten produkt?",
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -57,21 +61,21 @@ function confirmDeleteReturn() {
                 // After confirming, we delete the task using AJAX
                 $.ajax({
                     type: "POST",
-                    url: `/return/${return_id}/`,
+                    url: `/order_item/${order_item_id}/`,
                     data: {
                         csrfmiddlewaretoken: token,
-                        return_delete: "return_delete",
+                        order_item_delete: "order_item_delete",
                     },
                     success: function () {
-                        window.location.href = "/return/";
-                        swal("Zwrot został usunięty!", {
+                        window.location.href = "/order_item/";
+                        swal("Przedmiot został usunięty!", {
                             icon: "success",
                             timer: 3000,
                         })
                     },
                     error: function (xhr, textStatus, errorThrown) {
                         console.log(xhr.status, textStatus, errorThrown);
-                        swal("Wystąpił błąd podczas usuwania zwrotu.", {
+                        swal("Wystąpił błąd podczas usuwania przedmiotu.", {
                             icon: "error",
                             timer: 3000,
                         }).then(() => {
@@ -80,7 +84,7 @@ function confirmDeleteReturn() {
                     }
                 });
             } else {
-                swal("Zwrot nie został usunięty.", {
+                swal("Przedmiot nie został usunięty.", {
                     icon: "error",
                     timer: 3000,
                 });

@@ -16,7 +16,7 @@ closeBtn.addEventListener('click', () => {
 });
 
 function check_if_task_is_important(value) {
-    const card_element = document.getElementById(`task-card-left-id`);
+    const card_element = document.getElementById(`task-card-important-line`);
     if (value === 'True') {
         card_element.style.borderLeft = '4px solid #FF0060';
     }

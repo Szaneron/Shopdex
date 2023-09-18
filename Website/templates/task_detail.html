@@ -33,33 +33,35 @@
                     <h2> {{ task.name }}</h2>
                 </div>
             </div>
-            <div class="task-card">
-                <div class="task-card-left" id="task-card-left-id">
-                    {% if task.is_important %}
-                        <div class="task-important">
-                            <span>Zadanie ważne </span>
-                        </div>
-                    {% endif %}
-                    <h3>Opis</h3>
-                    <div class="task-description"> {{ task.description|linebreaksbr }}</div>
+            <div id="task-card-important-line">
+                <div class="task-card">
+                    <div class="task-card-left">
+                        {% if task.is_important %}
+                            <div class="task-important">
+                                <span>Zadanie ważne </span>
+                            </div>
+                        {% endif %}
+                        <h3>Opis</h3>
+                        <div class="task-description"> {{ task.description|linebreaksbr }}</div>
+                    </div>
+
+                    <div class="task-card-right">
+                        <div class="task-assignment"><img src="{{ task.assigned_to.profile_picture.url }}" alt=""></div>
+                        {% if task.status == 'Do zrobienia' %}
+                            <div class="task-status-todo">
+                                <span class="material-icons-sharp">schedule</span>
+                                <h2>{{ task.status }}</h2>
+                            </div>
+                        {% elif task.status == 'Zrobione' %}
+                            <div class="task-status-done">
+                                <span class="material-icons-sharp">done</span>
+                                <h2>{{ task.status }}</h2>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
                 </div>
-
-                <div class="task-card-right">
-                    <div class="task-assignment"><img src="{{ task.assigned_to.profile_picture.url }}" alt=""></div>
-                    {% if task.status == 'Do zrobienia' %}
-                        <div class="task-status-todo">
-                            <span class="material-icons-sharp">schedule</span>
-                            <h2>{{ task.status }}</h2>
-                        </div>
-                    {% elif task.status == 'Zrobione' %}
-                        <div class="task-status-done">
-                            <span class="material-icons-sharp">done</span>
-                            <h2>{{ task.status }}</h2>
-                        </div>
-                    {% endif %}
-
-                </div>
-
             </div>
             <div class="task-date"> {{ task.task_date|date:"j E Y" }}</div>
 

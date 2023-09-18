@@ -68,31 +68,31 @@
                         <tr>
                             {% if item.status == "Do zamówienia" %}
                                 <td class="status-warning">{{ page.start_index|add:forloop.counter0 }}</td>
-                            {% elif item.status == "Zamówiony" %}
+                            {% elif item.status == "Zamówione" %}
                                 <td class="status-success">{{ page.start_index|add:forloop.counter0 }}</td>
-                            {% elif item.status == "Niedostępny" %}
+                            {% elif item.status == "Niedostępne" %}
                                 <td class="status-danger">{{ page.start_index|add:forloop.counter0 }}</td>
                             {% endif %}
                             <td>{{ item.name }}</td>
                             <td>{{ item.description|truncatechars:70 }}</td>
                             {% if item.status == "Do zamówienia" %}
                                 <td class="primary">{{ item.status }}</td>
-                            {% elif item.status == "Zamówiony" %}
+                            {% elif item.status == "Zamówione" %}
                                 <td class="success">{{ item.status }}</td>
-                            {% elif item.status == "Niedostępny" %}
+                            {% elif item.status == "Niedostępne" %}
                                 <td class="danger">{{ item.status }}</td>
                             {% endif %}
                             <td>
                                 <a class="primary"
-                                   href="#">Szczegóły</a>
+                                   href="{% url 'order_item_detail_view' order_item_id=item.id %}">Szczegóły</a>
                             </td>
                             <td>
                                 <span class="material-icons-sharp change-status green" data-item-id="{{ item.id }}"
-                                      data-status="Zamówiony">done</span>
+                                      data-status="Zamówione">done</span>
                             </td>
                             <td>
                                 <span class="material-icons-sharp change-status red" data-item-id="{{ item.id }}"
-                                      data-status="Niedostępny">close</span>
+                                      data-status="Niedostępne">close</span>
                             </td>
                         </tr>
                     {% endfor %}
