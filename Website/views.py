@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -442,6 +443,26 @@ def returns(request):
 
     received_returns = Return.objects.filter(status="Odebrany").order_by('status', '-return_date')
 
+    search_query = request.GET.get('q')
+    if search_query:
+        # Check if the entered query is a number
+        if search_query.isdigit():
+            # If the query is a number, try to convert it to an integer
+            search_query_int = int(search_query)
+            received_returns = received_returns.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(return_date__day=search_query_int) |
+                Q(return_date__month=search_query_int) |
+                Q(return_date__year=search_query_int)
+            )
+        else:
+            # If the query is not a number, treat it as a text search
+            received_returns = received_returns.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+
     paginator_received = Paginator(received_returns, 5)  # Show 5 items per page
     page_number_received = request.GET.get('page_received')
     page_received = paginator_received.get_page(page_number_received)
@@ -458,6 +479,7 @@ def returns(request):
         'current_date': current_date,
         'page_received': page_received,
         'page_active': page_active,
+        'search_query': search_query,
     }
     return render(request, "return.html", context)
 
@@ -573,14 +595,23 @@ def order_item(request):
 
     items_to_order = OrderItem.objects.all().order_by('status', '-creation_time')
 
+    search_query = request.GET.get('q')
+    if search_query:
+        items_to_order = items_to_order.filter(
+            Q(name__icontains=search_query) | Q(description__icontains=search_query)
+        )
+
     paginator = Paginator(items_to_order, 10)  # Show 10 items per page
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
     if request.method == 'POST':
-        if 'create_order_item' in request.POST:
+        if 'order_item_create' in request.POST:
+            print('send')
             form = OrderItemCreateForm(request.POST)
+            print(form)
             if form.is_valid():
+                print('save')
                 form.save()  # Save the new OrderItem
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('order_item')
@@ -603,6 +634,7 @@ def order_item(request):
         'current_date': current_date,
         'page': page,
         'create_order_item_form': create_order_item_form,
+        'search_query': search_query,
     }
     return render(request, "order_item.html", context)
 

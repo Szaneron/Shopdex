@@ -30,18 +30,25 @@
             </button>
         </div>
         <h1>Przedmiot do zamówienia</h1>
+        <div>
 
+        </div>
         <!-- Order item table -->
-        <div class="order-item-table">
+        <div id="order-item-table" class="order-item-table">
             <div class="order-item-table-header">
                 <h2>Lista przedmiotów</h2>
                 <div class="header-add-content">
-                    <button id="order_item_create_button" name="create_order_item">
+                    <button id="order_item_create_button">
                         <span class="material-icons-sharp add-icon">add</span>
                         <span class="header-text">Dodaj</span>
                     </button>
-
                 </div>
+            </div>
+            <div class="search-box-container">
+                <form id="search-form">
+                    <input type="text" id="search-input" placeholder="Wyszukaj..."
+                           {% if search_query %}value="{{ search_query }}"{% endif %}>
+                </form>
             </div>
             <table id="order-item-table-content">
                 {% if items_to_order.count == 0 %}
@@ -87,12 +94,16 @@
                                    href="{% url 'order_item_detail_view' order_item_id=item.id %}">Szczegóły</a>
                             </td>
                             <td>
-                                <span class="material-icons-sharp change-status green" data-item-id="{{ item.id }}"
-                                      data-status="Zamówione">done</span>
+                                {% if item.status == 'Do zamówienia' %}
+                                    <span class="material-icons-sharp change-status green" data-item-id="{{ item.id }}"
+                                          data-status="Zamówione">done</span>
+                                {% endif %}
                             </td>
                             <td>
-                                <span class="material-icons-sharp change-status red" data-item-id="{{ item.id }}"
-                                      data-status="Niedostępne">close</span>
+                                {% if item.status == 'Do zamówienia' %}
+                                    <span class="material-icons-sharp change-status red" data-item-id="{{ item.id }}"
+                                          data-status="Niedostępne">close</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -103,7 +114,7 @@
         <!-- End of Order item table -->
 
         <!-- Order item pagiantion bar -->
-        {% if page.paginator.num_pages > 1 %}
+        {% if page.paginator.num_pages > 1 and not search_query %}
             <div class="pagination-container">
                 <ul class="pagination">
                     {% if page.has_previous %}

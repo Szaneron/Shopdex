@@ -68,6 +68,30 @@ main table tbody td {
     padding-left: 0.5em;
 }
 
+.received-retruns-table-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.search-box-container {
+    width: fit-content;
+    display: inline-flex;
+    float: right;
+}
+
+.search-box-container form {
+    height: 2rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: var(--border-radius-1);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-dark);
+}
+
 /* end of main */
 
 
@@ -166,6 +190,17 @@ main table tbody td {
         height: fit-content;
         margin-top: 7rem;
         padding: 0 1rem;
+    }
+
+    .received-retruns-table-header h2 {
+        margin: 0;
+    }
+
+    .received-retruns-table-header {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     thead tr th:nth-child(5) {

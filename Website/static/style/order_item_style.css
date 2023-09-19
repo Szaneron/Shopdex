@@ -62,6 +62,26 @@ main h2 {
     color: var(--color-white);
 }
 
+.search-box-container {
+    width: fit-content;
+    margin-top: 1rem;
+    display: inline-flex;
+    float: right;
+}
+
+.search-box-container form {
+    height: 2rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: var(--border-radius-1);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-dark);
+}
+
 .order-item-table {
     margin-top: 1rem;
 }
