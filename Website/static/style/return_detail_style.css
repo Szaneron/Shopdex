@@ -38,6 +38,7 @@ main .nav button {
 .return-card {
     display: grid;
     grid-template-columns: 60% 40%;
+    padding: var(--card-padding);
 }
 
 .return-heading {
@@ -53,9 +54,6 @@ main .nav button {
     font-size: 1.1rem;
 }
 
-.return-card-left, .return-card-right {
-    padding: var(--card-padding);
-}
 
 .return-card-left h3 {
     display: inline-block;
@@ -380,7 +378,6 @@ select {
         width: 100%;
         height: auto;
         grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
         padding-bottom: 2rem;
     }
 
@@ -420,6 +417,7 @@ select {
 
     .return-card {
         grid-template-columns: 1fr;
+        gap: 1.8rem;
     }
 
     .buttons-container {
@@ -430,7 +428,15 @@ select {
         margin-bottom: 1rem;
     }
 
-    .receiving-company-span {
-        display: none;
+    .form-content {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .modal-content {
+        max-height: 85% !important;
+        overflow-y: scroll !important;
+        margin-top: 2.5rem;
+        width: 90%;
     }
 }

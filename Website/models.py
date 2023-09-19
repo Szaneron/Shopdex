@@ -60,7 +60,7 @@ class Task(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField()
-    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='todo')
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='Do zrobienia')
     assigned_to = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     is_important = models.BooleanField(default=False)
     task_date = models.DateField(default=timezone.now)
@@ -192,8 +192,8 @@ class OrderItem(models.Model):
 
     STATUS_CHOICES = [
         ('Do zamówienia', 'Do zamówienia'),
-        ('Zamówiony', 'Zamówiony'),
-        ('Niedostępny', 'Niedostępny'),
+        ('Zamówione', 'Zamówione'),
+        ('Niedostępne', 'Niedostępne'),
     ]
 
     name = models.CharField(max_length=100)

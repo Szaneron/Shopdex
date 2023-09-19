@@ -29,7 +29,7 @@ main .nav button {
 main h2 {
     display: inline-block;
     border-bottom: 2px solid var(--color-secondary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .active-retruns-table {
@@ -37,7 +37,7 @@ main h2 {
 }
 
 .received-retruns-table {
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 main .active-retruns-table, .received-retruns-table {
@@ -66,6 +66,30 @@ main table tbody td {
 
 .active-retruns-table table tr td:first-child, .received-retruns-table table tr td:first-child {
     padding-left: 0.5em;
+}
+
+.received-retruns-table-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.search-box-container {
+    width: fit-content;
+    display: inline-flex;
+    float: right;
+}
+
+.search-box-container form {
+    height: 2rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: var(--border-radius-1);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-dark);
 }
 
 /* end of main */
@@ -159,7 +183,6 @@ main table tbody td {
         width: 100%;
         height: auto;
         grid-template-columns: 1fr;
-        padding: 0 var(--padding-1);
         padding-bottom: 2rem;
     }
 
@@ -167,6 +190,17 @@ main table tbody td {
         height: fit-content;
         margin-top: 7rem;
         padding: 0 1rem;
+    }
+
+    .received-retruns-table-header h2 {
+        margin: 0;
+    }
+
+    .received-retruns-table-header {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     thead tr th:nth-child(5) {

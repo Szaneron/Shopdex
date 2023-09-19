@@ -1,13 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
-from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm
-from .models import Task, Delivery, Day, Return
+from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm
+from .models import Task, Delivery, Day, Return, OrderItem
+
 from reportlab.lib.pagesizes import A6, landscape
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
@@ -441,6 +443,26 @@ def returns(request):
 
     received_returns = Return.objects.filter(status="Odebrany").order_by('status', '-return_date')
 
+    search_query = request.GET.get('q')
+    if search_query:
+        # Check if the entered query is a number
+        if search_query.isdigit():
+            # If the query is a number, try to convert it to an integer
+            search_query_int = int(search_query)
+            received_returns = received_returns.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(return_date__day=search_query_int) |
+                Q(return_date__month=search_query_int) |
+                Q(return_date__year=search_query_int)
+            )
+        else:
+            # If the query is not a number, treat it as a text search
+            received_returns = received_returns.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+
     paginator_received = Paginator(received_returns, 5)  # Show 5 items per page
     page_number_received = request.GET.get('page_received')
     page_received = paginator_received.get_page(page_number_received)
@@ -457,6 +479,7 @@ def returns(request):
         'current_date': current_date,
         'page_received': page_received,
         'page_active': page_active,
+        'search_query': search_query,
     }
     return render(request, "return.html", context)
 
@@ -561,3 +584,99 @@ def returns_detail_view(request, return_id):
     }
 
     return render(request, 'return_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def order_item(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    current_date = get_current_date()
+    create_order_item_form = OrderItemCreateForm(request.POST)
+
+    items_to_order = OrderItem.objects.all().order_by('status', '-creation_time')
+
+    search_query = request.GET.get('q')
+    if search_query:
+        items_to_order = items_to_order.filter(
+            Q(name__icontains=search_query) | Q(description__icontains=search_query)
+        )
+
+    paginator = Paginator(items_to_order, 10)  # Show 10 items per page
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    if request.method == 'POST':
+        if 'order_item_create' in request.POST:
+            print('send')
+            form = OrderItemCreateForm(request.POST)
+            print(form)
+            if form.is_valid():
+                print('save')
+                form.save()  # Save the new OrderItem
+                messages.success(request, 'Przedmiot został dodany!')
+                return redirect('order_item')
+
+        if 'change_status' in request.POST:
+            item_id = request.POST.get('item_id')
+            new_status = request.POST.get('new_status')
+            # Retrieve the OrderItem
+            item = OrderItem.objects.get(id=item_id)
+            item.status = new_status
+            item.save()
+
+    else:
+        create_order_item_form = OrderItemCreateForm()
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'items_to_order': items_to_order,
+        'current_date': current_date,
+        'page': page,
+        'create_order_item_form': create_order_item_form,
+        'search_query': search_query,
+    }
+    return render(request, "order_item.html", context)
+
+
+@login_required(login_url='login_user')
+def order_item_detail_view(request, order_item_id):
+    order_item_detail = get_object_or_404(OrderItem, id=order_item_id)
+    current_date = get_current_date()
+    user = request.user
+    order_item_edit_form = OrderItemEditForm(request.POST, instance=order_item_detail)
+
+    if request.method == 'POST':
+        if 'order_item_ordered' in request.POST:
+            order_item_detail.status = 'Zamówione'
+            order_item_detail.save()
+            messages.success(request, 'Produkt oznaczony jako zamówiony!')
+            return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
+
+        if 'order_item_not_available' in request.POST:
+            order_item_detail.status = 'Niedostępne'
+            order_item_detail.save()
+            messages.success(request, 'Produkt oznaczony jako niedostępny!')
+            return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
+
+        if 'order_item_edited' in request.POST:
+            if order_item_edit_form.is_valid():
+                order_item_edit_form.save()
+                messages.success(request, 'Przedmiot został zedytowany!')
+                return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
+
+        if 'order_item_delete' in request.POST:
+            order_item_detail.delete()
+            return redirect('order_item')
+
+    else:
+        order_item_edit_form = OrderItemEditForm(instance=order_item_detail)
+
+    context = {
+        'order_item_detail': order_item_detail,
+        'current_date': current_date,
+        'user': user,
+        'order_item_edit_form': order_item_edit_form,
+    }
+
+    return render(request, 'order_item_detail.html', context)

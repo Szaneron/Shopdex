@@ -256,6 +256,7 @@
                     {% else %}
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Nazwa</th>
                             <th>Status</th>
                             <th></th>
@@ -264,6 +265,7 @@
                         <tbody>
                         {% for return in returns_for_dashboard %}
                             <tr>
+                                <td></td>
                                 <td>{{ return.name }}</td>
                                 {% if return.status == "Do spakowania" %}
                                     <td class="primary">{{ return.status }}</td>

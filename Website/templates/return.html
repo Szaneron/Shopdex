@@ -64,7 +64,7 @@
                             {% elif return.status == "Odebrany" %}
                                 <td class="success">{{ return.status }}</td>
                             {% endif %}
-                            <td>{{ return.return_date }}</td>
+                            <td>{{ return.return_date|date:"d/m/Y" }}</td>
                             <td class="primary">
                                 <a class="primary"
                                    href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>
@@ -105,7 +105,15 @@
 
         <!-- Received retruns Table -->
         <div class="received-retruns-table">
-            <h2>Odebrane zwroty</h2>
+            <div class="received-retruns-table-header">
+                <h2>Odebrane zwroty</h2>
+                <div class="search-box-container">
+                    <form id="search-form">
+                        <input type="text" id="search-input" placeholder="Wyszukaj..."
+                               {% if search_query %}value="{{ search_query }}"{% endif %}>
+                    </form>
+                </div>
+            </div>
             <table id="received-retruns-table-content">
                 {% if received_returns.count == 0 %}
                     <thead>
@@ -138,7 +146,7 @@
                             {% elif return.status == "Odebrany" %}
                                 <td class="success">{{ return.status }}</td>
                             {% endif %}
-                            <td>{{ return.return_date }}</td>
+                            <td>{{ return.return_date|date:"d/m/Y" }}</td>
                             <td class="primary">
                                 <a class="primary"
                                    href="{% url 'returns_detail_view' return_id=return.id %}">Szczegóły</a>

@@ -79,7 +79,7 @@
 
             <div class="buttons-container">
 
-                <div class="action-buttons-status">
+                <div class="buttons-left">
                     {% if delivery.status == 'W drodze' %}
                         <form method="post">
                             {% csrf_token %}
@@ -92,16 +92,14 @@
                     {% endif %}
                 </div>
 
-                <div class="action-buttons">
+                <div class="buttons-right">
                     {% if user.userprofile.position != 'Pracownik' %}
-                        <div class="action-buttons-container">
-                            <button class="delivery-to-edit" id="delivery_edit_button" name="delivery_edit">Edytuj
-                                zadanie
-                            </button>
-                            <button class="delivery-to-delete" id="delivery_delete_button" name="delivery_delete"
-                                    onclick="confirmDeleteDelivery()">Usuń zadanie
-                            </button>
-                        </div>
+                        <button class="delivery-to-edit" id="delivery_edit_button" name="delivery_edit">Edytuj
+                            zadanie
+                        </button>
+                        <button class="delivery-to-delete" id="delivery_delete_button" name="delivery_delete"
+                                onclick="confirmDeleteDelivery()">Usuń zadanie
+                        </button>
                     {% endif %}
                 </div>
 
@@ -142,7 +140,7 @@
                     {% render_field delivery_edit_form.delivery_date class="form-control" %}
                 </div>
                 <div class="send-element">
-                    <button class="send-form" name="delivery_edited" type="submit">Save Changes</button>
+                    <button class="send-form" name="delivery_edited" type="submit">Zapisz zmiany</button>
                 </div>
             </form>
         </div>
