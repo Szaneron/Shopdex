@@ -202,4 +202,23 @@ class OrderItem(models.Model):
     creation_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.name
+        return f"Order Item: {self.name}"
+
+
+class StockItem(models.Model):
+    """
+    Model representing an item in the inventory.
+    Fields:
+    - dimensions (str): Dimensions of the item.
+    - usage (str): Usage or application of the item.
+    - quantity (int): Quantity of the item in the inventory.
+    - created_by (User): The user who created this inventory item.
+    """
+
+    dimensions = models.CharField(max_length=150, unique=True)
+    usage = models.TextField()
+    quantity = models.PositiveIntegerField()
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Stock Item: {self.dimensions}"

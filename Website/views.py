@@ -7,8 +7,9 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
-from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm
-from .models import Task, Delivery, Day, Return, OrderItem
+from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
+    StockItemCreateForm
+from .models import Task, Delivery, Day, Return, OrderItem, StockItem
 
 from reportlab.lib.pagesizes import A6, landscape
 from reportlab.pdfgen import canvas
@@ -590,7 +591,6 @@ def returns_detail_view(request, return_id):
 def order_item(request):
     user = request.user
     user_rating = get_employee_rating(user)
-    current_date = get_current_date()
     create_order_item_form = OrderItemCreateForm(request.POST)
 
     items_to_order = OrderItem.objects.all().order_by('status', '-creation_time')
@@ -607,11 +607,8 @@ def order_item(request):
 
     if request.method == 'POST':
         if 'order_item_create' in request.POST:
-            print('send')
             form = OrderItemCreateForm(request.POST)
-            print(form)
             if form.is_valid():
-                print('save')
                 form.save()  # Save the new OrderItem
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('order_item')
@@ -631,7 +628,6 @@ def order_item(request):
         'user': user,
         'user_rating': user_rating,
         'items_to_order': items_to_order,
-        'current_date': current_date,
         'page': page,
         'create_order_item_form': create_order_item_form,
         'search_query': search_query,
@@ -680,3 +676,66 @@ def order_item_detail_view(request, order_item_id):
     }
 
     return render(request, 'order_item_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def stock_item(request):
+    user = request.user
+    stock_items = StockItem.objects.all().order_by('quantity')
+    create_stock_item_form = StockItemCreateForm(request.POST)
+
+    search_query = request.GET.get('q')
+    if search_query:
+        stock_items = stock_items.filter(
+            Q(dimensions__icontains=search_query) | Q(usage__icontains=search_query)
+        )
+
+    paginator = Paginator(stock_items, 10)  # Show 10 items per page
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    if request.method == 'POST':
+        if 'stock_item_create' in request.POST:
+            form = StockItemCreateForm(request.POST)
+            form.created_by = request.user
+            if form.is_valid():
+                stock_item = form.save(commit=False)
+                stock_item.created_by = request.user
+                stock_item.save()
+                messages.success(request, 'Przedmiot został dodany!')
+                return redirect('stock_item')
+
+        if 'stock_item_increase_quantity' in request.POST:
+            item_id = request.POST.get('increase_item_id')
+            quantity = int(request.POST.get('increase_quantity'))
+            print(item_id)
+            print(quantity)
+            # Znajdź odpowiedni przedmiot i zwiększ ilość
+            item = StockItem.objects.get(id=item_id)
+            item.quantity += quantity
+            item.save()
+            messages.success(request, 'Ilość przedmiotu została zwiększona!')
+            return redirect('stock_item')
+
+        if 'stock_item_reduce_quantity' in request.POST:
+            item_id = request.POST.get('reduce_item_id')
+            quantity = int(request.POST.get('reduce_quantity'))
+            print(item_id)
+            print(quantity)
+            # Znajdź odpowiedni przedmiot i zwiększ ilość
+            item = StockItem.objects.get(id=item_id)
+            item.quantity -= quantity
+            item.save()
+            messages.success(request, 'Ilość przedmiotu została zmniejszona!')
+            return redirect('stock_item')
+    else:
+        create_stock_item_form = StockItemCreateForm()
+
+    context = {
+        'stock_items': stock_items,
+        'page': page,
+        'search_query': search_query,
+        'create_stock_item_form': create_stock_item_form,
+    }
+
+    return render(request, 'stock_item.html', context)
