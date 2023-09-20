@@ -284,6 +284,7 @@ def task_detail_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     task_edit_form = TaskEditForm(request.POST, instance=task)
 
     if request.method == 'POST':
@@ -310,6 +311,7 @@ def task_detail_view(request, task_id):
         'task': task,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'task_edit_form': task_edit_form,
     }
 
@@ -362,6 +364,7 @@ def delivery_detail_view(request, delivery_id):
     delivery = get_object_or_404(Delivery, id=delivery_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     delivery_edit_form = DeliveryEditForm(request.POST, instance=delivery)
 
     if request.method == 'POST':
@@ -427,6 +430,7 @@ def delivery_detail_view(request, delivery_id):
         'delivery': delivery,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'delivery_edit_form': delivery_edit_form,
     }
 
@@ -490,6 +494,7 @@ def returns_detail_view(request, return_id):
     return_detail = get_object_or_404(Return, id=return_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     return_edit_form = ReturnEditForm(request.POST, instance=return_detail)
 
     def generate_return_pdf(return_id):
@@ -581,6 +586,7 @@ def returns_detail_view(request, return_id):
         'return_detail': return_detail,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'return_edit_form': return_edit_form,
     }
 
@@ -640,6 +646,7 @@ def order_item_detail_view(request, order_item_id):
     order_item_detail = get_object_or_404(OrderItem, id=order_item_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     order_item_edit_form = OrderItemEditForm(request.POST, instance=order_item_detail)
 
     if request.method == 'POST':
@@ -672,6 +679,7 @@ def order_item_detail_view(request, order_item_id):
         'order_item_detail': order_item_detail,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'order_item_edit_form': order_item_edit_form,
     }
 
@@ -681,6 +689,7 @@ def order_item_detail_view(request, order_item_id):
 @login_required(login_url='login_user')
 def stock_item(request):
     user = request.user
+    user_rating = get_employee_rating(user)
     stock_items = StockItem.objects.all().order_by('quantity')
     create_stock_item_form = StockItemCreateForm(request.POST)
 
@@ -732,6 +741,8 @@ def stock_item(request):
         create_stock_item_form = StockItemCreateForm()
 
     context = {
+        'user': user,
+        'user_rating': user_rating,
         'stock_items': stock_items,
         'page': page,
         'search_query': search_query,

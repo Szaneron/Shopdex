@@ -64,8 +64,10 @@
                         <th>Opis</th>
                         <th>Status</th>
                         <th></th>
-                        <th></th>
-                        <th></th>
+                        {% if user.userprofile.position != "Pracownik" %}
+                            <th></th>
+                            <th></th>
+                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
@@ -91,18 +93,22 @@
                                 <a class="primary"
                                    href="{% url 'order_item_detail_view' order_item_id=item.id %}">Szczegóły</a>
                             </td>
-                            <td>
-                                {% if item.status == 'Do zamówienia' %}
-                                    <span class="material-icons-sharp change-status green" data-item-id="{{ item.id }}"
-                                          data-status="Zamówione">done</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if item.status == 'Do zamówienia' %}
-                                    <span class="material-icons-sharp change-status red" data-item-id="{{ item.id }}"
-                                          data-status="Niedostępne">close</span>
-                                {% endif %}
-                            </td>
+                            {% if user.userprofile.position != "Pracownik" %}
+                                <td>
+                                    {% if item.status == 'Do zamówienia' %}
+                                        <span class="material-icons-sharp change-status green"
+                                              data-item-id="{{ item.id }}"
+                                              data-status="Zamówione">done</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.status == 'Do zamówienia' %}
+                                        <span class="material-icons-sharp change-status red"
+                                              data-item-id="{{ item.id }}"
+                                              data-status="Niedostępne">close</span>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>
