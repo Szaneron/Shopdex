@@ -1,0 +1,188 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <title>Shopdex</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/stock_item_detail_style.css' %}"/>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar Section -->
+    {% include  "sidebar.html" %}
+    <!-- End of Sidebar Section-->
+
+    <!-- Main content -->
+    <main>
+        <div class="nav">
+            <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+            </button>
+        </div>
+        <h1>Szczegóły produktu na magazynie</h1>
+        <div class="stock-item-container">
+            <div class="stock-item-heading">
+                <div class="stock-item-name">
+                    <h2> {{ stock_item_detail.dimensions }}</h2>
+                </div>
+            </div>
+            <div class="stock-item-card">
+                <div class="stock-item-card-left">
+                    <h3>Opis</h3>
+                    <div class="stock-item-usage"> {{ stock_item_detail.usage|linebreaksbr }}</div>
+                </div>
+
+                <div class="stock-item-card-right">
+                    <div class="stock-item-card-right-content">
+                        <span>{{ stock_item_detail.quantity }}</span>
+                        <img src="{% static 'images/stock_item_images/stock_item.png' %}" alt="">
+                    </div>
+                </div>
+            </div>
+            <div class="stock-item-date"></div>
+
+            <div class="buttons-container">
+                <div class="buttons-left">
+                    <button class="stock-item-increase" id="stock-item-increase-button">Zwiększ ilość</button>
+                    <button class="stock-item-reduce" id="stock-item-reduce-button">Zmniejsz ilość</button>
+                </div>
+
+                <div class="buttons-right">
+                    {% if user.userprofile.position == 'Pracownik' %}
+                        <button class="stock-item-to-edit" id="stock_item_edit_button" name="stock_item_edited">Edytuj
+                            produkt
+                        </button>
+                    {% elif user.userprofile.position != 'Pracownik' %}
+                        <button class="stock-item-to-edit" id="stock_item_edit_button" name="stock_item_edited">Edytuj
+                            produkt
+                        </button>
+                        <button class="stock-item-to-delete" id="stock_item_delete_button" name="stock_item_delete"
+                                onclick="confirmDeleteStockItem()">Usuń produkt
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- End of Main content -->
+
+    <!-- Start modal form content -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Edycja produktu</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-content">
+                    <div class="form-group">
+                        <label class="control-label">Nazwa</label>
+                        {% render_field stock_item_edit_form.dimensions class="form-control" %}
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Opis</label>
+                        {% render_field stock_item_edit_form.usage class="form-control-usage" %}
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Ilość</label>
+                        {% render_field stock_item_edit_form.quantity class="form-control" %}
+                    </div>
+                </div>
+
+                <div class="send-element">
+                    <button class="send-form" name="stock_item_edited" type="submit">Zapisz zmiany</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal form content -->
+
+    <!-- Start modal form to increase quantity -->
+    <div id="increaseModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Zwiększanie ilości</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label">
+                        Ilosć
+                        <input class="form-control" type="number" name="increase_quantity_value" min="1" required>
+                    </label>
+                </div>
+                <div class="send-element">
+                    <button class="send-form" name="stock_item_increase_quantity" type="submit">Zwiększ ilość</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal form  to increase quantity -->
+
+    <!-- Start modal form to reduce quantity -->
+    <div id="reduceModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Zmniejszenie ilości</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label">
+                        Ilosć
+                        <input class="form-control" type="number" name="reduce_quantity_value"
+                               min="1" max="{{ stock_item_detail.quantity }}" required>
+                    </label>
+                </div>
+                <div class="send-element">
+                    <button class="send-form" name="stock_item_reduce_quantity" type="submit">Zmniejsz ilość</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal form  to reduce quantity -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    const token = '{{ csrf_token }}'
+    const stock_item_id = '{{ stock_item_detail.id}}'
+
+    // Function to display Django messages as SweetAlert alerts
+    function displayMessages() {
+        {% for message in messages %}
+            let message_type = "{{ message.tags }}";
+            let message_text = "{{ message }}";
+
+            // Map Django message types to SweetAlert types
+            let swalType = 'info';
+            if (message_type === "success") {
+                swalType = 'success';
+            } else if (message_type === "error") {
+                swalType = 'error';
+            } else if (message_type === "warning") {
+                swalType = 'warning';
+            }
+
+            // Display SweetAlert popup
+            swal({
+                icon: swalType,
+                title: message_text,
+                timer: 3000, // Auto-close after 3 seconds
+            });
+        {% endfor %}
+    }
+
+    // Call the function when the page loads
+    $(document).ready(function () {
+        displayMessages();
+    });
+</script>
+<script src="{% static 'js/stock_item_detail.js' %}"></script>
+</body>
+</html>

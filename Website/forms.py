@@ -66,3 +66,13 @@ class StockItemCreateForm(forms.ModelForm):
     widgets = {
         'usage': forms.Textarea(attrs={'rows': 10}),
     }
+
+
+class StockItemEditForm(forms.ModelForm):
+    class Meta:
+        model = StockItem
+        fields = ['dimensions', 'usage', 'quantity']
+
+        widgets = {
+            'usage': forms.Textarea(attrs={'rows': 10}),
+        }

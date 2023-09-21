@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
-    StockItemCreateForm
+    StockItemCreateForm, StockItemEditForm
 from .models import Task, Delivery, Day, Return, OrderItem, StockItem
 
 from reportlab.lib.pagesizes import A6, landscape
@@ -717,9 +717,8 @@ def stock_item(request):
         if 'stock_item_increase_quantity' in request.POST:
             item_id = request.POST.get('increase_item_id')
             quantity = int(request.POST.get('increase_quantity'))
-            print(item_id)
-            print(quantity)
-            # Znajdź odpowiedni przedmiot i zwiększ ilość
+
+            # Find the right item and increase the quantity
             item = StockItem.objects.get(id=item_id)
             item.quantity += quantity
             item.save()
@@ -728,10 +727,9 @@ def stock_item(request):
 
         if 'stock_item_reduce_quantity' in request.POST:
             item_id = request.POST.get('reduce_item_id')
+
             quantity = int(request.POST.get('reduce_quantity'))
-            print(item_id)
-            print(quantity)
-            # Znajdź odpowiedni przedmiot i zwiększ ilość
+            # Find the right item and reduce the quantity
             item = StockItem.objects.get(id=item_id)
             item.quantity -= quantity
             item.save()
@@ -750,3 +748,52 @@ def stock_item(request):
     }
 
     return render(request, 'stock_item.html', context)
+
+
+@login_required(login_url='login_user')
+def stock_item_detail_view(request, stock_item_id):
+    stock_item_detail = get_object_or_404(StockItem, id=stock_item_id)
+    current_date = get_current_date()
+    user = request.user
+    user_rating = get_employee_rating(user)
+    stock_item_edit_form = StockItemEditForm(request.POST, instance=stock_item_detail)
+
+    if request.method == 'POST':
+        if 'stock_item_increase_quantity' in request.POST:
+            increase_quantity_value = int(request.POST.get('increase_quantity_value'))
+            print(increase_quantity_value)
+            stock_item_detail.quantity += increase_quantity_value
+            stock_item_detail.save()
+            messages.success(request, 'Ilość przedmiotu została zwiększona!')
+            return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
+
+        if 'stock_item_reduce_quantity' in request.POST:
+            reduce_quantity_value = int(request.POST.get('reduce_quantity_value'))
+            print(reduce_quantity_value)
+            stock_item_detail.quantity -= reduce_quantity_value
+            stock_item_detail.save()
+            messages.success(request, 'Ilość przedmiotu została zmniejszona!')
+            return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
+
+        if 'stock_item_edited' in request.POST:
+            if stock_item_edit_form.is_valid():
+                stock_item_edit_form.save()
+                messages.success(request, 'Przedmiot został zedytowany!')
+                return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
+
+        if 'stock_item_delete' in request.POST:
+            stock_item_detail.delete()
+            return redirect('stock_item')
+
+    else:
+        stock_item_edit_form = StockItemEditForm(instance=stock_item_detail)
+
+    context = {
+        'stock_item_detail': stock_item_detail,
+        'current_date': current_date,
+        'user': user,
+        'user_rating': user_rating,
+        'stock_item_edit_form': stock_item_edit_form,
+    }
+
+    return render(request, 'stock_item_detail.html', context)
