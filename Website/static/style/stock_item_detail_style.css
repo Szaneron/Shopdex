@@ -1,8 +1,7 @@
 @import "root_style.css";
 @import "sidebar_style.css";
-@import "modal_form_style.css";
 @import "navigation_menu_style.css";
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons+Sharp");
+@import "modal_form_style.css";
 
 .container {
     display: grid;
@@ -14,11 +13,12 @@
 }
 
 /* main */
+
 main {
     margin-top: 1.4rem;
 }
 
-.delivery-content {
+.stock-item-container {
     margin-top: 1rem;
     margin-bottom: 1rem;
     width: 100%;
@@ -27,103 +27,52 @@ main {
     background-color: var(--color-white);
 }
 
-.delivery-heading {
-    display: flex;
-    border-bottom: 2px solid var(--color-secondary);
-    margin: 1.8rem 1.8rem 0 1.8rem;
-}
-
-.delivery-card {
+.stock-item-card {
     display: grid;
     grid-template-columns: 60% 40%;
     padding: var(--card-padding);
 }
 
+.stock-item-heading {
+    border-bottom: 2px solid var(--color-secondary);
+    margin: 1.8rem 1.8rem 0 1.8rem;
+}
 
-.delivery-card-left h3 {
+.stock-item-card-left h3 {
     display: inline-block;
     font-size: 1.1rem;
     font-weight: 500;
     border-bottom: 2px solid var(--color-secondary);
-    margin: 1.8rem 0 0.5rem 0;
+    margin-bottom: 0.5rem;
 }
 
-.delivery-form {
-    color: var(--color-primary);
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-
-.delivery-generated-context {
-    color: var(--color-danger);
-    font-weight: 500;
-}
-
-.delivery-date {
-    border-top: 2px solid var(--color-secondary);
-    text-align: right;
-    padding-top: 0.2rem;
-    margin: 0 1.8rem 0 1.8rem;
-}
-
-.delivery-icon {
+.stock-item-card-right {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+}
+
+.stock-item-card-right-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 1rem;
 }
 
-.delivery-icon span {
+.stock-item-card-right-content span {
     font-size: 4.5rem;
     border-bottom: 2px solid var(--color-secondary);
 }
 
-.delivery-icon img {
+.stock-item-card-right-content img {
     width: 8rem;
     height: 8rem;
+    margin: auto;
 }
 
-.delivery-status-on-the-way {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-    color: var(--color-white);;
-    width: fit-content;
-    padding: 0.5rem 1rem 0.5rem 1rem;
-    border-radius: var(--card-border-radius);
-    background-color: var(--color-primary);
-    text-align: center;
-    font-size: 1rem;
-    margin: 1.5rem auto 0 auto;
-}
-
-.delivery-status-received {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-    color: var(--color-white);;
-    width: fit-content;
-    padding: 0.5rem 1.5rem 0.5rem 1.5rem;
-    border-radius: var(--card-border-radius);
-    background-color: var(--color-success);
-    text-align: center;
-    margin: 1.5rem auto 0 auto;
-}
-
-.delivery-status-not-delivered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-    color: var(--color-white);;
-    width: fit-content;
-    padding: 0.5rem 1.5rem 0.5rem 1.5rem;
-    border-radius: var(--card-border-radius);
-    background-color: var(--color-danger);
-    text-align: center;
-    margin: 1.5rem auto 0 auto;
+.stock-item-date {
+    border-top: 2px solid var(--color-secondary);
+    margin: 0 1.8rem 0 1.8rem;
 }
 
 .buttons-container {
@@ -132,12 +81,18 @@ main {
     grid-template-columns: 60% 40%;
 }
 
-.buttons-left form {
+.buttons-left {
     display: flex;
     gap: 1rem;
 }
 
-.delivery-received {
+.buttons-right {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.stock-item-increase {
     width: 12rem;
     font-weight: 500;
     color: var(--color-white);
@@ -150,8 +105,7 @@ main {
     transition: top ease 0.5s;
 }
 
-
-.delivery-not-delivered {
+.stock-item-reduce {
     width: 12rem;
     font-weight: 500;
     color: var(--color-white);
@@ -164,13 +118,12 @@ main {
     transition: top ease 0.5s;
 }
 
-.buttons-right {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+.stock-item-increase:hover, .stock-item-reduce:hover {
+    top: -3px;
+    box-shadow: var(--box-shadow);
 }
 
-.delivery-to-edit {
+.stock-item-to-edit {
     width: 12rem;
     height: 45px;
     font-weight: 500;
@@ -184,7 +137,7 @@ main {
     transition: top ease 0.5s;
 }
 
-.delivery-to-delete {
+.stock-item-to-delete {
     width: 12rem;
     height: 45px;
     font-weight: 500;
@@ -198,19 +151,18 @@ main {
     transition: top ease 0.5s;
 }
 
-.delivery-received:hover, .delivery-not-delivered:hover, .delivery-to-edit:hover, .delivery-to-delete:hover {
+.stock-item-to-edit:hover {
+    background-color: #939397;
+    color: var(--color-white);
     top: -3px;
     box-shadow: var(--box-shadow);
 }
 
-.delivery-to-edit:hover {
-    background-color: #939397;
-    color: var(--color-white);
-}
-
-.delivery-to-delete:hover {
+.stock-item-to-delete:hover {
     background-color: var(--color-danger);
     color: var(--color-white);
+    top: -3px;
+    box-shadow: var(--box-shadow);
 }
 
 @media screen and (max-width: 1300px) {
@@ -218,20 +170,15 @@ main {
         grid-template-columns: 7rem auto;
     }
 
-    .delivery-card {
+    .stock-item-card {
         grid-template-columns: 50% 50%;
-        gap: 1.8rem;
     }
 
-    .status-size h2 {
-        font-size: 1.2rem;
-    }
-
-    .delivery-icon span {
+    .stock-item-card-right-content span {
         font-size: 3rem;
     }
 
-    .delivery-icon img {
+    .stock-item-card-right-content img {
         width: 6rem;
         height: 6rem;
     }
@@ -240,7 +187,7 @@ main {
         grid-template-columns: 50% 50%;
     }
 
-    .buttons-left form {
+    .buttons-left {
         display: grid;
         grid-template-columns: 1fr;
         justify-items: center;
@@ -268,29 +215,25 @@ main {
         padding: 0 1rem;
     }
 
-    .delivery-card {
+    .stock-item-card {
         grid-template-columns: 1fr;
         gap: 1.8rem;
     }
 
-    .delivery-icon span {
+    .stock-item-card-right-content span {
         font-size: 2.5rem;
     }
 
-    .delivery-icon img {
+    .stock-item-card-right-content img {
         width: 5rem;
         height: 5rem;
-    }
-
-    .status-size h2 {
-        font-size: 1.1rem;
     }
 
     .buttons-container {
         grid-template-columns: 1fr;
     }
 
-    .buttons-left form {
+    .buttons-left {
         margin-bottom: 1rem;
     }
 }

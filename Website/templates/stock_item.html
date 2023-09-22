@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <title>Shopdex</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'style/order_item_style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'style/stock_item_style.css' %}"/>
 
 </head>
 <body>
@@ -29,14 +29,14 @@
                     </span>
             </button>
         </div>
-        <h1>Przedmiot do zamówienia</h1>
+        <h1>Pozycje magazynowe</h1>
 
-        <!-- Order item table -->
-        <div id="order-item-table" class="order-item-table">
-            <div class="order-item-table-header">
+        <!-- Stock items table -->
+        <div id="stock-item-table" class="stock-item-table">
+            <div class="stock-item-table-header">
                 <h2>Lista przedmiotów</h2>
                 <div class="header-add-content">
-                    <button id="order_item_create_button">
+                    <button id="stock_item_create_button">
                         <span class="material-icons-sharp add-icon">add</span>
                         <span class="header-text">Dodaj</span>
                     </button>
@@ -48,8 +48,8 @@
                            {% if search_query %}value="{{ search_query }}"{% endif %}>
                 </form>
             </div>
-            <table id="order-item-table-content">
-                {% if items_to_order.count == 0 %}
+            <table id="stock-item-table-content">
+                {% if stock_items.count == 0 %}
                     <thead>
                     <tr>
                         <th>Brak przedmiotów do zamówienia</th>
@@ -60,62 +60,48 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>Nazwa</th>
+                        <th>Wymiary</th>
                         <th>Opis</th>
-                        <th>Status</th>
+                        <th>Ilość</th>
                         <th></th>
-                        {% if user.userprofile.position != "Pracownik" %}
-                            <th></th>
-                            <th></th>
-                        {% endif %}
+                        <th></th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for item in page %}
                         <tr>
-                            {% if item.status == "Do zamówienia" %}
+                            {% if item.quantity <= 20 %}
                                 <td class="status-warning">{{ page.start_index|add:forloop.counter0 }}</td>
-                            {% elif item.status == "Zamówione" %}
-                                <td class="status-success">{{ page.start_index|add:forloop.counter0 }}</td>
-                            {% elif item.status == "Niedostępne" %}
-                                <td class="status-danger">{{ page.start_index|add:forloop.counter0 }}</td>
+                            {% else %}
+                                <td>{{ page.start_index|add:forloop.counter0 }}</td>
                             {% endif %}
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.description|truncatechars:70 }}</td>
-                            {% if item.status == "Do zamówienia" %}
-                                <td class="primary">{{ item.status }}</td>
-                            {% elif item.status == "Zamówione" %}
-                                <td class="success">{{ item.status }}</td>
-                            {% elif item.status == "Niedostępne" %}
-                                <td class="danger">{{ item.status }}</td>
-                            {% endif %}
+                            <td>{{ item.dimensions }}</td>
+                            <td>{{ item.usage|truncatechars:70 }}</td>
+                            <td>{{ item.quantity }}</td>
                             <td>
                                 <a class="primary"
-                                   href="{% url 'order_item_detail_view' order_item_id=item.id %}">Szczegóły</a>
+                                   href="{% url 'stock_item_detail_view' stock_item_id=item.id %}">Szczegóły</a>
                             </td>
-                            {% if user.userprofile.position != "Pracownik" %}
-                                <td>
-                                    {% if item.status == 'Do zamówienia' %}
-                                        <span class="material-icons-sharp change-status green"
-                                              data-item-id="{{ item.id }}"
-                                              data-status="Zamówione">done</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if item.status == 'Do zamówienia' %}
-                                        <span class="material-icons-sharp change-status red"
-                                              data-item-id="{{ item.id }}"
-                                              data-status="Niedostępne">close</span>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
+                            <td>
+                                <span class="material-icons-sharp green increase-quantity-button"
+                                      data-id="{{ item.id }}">
+                                    add
+                                </span>
+                            </td>
+                            <td>
+                                <span class="material-icons-sharp red reduce-quantity-button"
+                                      data-id="{{ item.id }}" data-quantity="{{ item.quantity }}">
+                                    remove
+                                </span>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 {% endif %}
             </table>
         </div>
-        <!-- End of Order item table -->
+        <!-- End of Stock items table -->
 
         <!-- Order item pagiantion bar -->
         {% if page.paginator.num_pages > 1 and not search_query %}
@@ -145,7 +131,7 @@
     </main>
     <!-- End of Main content -->
 
-    <!-- Start modal form content -->
+    <!-- Start modal form to add content -->
     <div id="createModal" class="modal">
         <div class="modal-content">
             <span id="close-modal" class="material-icons-sharp close-form">close</span>
@@ -154,25 +140,75 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label class="control-label">Nazwa</label>
-                    {% render_field create_order_item_form.name class="form-control" %}
+                    {% render_field create_stock_item_form.dimensions class="form-control" %}
                 </div>
                 <div class="form-group">
                     <label class="control-label">Opis</label>
-                    {% render_field create_order_item_form.description class="form-control-description" %}
+                    {% render_field create_stock_item_form.usage class="form-control-description" %}
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Opis</label>
+                    {% render_field create_stock_item_form.quantity min='1' class="form-control" %}
                 </div>
                 <div class="send-element">
-                    <button class="send-form" name="order_item_create" type="submit">Dodaj przedmiot</button>
+                    <button class="send-form" name="stock_item_create" type="submit">Dodaj przedmiot</button>
                 </div>
             </form>
         </div>
     </div>
-    <!-- End of modal form content -->
+    <!-- End of modal form to add content -->
+
+    <!-- Start modal form to increase quantity -->
+    <div id="increaseModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Zwiększanie ilości</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label">
+                        Ilosć
+                        <input class="form-control" type="number" name="increase_quantity" min="1" required>
+                    </label>
+                </div>
+                <input type="hidden" name="increase_item_id" value="">
+                <div class="send-element">
+                    <button class="send-form" name="stock_item_increase_quantity" type="submit">Zwiększ ilość</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal form  to increase quantity -->
+
+    <!-- Start modal form to reduce quantity -->
+    <div id="reduceModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Zmniejszenie ilości</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label">
+                        Ilosć
+                        <input class="form-control" type="number" name="reduce_quantity"
+                               min="1" required>
+                    </label>
+                </div>
+                <input type="hidden" name="reduce_item_id" value="">
+                <div class="send-element">
+                    <button class="send-form" name="stock_item_reduce_quantity" type="submit">Zmniejsz ilość</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal form  to reduce quantity -->
 
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
-    const token = '{{ csrf_token }}'
+    const token = '{{ csrf_token }}';
 
     // Function to display Django messages as SweetAlert alerts
     function displayMessages() {
@@ -204,6 +240,6 @@
         displayMessages();
     });
 </script>
-<script src="{% static 'js/order_item.js' %}"></script>
+<script src="{% static 'js/stock_item.js' %}"></script>
 </body>
 </html>

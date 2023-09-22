@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task, Delivery, Return, OrderItem
+from .models import Task, Delivery, Return, OrderItem, StockItem
 
 
 class TaskEditForm(forms.ModelForm):
@@ -41,7 +41,7 @@ class ReturnEditForm(forms.ModelForm):
 class OrderItemCreateForm(forms.ModelForm):
     class Meta:
         model = OrderItem
-        fields = ['name', 'description', ]
+        fields = ['name', 'description']
 
         widgets = {
             'description': forms.Textarea(attrs={'rows': 10}),
@@ -55,4 +55,24 @@ class OrderItemEditForm(forms.ModelForm):
 
         widgets = {
             'description': forms.Textarea(attrs={'rows': 10}),
+        }
+
+
+class StockItemCreateForm(forms.ModelForm):
+    class Meta:
+        model = StockItem
+        fields = ['dimensions', 'usage', 'quantity']
+
+    widgets = {
+        'usage': forms.Textarea(attrs={'rows': 10}),
+    }
+
+
+class StockItemEditForm(forms.ModelForm):
+    class Meta:
+        model = StockItem
+        fields = ['dimensions', 'usage', 'quantity']
+
+        widgets = {
+            'usage': forms.Textarea(attrs={'rows': 10}),
         }

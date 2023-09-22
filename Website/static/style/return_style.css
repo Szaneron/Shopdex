@@ -1,5 +1,7 @@
 @import "root_style.css";
 @import "sidebar_style.css";
+@import "pagination_syle.css";
+@import "navigation_menu_style.css";
 
 .container {
     display: grid;
@@ -15,15 +17,6 @@
 
 main {
     margin-top: 1.4rem;
-}
-
-main .nav {
-    display: flex;
-    justify-content: end;
-}
-
-main .nav button {
-    display: none;
 }
 
 main h2 {
@@ -95,75 +88,6 @@ main table tbody td {
 /* end of main */
 
 
-/* pagination.css */
-
-.pagination-container {
-    text-align: right;
-    justify-items: right;
-    margin-top: 1rem;
-}
-
-.pagination {
-    display: flex;
-    list-style: none;
-    justify-content: right;
-    padding: 0;
-    margin: 0;
-}
-
-.pagination > li {
-    display: inline;
-}
-
-.pagination > li > a,
-.pagination > li > span {
-    position: relative;
-    float: left;
-    width: 3rem;
-    padding: 6px 12px;
-    margin-left: -1px;
-    text-align: center;
-    line-height: 1.42857143;
-    color: var(--color-dark);
-    text-decoration: none;
-    background-color: var(--color-white);
-    border: 1px solid #ddd;
-}
-
-.pagination > li:first-child > a,
-.pagination > li:first-child > span {
-    margin-left: 0;
-    border-bottom-left-radius: 2rem;
-    border-top-left-radius: 2rem;
-}
-
-.pagination > li:last-child > a,
-.pagination > li:last-child > span {
-    border-bottom-right-radius: 2rem;
-    border-top-right-radius: 2rem;
-}
-
-.pagination > .active > span,
-.pagination > .active > a,
-.pagination > .active > a:hover,
-.pagination > .active > a:focus {
-    z-index: 2;
-    color: var(--color-white);
-    background-color: var(--color-secondary);
-    border-color: var(--color-secondary);
-    cursor: default;
-}
-
-.pagination > .disabled > span,
-.pagination > .disabled > a,
-.pagination > .disabled > a:hover,
-.pagination > .disabled > a:focus {
-    color: #777;
-    background-color: #fff;
-    border-color: #ddd;
-    cursor: not-allowed;
-}
-
 @media screen and (max-width: 1300px) {
     .container {
         grid-template-columns: 7rem auto;
@@ -209,32 +133,5 @@ main table tbody td {
 
     tbody tr td:nth-child(5) {
         display: none;
-    }
-
-    main .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        align-items: center;
-        background-color: var(--color-white);
-        padding: 0 var(--padding-1);
-        height: 4.6rem;
-        width: 100%;
-        z-index: 2;
-        box-shadow: 0 1rem 1rem var(--color-light);
-        margin: 0;
-    }
-
-    main .nav button {
-        display: inline-block;
-        background-color: transparent;
-        cursor: pointer;
-        color: var(--color-dark);
-        position: absolute;
-        left: 2rem;
-    }
-
-    main .nav button span {
-        font-size: 2rem;
     }
 }

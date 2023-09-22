@@ -4,8 +4,8 @@
     --color-primary: #EFB34A;
     --color-secondary: #7f6cc1; /* base: 816eb0, image: 8674f3 */
     --color-secondary-light: #e6e2fe;
-    --color-danger: #FF0060;
-    --color-success: #1B9C85;
+    --color-danger: #ef233c; /* base: FF0060 */
+    --color-success: #1B9C85; /* base: 1B9C85 */
     --color-warning: #EDB34E;
     --color-white: #fff;
     --color-black: #000;

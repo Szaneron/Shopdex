@@ -1,5 +1,7 @@
 @import "root_style.css";
 @import "sidebar_style.css";
+@import "modal_form_style.css";
+@import "navigation_menu_style.css";
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons+Sharp");
 
 .container {
@@ -14,15 +16,6 @@
 /* main */
 main {
     margin-top: 1.4rem;
-}
-
-main .nav {
-    display: flex;
-    justify-content: end;
-}
-
-main .nav button {
-    display: none;
 }
 
 .task-content {
@@ -181,100 +174,6 @@ main .nav button {
     box-shadow: var(--box-shadow);
 }
 
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
-/* Modal content */
-.modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color-white);
-    padding: 2rem;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.modal-content h2 {
-    margin-bottom: 1rem;
-}
-
-.form-group {
-    margin: 1.3rem 0 1.3rem 0;
-}
-
-.form-group-checkbox {
-    display: flex;
-    gap: 1rem;
-}
-
-/* Close button */
-.close-form {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    font-size: 25px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.form-control {
-    height: 3rem;
-    width: 100%;
-    font-weight: 500;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    border-radius: 1rem;
-    border: 1px solid var(--color-secondary);
-    color: var(--color-dark);
-}
-
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-    background-repeat: no-repeat;
-    background-color: var(--color-white);
-    background-position: right 1.2rem top 50%;
-    background-size: 0.65rem auto;
-}
-
-.form-control-description {
-    width: 100%;
-    font-weight: 500;
-    padding: 1rem;
-    border-radius: 1rem;
-    border: 1px solid var(--color-secondary);
-    color: var(--color-dark);
-}
-
-.send-element {
-    display: flex;
-    justify-content: center;
-    margin-top: 2rem;
-}
-
-.send-form {
-    border-radius: var(--border-radius-1);
-    background-color: var(--color-secondary);
-    color: var(--color-white);
-    height: 3rem;
-    font-weight: 600;
-    padding: 0 2.5rem;
-    letter-spacing: 1px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: var(--box-shadow);
-}
 
 @media screen and (max-width: 1300px) {
     .container {
@@ -285,6 +184,15 @@ select {
         grid-template-columns: 50% 50%;
     }
 
+    .status-size h2 {
+        font-size: 1.2rem;
+    }
+
+    .task-assignment img {
+        width: 6rem;
+        height: 6rem;
+    }
+
     .buttons-container {
         grid-template-columns: 50% 50%;
     }
@@ -293,10 +201,6 @@ select {
         display: grid;
         grid-template-columns: 1fr;
         justify-items: center;
-    }
-
-    .modal-content {
-        width: 70%;
     }
 }
 
@@ -315,35 +219,18 @@ select {
         padding: 0 1rem;
     }
 
-    main .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        align-items: center;
-        background-color: var(--color-white);
-        padding: 0 var(--padding-1);
-        height: 4.6rem;
-        width: 100%;
-        z-index: 2;
-        box-shadow: 0 1rem 1rem var(--color-light);
-        margin: 0;
-    }
-
-    main .nav button {
-        display: inline-block;
-        background-color: transparent;
-        cursor: pointer;
-        color: var(--color-dark);
-        position: absolute;
-        left: 2rem;
-    }
-
-    main .nav button span {
-        font-size: 2rem;
-    }
-
     .task-card {
         grid-template-columns: 1fr;
+        gap: 1.8rem;
+    }
+
+    .task-assignment img {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .status-size h2 {
+        font-size: 1.1rem;
     }
 
     .buttons-container {
@@ -354,12 +241,5 @@ select {
         display: flex;
         justify-content: center;
         margin-bottom: 1rem;
-    }
-
-    .modal-content {
-        max-height: 85% !important;
-        overflow-y: scroll !important;
-        margin-top: 2.5rem;
-        width: 90%;
     }
 }

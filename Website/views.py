@@ -7,8 +7,9 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
-from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm
-from .models import Task, Delivery, Day, Return, OrderItem
+from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
+    StockItemCreateForm, StockItemEditForm
+from .models import Task, Delivery, Day, Return, OrderItem, StockItem
 
 from reportlab.lib.pagesizes import A6, landscape
 from reportlab.pdfgen import canvas
@@ -283,6 +284,7 @@ def task_detail_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     task_edit_form = TaskEditForm(request.POST, instance=task)
 
     if request.method == 'POST':
@@ -309,6 +311,7 @@ def task_detail_view(request, task_id):
         'task': task,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'task_edit_form': task_edit_form,
     }
 
@@ -361,6 +364,7 @@ def delivery_detail_view(request, delivery_id):
     delivery = get_object_or_404(Delivery, id=delivery_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     delivery_edit_form = DeliveryEditForm(request.POST, instance=delivery)
 
     if request.method == 'POST':
@@ -426,6 +430,7 @@ def delivery_detail_view(request, delivery_id):
         'delivery': delivery,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'delivery_edit_form': delivery_edit_form,
     }
 
@@ -489,6 +494,7 @@ def returns_detail_view(request, return_id):
     return_detail = get_object_or_404(Return, id=return_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     return_edit_form = ReturnEditForm(request.POST, instance=return_detail)
 
     def generate_return_pdf(return_id):
@@ -580,6 +586,7 @@ def returns_detail_view(request, return_id):
         'return_detail': return_detail,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'return_edit_form': return_edit_form,
     }
 
@@ -590,7 +597,6 @@ def returns_detail_view(request, return_id):
 def order_item(request):
     user = request.user
     user_rating = get_employee_rating(user)
-    current_date = get_current_date()
     create_order_item_form = OrderItemCreateForm(request.POST)
 
     items_to_order = OrderItem.objects.all().order_by('status', '-creation_time')
@@ -607,11 +613,8 @@ def order_item(request):
 
     if request.method == 'POST':
         if 'order_item_create' in request.POST:
-            print('send')
             form = OrderItemCreateForm(request.POST)
-            print(form)
             if form.is_valid():
-                print('save')
                 form.save()  # Save the new OrderItem
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('order_item')
@@ -631,7 +634,6 @@ def order_item(request):
         'user': user,
         'user_rating': user_rating,
         'items_to_order': items_to_order,
-        'current_date': current_date,
         'page': page,
         'create_order_item_form': create_order_item_form,
         'search_query': search_query,
@@ -644,6 +646,7 @@ def order_item_detail_view(request, order_item_id):
     order_item_detail = get_object_or_404(OrderItem, id=order_item_id)
     current_date = get_current_date()
     user = request.user
+    user_rating = get_employee_rating(user)
     order_item_edit_form = OrderItemEditForm(request.POST, instance=order_item_detail)
 
     if request.method == 'POST':
@@ -676,7 +679,121 @@ def order_item_detail_view(request, order_item_id):
         'order_item_detail': order_item_detail,
         'current_date': current_date,
         'user': user,
+        'user_rating': user_rating,
         'order_item_edit_form': order_item_edit_form,
     }
 
     return render(request, 'order_item_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def stock_item(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    stock_items = StockItem.objects.all().order_by('quantity')
+    create_stock_item_form = StockItemCreateForm(request.POST)
+
+    search_query = request.GET.get('q')
+    if search_query:
+        stock_items = stock_items.filter(
+            Q(dimensions__icontains=search_query) | Q(usage__icontains=search_query)
+        )
+
+    paginator = Paginator(stock_items, 10)  # Show 10 items per page
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    if request.method == 'POST':
+        if 'stock_item_create' in request.POST:
+            form = StockItemCreateForm(request.POST)
+            form.created_by = request.user
+            if form.is_valid():
+                stock_item = form.save(commit=False)
+                stock_item.created_by = request.user
+                stock_item.save()
+                messages.success(request, 'Przedmiot został dodany!')
+                return redirect('stock_item')
+
+        if 'stock_item_increase_quantity' in request.POST:
+            item_id = request.POST.get('increase_item_id')
+            quantity = int(request.POST.get('increase_quantity'))
+
+            # Find the right item and increase the quantity
+            item = StockItem.objects.get(id=item_id)
+            item.quantity += quantity
+            item.save()
+            messages.success(request, 'Ilość przedmiotu została zwiększona!')
+            return redirect('stock_item')
+
+        if 'stock_item_reduce_quantity' in request.POST:
+            item_id = request.POST.get('reduce_item_id')
+
+            quantity = int(request.POST.get('reduce_quantity'))
+            # Find the right item and reduce the quantity
+            item = StockItem.objects.get(id=item_id)
+            item.quantity -= quantity
+            item.save()
+            messages.success(request, 'Ilość przedmiotu została zmniejszona!')
+            return redirect('stock_item')
+    else:
+        create_stock_item_form = StockItemCreateForm()
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'stock_items': stock_items,
+        'page': page,
+        'search_query': search_query,
+        'create_stock_item_form': create_stock_item_form,
+    }
+
+    return render(request, 'stock_item.html', context)
+
+
+@login_required(login_url='login_user')
+def stock_item_detail_view(request, stock_item_id):
+    stock_item_detail = get_object_or_404(StockItem, id=stock_item_id)
+    current_date = get_current_date()
+    user = request.user
+    user_rating = get_employee_rating(user)
+    stock_item_edit_form = StockItemEditForm(request.POST, instance=stock_item_detail)
+
+    if request.method == 'POST':
+        if 'stock_item_increase_quantity' in request.POST:
+            increase_quantity_value = int(request.POST.get('increase_quantity_value'))
+            print(increase_quantity_value)
+            stock_item_detail.quantity += increase_quantity_value
+            stock_item_detail.save()
+            messages.success(request, 'Ilość przedmiotu została zwiększona!')
+            return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
+
+        if 'stock_item_reduce_quantity' in request.POST:
+            reduce_quantity_value = int(request.POST.get('reduce_quantity_value'))
+            print(reduce_quantity_value)
+            stock_item_detail.quantity -= reduce_quantity_value
+            stock_item_detail.save()
+            messages.success(request, 'Ilość przedmiotu została zmniejszona!')
+            return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
+
+        if 'stock_item_edited' in request.POST:
+            if stock_item_edit_form.is_valid():
+                stock_item_edit_form.save()
+                messages.success(request, 'Przedmiot został zedytowany!')
+                return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
+
+        if 'stock_item_delete' in request.POST:
+            stock_item_detail.delete()
+            return redirect('stock_item')
+
+    else:
+        stock_item_edit_form = StockItemEditForm(instance=stock_item_detail)
+
+    context = {
+        'stock_item_detail': stock_item_detail,
+        'current_date': current_date,
+        'user': user,
+        'user_rating': user_rating,
+        'stock_item_edit_form': stock_item_edit_form,
+    }
+
+    return render(request, 'stock_item_detail.html', context)

@@ -1,5 +1,6 @@
 @import "root_style.css";
 @import "sidebar_style.css";
+@import "navigation_menu_style.css";
 
 .container {
     display: grid;
@@ -265,15 +266,6 @@ main .tasks-table a {
     cursor: pointer;
 }
 
-.right-section .nav {
-    display: flex;
-    justify-content: end;
-}
-
-.right-section .nav button {
-    display: none;
-}
-
 .right-section .returns {
     margin-top: 1.3rem
 }
@@ -423,32 +415,5 @@ main .tasks-table a {
         width: 100%;
         margin: auto;
         padding: 0 1rem;
-    }
-
-    .right-section .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        align-items: center;
-        background-color: var(--color-white);
-        padding: 0 var(--padding-1);
-        height: 4.6rem;
-        width: 100%;
-        z-index: 2;
-        box-shadow: 0 1rem 1rem var(--color-light);
-        margin: 0;
-    }
-
-    .right-section .nav button {
-        display: inline-block;
-        background-color: transparent;
-        cursor: pointer;
-        color: var(--color-dark);
-        position: absolute;
-        left: 2rem;
-    }
-
-    .right-section .nav button span {
-        font-size: 2rem;
     }
 }
