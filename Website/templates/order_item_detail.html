@@ -44,17 +44,17 @@
                         <img src="{% static 'images/order_item_images/cart.png' %}" alt="">
 
                         {% if order_item_detail.status == 'Do zamówienia' %}
-                            <div class="order-item-status-to-order">
+                            <div class="order-item-status-to-order status-size">
                                 <span class="material-icons-sharp">schedule</span>
                                 <h2>{{ order_item_detail.status }}</h2>
                             </div>
                         {% elif order_item_detail.status == 'Zamówione' %}
-                            <div class="order-item-status-ordered">
+                            <div class="order-item-status-ordered status-size">
                                 <span class="material-icons-sharp">done</span>
                                 <h2>{{ order_item_detail.status }}</h2>
                             </div>
                         {% elif order_item_detail.status == 'Niedostępne' %}
-                            <div class="order-item-status-not-available">
+                            <div class="order-item-status-not-available status-size">
                                 <span class="material-icons-sharp">not_interested</span>
                                 <h2>{{ order_item_detail.status }}</h2>
                             </div>

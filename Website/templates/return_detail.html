@@ -65,17 +65,17 @@
                         <img src="{% static 'images/return_images/return.png' %}" alt="">
 
                         {% if return_detail.status == 'Do spakowania' %}
-                            <div class="return-status-to-pack">
+                            <div class="return-status-to-pack status-size">
                                 <span class="material-icons-sharp">schedule</span>
                                 <h2>{{ return_detail.status }}</h2>
                             </div>
                         {% elif return_detail.status == 'Przygotowany' %}
-                            <div class="return-status-prepared">
+                            <div class="return-status-prepared status-size">
                                 <span class="material-icons-sharp">done</span>
                                 <h2>{{ return_detail.status }}</h2>
                             </div>
                         {% elif return_detail.status == 'Odebrany' %}
-                            <div class="return-status-received">
+                            <div class="return-status-received status-size">
                                 <span class="material-icons-sharp">local_shipping</span>
                                 <h2>{{ return_detail.status }}</h2>
                             </div>

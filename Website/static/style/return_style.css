@@ -1,6 +1,7 @@
 @import "root_style.css";
 @import "sidebar_style.css";
 @import "pagination_syle.css";
+@import "navigation_menu_style.css";
 
 .container {
     display: grid;
@@ -16,15 +17,6 @@
 
 main {
     margin-top: 1.4rem;
-}
-
-main .nav {
-    display: flex;
-    justify-content: end;
-}
-
-main .nav button {
-    display: none;
 }
 
 main h2 {
@@ -141,32 +133,5 @@ main table tbody td {
 
     tbody tr td:nth-child(5) {
         display: none;
-    }
-
-    main .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        align-items: center;
-        background-color: var(--color-white);
-        padding: 0 var(--padding-1);
-        height: 4.6rem;
-        width: 100%;
-        z-index: 2;
-        box-shadow: 0 1rem 1rem var(--color-light);
-        margin: 0;
-    }
-
-    main .nav button {
-        display: inline-block;
-        background-color: transparent;
-        cursor: pointer;
-        color: var(--color-dark);
-        position: absolute;
-        left: 2rem;
-    }
-
-    main .nav button span {
-        font-size: 2rem;
     }
 }

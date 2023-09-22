@@ -56,17 +56,17 @@
                         {% endif %}
                     </div>
                     {% if delivery.status == 'W drodze' %}
-                        <div class="delivery-status-on-the-way">
+                        <div class="delivery-status-on-the-way status-size">
                             <span class="material-icons-sharp">schedule</span>
                             <h2>{{ delivery.status }}</h2>
                         </div>
                     {% elif delivery.status == 'Odebrana' %}
-                        <div class="delivery-status-received">
+                        <div class="delivery-status-received status-size">
                             <span class="material-icons-sharp">done</span>
                             <h2>{{ delivery.status }}</h2>
                         </div>
                     {% elif delivery.status == 'Nie dostarczona' %}
-                        <div class="delivery-status-not-delivered">
+                        <div class="delivery-status-not-delivered status-size">
                             <span class="material-icons-sharp">error_outline</span>
                             <h2>{{ delivery.status }}</h2>
                         </div>

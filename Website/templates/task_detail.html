@@ -48,12 +48,12 @@
                     <div class="task-card-right">
                         <div class="task-assignment"><img src="{{ task.assigned_to.profile_picture.url }}" alt=""></div>
                         {% if task.status == 'Do zrobienia' %}
-                            <div class="task-status-todo">
+                            <div class="task-status-todo status-size">
                                 <span class="material-icons-sharp">schedule</span>
                                 <h2>{{ task.status }}</h2>
                             </div>
                         {% elif task.status == 'Zrobione' %}
-                            <div class="task-status-done">
+                            <div class="task-status-done status-size">
                                 <span class="material-icons-sharp">done</span>
                                 <h2>{{ task.status }}</h2>
                             </div>
