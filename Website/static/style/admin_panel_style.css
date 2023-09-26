@@ -1,0 +1,229 @@
+@import "root_style.css";
+@import "sidebar_style.css";
+@import "modal_form_style.css";
+@import "navigation_menu_style.css";
+
+.container {
+    display: grid;
+    height: 100%;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 16rem auto;
+}
+
+/* main */
+main {
+    margin-top: 1.4rem;
+    width: 100%;
+}
+
+.content-container {
+    width: 100%;
+    height: calc(89% + 7px);
+    max-height: calc(89% + 7px);
+    margin-top: calc(1.1rem - 1px);
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+/* Left Main */
+.left-container {
+    height: 100%;
+}
+
+.form-card {
+    height: 100%;
+    background-color: var(--color-white);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+}
+
+.form-card h2 {
+    display: inline-block;
+    border-bottom: 2px solid var(--color-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.form-return-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.8rem;
+}
+
+.tab-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-header {
+    display: flex;
+    align-items: center;
+    gap: 1.8rem;
+    padding: var(--padding-1);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.tab-header .tab-item {
+    cursor: pointer;
+}
+
+.tab-header .tab-item:after {
+    display: block;
+    content: '';
+    border-bottom: 2px solid var(--color-secondary);
+    transform: scaleX(0);
+    transition: transform 250ms ease-in-out;
+}
+
+.tab-header .tab-item:hover:after {
+    transform: scaleX(1);
+}
+
+.tab-content .tab-pane {
+    display: none;
+    padding: 0 1.2rem 1.2rem 1.2rem;
+}
+
+.active {
+    color: var(--color-secondary);
+}
+
+.form-group:first-child {
+    margin-top: 0;
+}
+
+.form-control {
+    height: 2.5rem;
+}
+
+/* Right Main */
+.right-container {
+    margin-left: 1.8rem;
+}
+
+.chart-card {;
+    background-color: var(--color-white);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+}
+
+.chart-card h2 {
+    display: inline-block;
+    border-bottom: 2px solid var(--color-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.users-container {
+    margin-top: 1.8rem;
+}
+
+.users-card {
+    background-color: var(--color-white);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+}
+
+.users-card h2 {
+    display: inline-block;
+    border-bottom: 2px solid var(--color-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.users-layout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    overflow-x: scroll;
+}
+
+.single-user {
+    display: grid;
+    text-align: center;
+    grid-template-columns: 1fr;
+}
+
+.worker-name {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.worker-rating {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    border-radius: 15px;
+    padding: 0.2rem 0.7rem 0.2rem 0.7rem;
+    color: var(--color-white);
+    background-color: var(--color-secondary);
+}
+
+#adminChart {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.worker-rating span {
+    font-size: 16px;
+    color: var(--color-primary);
+}
+
+.single-user img {
+    margin: auto;
+    height: 6rem;
+    width: 6rem;
+    border-radius: 50%;
+}
+
+@media screen and (max-width: 1300px) {
+    .container {
+        grid-template-columns: 7rem auto;
+    }
+
+    .tab-header {
+        font-size: 0.9rem;
+        gap: 0.5rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100vw;
+        height: auto;
+        grid-template-columns: 1fr;
+        padding-bottom: 2rem;
+    }
+
+    main {
+        width: 100%;
+        height: fit-content;
+        margin-top: 7rem;
+        padding: 0 1rem;
+    }
+
+    .content-container {
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+    }
+
+    .right-container {
+        margin: 0;
+    }
+
+    .tab-header {
+        text-align: center;
+    }
+
+    .form-return-content {
+        grid-template-columns: 1fr;
+    }
+
+    .users-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}

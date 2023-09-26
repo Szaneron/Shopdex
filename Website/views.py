@@ -1,20 +1,28 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
+from collections import defaultdict
 
+from django.utils import timezone
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
-    StockItemCreateForm, StockItemEditForm
-from .models import Task, Delivery, Day, Return, OrderItem, StockItem
+    StockItemCreateForm, StockItemEditForm, AddDeliveryForm, AddTaskForm, AddReturnForm
+from .models import Task, Delivery, Day, Return, OrderItem, StockItem, UserProfile
 
 from reportlab.lib.pagesizes import A6, landscape
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
+MONTHS_PL = {
+    1: 'styczeń', 2: 'luty', 3: 'marzec', 4: 'kwiecień', 5: 'maj', 6: 'czerwiec',
+    7: 'lipiec', 8: 'sierpień', 9: 'wrzesień', 10: 'październik', 11: 'listopad', 12: 'grudzień'
+}
 
 
 def get_current_date():
@@ -797,3 +805,159 @@ def stock_item_detail_view(request, stock_item_id):
     }
 
     return render(request, 'stock_item_detail.html', context)
+
+
+@login_required(login_url='login_user')
+def admin_panel(request):
+    all_workers = UserProfile.objects.all().filter(position='Pracownik')
+
+    def get_workers_rating_in_dict(all_workers):
+        """
+        Function to calculate worker ratings based on completed and assigned tasks.
+
+        Parameters:
+            all_workers (list): List of worker objects containing information about completed and assigned tasks.
+
+        Returns:
+            dict: A dictionary containing worker ratings, where the key is the worker's username,
+                  and the value is the rating on a scale from 1 to 5 (rounded to one decimal place)
+                  or 'No tasks' if the worker has no assigned tasks.
+        """
+
+        workers_rating = {}
+        for worker in all_workers:
+            completed_tasks = worker.completed_tasks
+            assigned_tasks = worker.assigned_tasks
+            print(completed_tasks)
+            print(assigned_tasks)
+
+            if assigned_tasks == 0:
+                workers_rating[worker.user.username] = 'Brak zadań'
+                continue
+
+            rating = round(min(5, max(1, completed_tasks / assigned_tasks * 5)), 1)
+            workers_rating[worker.user.username] = rating
+
+        return workers_rating
+
+    def get_deliveries_count_last_six_months():
+        """
+        Get the count of deliveries for each month in the last six months.
+
+        Returns:
+        month_labels (list): List of month labels for the last six months.
+        month_data (list): List of delivery counts for each month.
+        """
+        today = timezone.now()
+        six_months_ago = today - timedelta(days=180)  # 6 months ago
+
+        # Group deliveries by months and count the number of deliveries for each month
+        deliveries = Delivery.objects.filter(
+            delivery_date__gte=six_months_ago,
+            delivery_date__lte=today
+        )
+
+        # Create a dictionary with data on the number of deliveries for each month
+        data = defaultdict(int)
+        for delivery in deliveries:
+            # Extract year and month from the delivery date
+            year_month = delivery.delivery_date.strftime('%Y-%m')
+            data[year_month] += 1
+
+        # Get the full range of months from 6 months ago to the current month
+        month = today.month
+        year = today.year
+        month_labels = []
+        month_data = []
+
+        for i in range(6):
+            month_labels.append(MONTHS_PL[month] if month in MONTHS_PL else f'Unknown Month ({month})')
+            month_data.append(data.get(f'{year}-{month:02}', 0))
+            month -= 1
+            if month == 0:
+                month = 12
+                year -= 1
+
+        return month_labels, month_data
+
+    def get_tasks_count_last_six_months():
+        """
+        Get the count of tasks for each month in the last six months.
+
+        Returns:
+        month_labels (list): List of month labels for the last six months.
+        month_data (list): List of task counts for each month.
+        """
+        today = timezone.now()
+        six_months_ago = today - timedelta(days=180)  # 6 months ago
+
+        # Group tasks by months and count the number of tasks for each month
+        tasks = Task.objects.filter(
+            task_date__gte=six_months_ago,
+            task_date__lte=today
+        )
+
+        # Create a dictionary with data on the number of tasks for each month
+        data = defaultdict(int)
+        for task in tasks:
+            # Extract year and month from the task date
+            year_month = task.task_date.strftime('%Y-%m')
+            data[year_month] += 1
+
+        # Get the full range of months from 6 months ago to the current month
+        month = today.month
+        year = today.year
+        month_labels = []
+        month_data = []
+
+        for i in range(6):
+            month_labels.append(MONTHS_PL[month] if month in MONTHS_PL else f'Unknown Month ({month})')
+            month_data.append(data.get(f'{year}-{month:02}', 0))
+            month -= 1
+            if month == 0:
+                month = 12
+                year -= 1
+
+        return month_labels, month_data
+
+    workers_rating_dictionary = get_workers_rating_in_dict(all_workers)
+    delivery_month_labels, delivery_month_data = get_deliveries_count_last_six_months()
+    tasks_month_labels, tasks_month_data = get_tasks_count_last_six_months()
+
+    add_delivery_form = AddDeliveryForm()
+    add_task_form = AddTaskForm()
+    add_return_form = AddReturnForm()
+
+    if request.method == 'POST':
+        if 'add_delivery' in request.POST:
+            form = AddDeliveryForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Dostawa został utworzona!')
+                return redirect('admin_panel')
+        if 'add_task' in request.POST:
+            form = AddTaskForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Zadanie zostało utworzone!')
+                return redirect('admin_panel')
+        if 'add_return' in request.POST:
+            form = AddReturnForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Zwrot został utworzony!')
+                return redirect('admin_panel')
+
+    context = {
+        'delivery_month_labels': delivery_month_labels,
+        'delivery_month_data': delivery_month_data,
+        'tasks_month_labels': tasks_month_labels,
+        'tasks_month_data': tasks_month_data,
+        'all_workers': all_workers,
+        'workers_rating_dictionary': workers_rating_dictionary,
+        'add_delivery_form': add_delivery_form,
+        'add_task_form': add_task_form,
+        'add_return_form': add_return_form,
+    }
+
+    return render(request, 'admin_panel.html', context)

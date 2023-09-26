@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import dashboard, login_user, logout_user, task, task_detail_view, delivery, delivery_detail_view, \
-    returns, returns_detail_view, order_item, order_item_detail_view, stock_item, stock_item_detail_view
+    returns, returns_detail_view, order_item, order_item_detail_view, stock_item, stock_item_detail_view, admin_panel
 
 urlpatterns = [
     path("dashboard/", dashboard, name="dashboard"),
@@ -17,4 +17,5 @@ urlpatterns = [
     path('order_item/<int:order_item_id>/', order_item_detail_view, name='order_item_detail_view'),
     path('stock_item/', stock_item, name='stock_item'),
     path('stock_item/<int:stock_item_id>/', stock_item_detail_view, name='stock_item_detail_view'),
+    path('admin_panel/', admin_panel, name='admin_panel'),
 ]

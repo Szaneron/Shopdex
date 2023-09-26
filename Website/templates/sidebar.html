@@ -41,6 +41,14 @@
                         </span>
             <h3>Tablica</h3>
         </a>
+        {% if user.userprofile.position != 'Pracownik' %}
+            <a href="{% url 'admin_panel' %}" id="link_admin_panel">
+                        <span class="material-icons-sharp">
+                            admin_panel_settings
+                        </span>
+                <h3>Panel admina</h3>
+            </a>
+        {% endif %}
         <a href="{% url 'task' %}" id="link_task">
                     <span class="material-icons-sharp">
                         fact_check
