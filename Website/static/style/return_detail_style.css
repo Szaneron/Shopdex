@@ -26,6 +26,12 @@ main {
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
     background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+.return-container:hover {
+    box-shadow: none;
 }
 
 .return-card {

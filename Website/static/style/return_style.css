@@ -38,6 +38,11 @@ main .active-retruns-table, .received-retruns-table {
     padding: var(--card-padding);
     border-radius: var(--card-border-radius);
     box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+main .active-retruns-table:hover, .received-retruns-table:hover {
+    box-shadow: none;
 }
 
 main .active-retruns-table table, .received-retruns-table table {

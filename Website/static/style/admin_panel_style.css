@@ -37,6 +37,12 @@ main {
     background-color: var(--color-white);
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+.form-card:hover {
+    box-shadow: none;
 }
 
 .form-card h2 {
@@ -107,6 +113,12 @@ main {
     background-color: var(--color-white);
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+    box-shadow: none;
 }
 
 .chart-card h2 {
@@ -123,6 +135,12 @@ main {
     background-color: var(--color-white);
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+.users-card:hover {
+    box-shadow: none;
 }
 
 .users-card h2 {
@@ -136,6 +154,15 @@ main {
     align-items: center;
     gap: 1rem;
     overflow-x: scroll;
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.users-layout::-webkit-scrollbar {
+    display: none;
 }
 
 .single-user {
