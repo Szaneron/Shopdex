@@ -64,6 +64,7 @@ main {
 
 .tab-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 1.8rem;
     padding: var(--padding-1);
@@ -213,7 +214,7 @@ main {
 
     .tab-header {
         font-size: 0.9rem;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 }
 

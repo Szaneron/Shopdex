@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task, Delivery, Return, OrderItem, StockItem
+from .models import Task, Delivery, Return, OrderItem, StockItem, Day
 
 
 class TaskEditForm(forms.ModelForm):
@@ -112,3 +112,13 @@ class AddReturnForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'rows': 5}),
             'return_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+
+class DayForm(forms.ModelForm):
+    class Meta:
+        model = Day
+        fields = ['day_date', 'end_of_work_hour']
+
+        widgets = {
+            'day_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_of_work_hour': forms.TimeInput(attrs={'type': 'time'}), }
