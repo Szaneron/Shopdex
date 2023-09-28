@@ -135,7 +135,7 @@ class Day(models.Model):
     - __str__: Returns the string representation of the work day.
 
     """
-    end_of_work_hour = models.TimeField()
+    end_of_work_hour = models.TimeField(null=False, blank=False)
     day_date = models.DateField(default=timezone.now, unique=True)
 
     def __str__(self):
@@ -184,10 +184,11 @@ class OrderItem(models.Model):
     Model representing an item to be ordered by the company.
 
     Fields:
-    1. name (CharField): Name of the item.
-    2. description (TextField): Description of the item.
-    3. status (CharField): Status of the order item, available choices defined in STATUS_CHOICES.
-    4. creation_time (DateTimeField): Date and time when the order item was created.
+    - name (CharField): Name of the item.
+    - description (TextField): Description of the item.
+    - status (CharField): Status of the order item, available choices defined in STATUS_CHOICES.
+    - creation_time (DateTimeField): Date and time when the order item was created.
+    - created_by (User): The user who created this item.
     """
 
     STATUS_CHOICES = [
@@ -200,6 +201,7 @@ class OrderItem(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Do zamówienia')
     creation_time = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"Order Item: {self.name}"
@@ -208,6 +210,7 @@ class OrderItem(models.Model):
 class StockItem(models.Model):
     """
     Model representing an item in the inventory.
+
     Fields:
     - dimensions (str): Dimensions of the item.
     - usage (str): Usage or application of the item.
@@ -222,3 +225,49 @@ class StockItem(models.Model):
 
     def __str__(self):
         return f"Stock Item: {self.dimensions}"
+
+
+class Notification(models.Model):
+    """
+    Model representing notifications for various types of activities in the system.
+
+    Fields:
+    - model_name  (CharField): The type of activity related to the notification, available choices defined in NAME_CHOICES.
+    - model_id  (IntegerField): The ID of the related model.
+    - description (TextField): A text description of the notification.
+    - read_by (ManyToManyField): Users who have marked the notification as read.
+    - creation_time (DateTimeField): Date and time when the notification was created.
+    - notify_for (CharField): The target of the notification, available choices defined in NOTIFY_CHOICES.
+    - made_by (User): The user who created the notification.
+    """
+
+    NAME_CHOICES = [
+        ('Godzina', 'Godzina'),
+        ('Zadanie', 'Zadanie'),
+        ('Dostawa', 'Dostawa'),
+        ('Zwrot', 'Zwrot'),
+        ('Zamówienie', 'Zamówienie'),
+        ('Magazyn', 'Magazyn'),
+    ]
+
+    STATUS_CHOICES = [
+        ('Przeczytane', 'Przeczytane'),
+        ('Nieprzeczytane', 'Nieprzeczytane'),
+    ]
+
+    NOTIFY_CHOICES = [
+        ('Pracownik', 'Pracownik'),
+        ('Other', 'Other'),
+    ]
+
+    model_name = models.CharField(max_length=150, choices=NAME_CHOICES)
+    model_destiantion = models.CharField(max_length=150)
+    model_id = models.PositiveIntegerField()
+    description = models.TextField()
+    read_by = models.ManyToManyField(User, related_name='read_notifications')
+    creation_time = models.DateTimeField(default=timezone.now)
+    notify_for = models.CharField(max_length=20, choices=NOTIFY_CHOICES)
+    made_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Notification: {self.model_name} - {self.creation_time.date()}"

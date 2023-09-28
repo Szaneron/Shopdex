@@ -42,6 +42,7 @@
                             </div>
                             <div class="tab-item" id="task-tab-item" onclick="showTab('task')">Dodaj zadanie</div>
                             <div class="tab-item" id="return-tab-item" onclick="showTab('return')">Dodaj zwrot</div>
+                            <div class="tab-item" id="time-tab-item" onclick="showTab('time')">Zmień godzinę</div>
                         </div>
 
                         <div class="tab-content">
@@ -149,7 +150,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label class="control-label">Ilość paczek</label>
-                                                {% render_field add_return_form.package_quantity class="form-control" %}
+                                                {% render_field add_return_form.package_quantity min=1 class="form-control" %}
                                             </div>
                                         </div>
                                     </div>
@@ -159,7 +160,27 @@
                                     </div>
                                 </form>
                             </div>
-                            <!-- Dodaj kolejne tab-pane i formularze dla innych formularzy -->
+
+                            <div class="tab-pane" id="time-tab">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="form-content">
+                                        <div class="form-group">
+                                            <label class="control-label">Data</label>
+                                            {% render_field day_form.end_of_work_hour class="form-control" %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Data</label>
+                                            {% render_field day_form.day_date name='day_date' class="form-control" %}
+                                        </div>
+                                    </div>
+
+                                    <div class="send-element">
+                                        <button class="send-form" name="set_day" type="submit">Zmień czas pracy
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
