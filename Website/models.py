@@ -261,7 +261,6 @@ class Notification(models.Model):
     ]
 
     model_name = models.CharField(max_length=150, choices=NAME_CHOICES)
-    model_destiantion = models.CharField(max_length=150)
     model_id = models.PositiveIntegerField()
     description = models.TextField()
     read_by = models.ManyToManyField(User, related_name='read_notifications')

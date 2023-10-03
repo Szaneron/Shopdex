@@ -79,12 +79,16 @@
                     </span>
             <h3>Magazyn</h3>
         </a>
-        <a href="#">
-                        <span class="material-icons-sharp">
-                            notifications
-                        </span>
+        <a href="{% url 'notification' %}" id="link_notification">
+            <span class="material-icons-sharp">
+                notifications
+            </span>
             <h3>Powiadomienia</h3>
-            <span class="message-count">12</span>
+            {% if unread_notifications.count > 0 %}
+                <span class="message-count">
+                    {{ unread_notifications.count }}
+                </span>
+            {% endif %}
         </a>
         <a href="{% url 'logout_user' %}">
                     <span class="material-icons-sharp">

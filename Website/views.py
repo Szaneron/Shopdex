@@ -24,17 +24,74 @@ MONTHS_PL = {
 }
 
 
-def add_notifiaction(user, target, notif_name, notif_destination, notif_description):
+def add_notifiaction(user, target, notif_name, notif_description):
+    """
+    Add a notification for a given user and target.
+
+    Parameters:
+        user (User): The user for whom the notification is intended.
+        target (Model): The target model associated with the notification.
+        notif_name (str): The name or type of the notification.
+        notif_description (str): A description or additional information for the notification.
+
+    This function creates a new notification with the provided information and links it to a specific target model.
+    The notification is intended for the user and is based on the user's position ('Pracownik' or 'Other').
+
+    - If the user's position is 'Pracownik', the notification is intended for 'Other'.
+    - If the user's position is different, the notification is intended for 'Pracownik'.
+    """
     notify_for = 'Other' if user.userprofile.position == 'Pracownik' else 'Pracownik'
 
     Notification.objects.create(
         model_name=notif_name,
-        model_destiantion=notif_destination,
         model_id=target.id,
         description=notif_description,
         notify_for=notify_for,
         made_by=user
     )
+
+
+def get_notifications(user):
+    """
+    Get notifications for a given user.
+
+    Parameters:
+        user (User): The user for whom notifications are to be retrieved.
+
+    Returns:
+        tuple: A tuple containing two querysets - unread_notifications and read_notifications.
+
+    The function first checks the user's position. If the position is 'Pracownik' (employee),
+    it retrieves unread and read notifications targeted at employees. If the position is different,
+    it retrieves notifications targeted at others.
+
+    For 'Pracownik':
+    - unread_notifications: Unread notifications for employees.
+    - read_notifications: Read notifications for employees (up to 10, ordered by creation time).
+
+    For other positions:
+    - unread_notifications: Unread notifications for others.
+    - read_notifications: Read notifications for others (up to 10, ordered by creation time).
+    """
+
+    if user.userprofile.position == 'Pracownik':
+        # Get notifications that have not yet been read and are for an employee
+        unread_notifications = Notification.objects.filter(
+            Q(notify_for='Pracownik') & ~Q(read_by=user)
+        ).order_by('-creation_time')
+        read_notifications = Notification.objects.filter(
+            Q(notify_for='Pracownik') & Q(read_by=user)
+        ).order_by('-creation_time')[:10]
+    else:
+        # Get notifications that have not yet been read and are for others
+        unread_notifications = Notification.objects.filter(
+            Q(notify_for='Other') & ~Q(read_by=user)
+        ).order_by('-creation_time')
+        read_notifications = Notification.objects.filter(
+            Q(notify_for='Other') & Q(read_by=user)
+        ).order_by('-creation_time')[:10]
+
+    return unread_notifications, read_notifications
 
 
 def get_current_date():
@@ -93,6 +150,7 @@ def logout_user(request):
 @login_required(login_url='login_user')
 def dashboard(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
     day_name = current_date.strftime('%A')
@@ -217,6 +275,7 @@ def dashboard(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'current_date': current_date,
         'day_name': day_name,
         'all_tasks': all_tasks,
@@ -311,22 +370,22 @@ def task_detail_view(request, task_id):
         if 'task_edited' in request.POST:
             if task_edit_form.is_valid():
                 instance = task_edit_form.save()
-                add_notifiaction(request.user, instance, 'Zadanie', 'task_detail_view',
-                                 'Zadanie zostało zedytowane!')
+                add_notifiaction(request.user, instance, 'Zadanie', 'Zadanie zostało zedytowane!')
                 messages.success(request, 'Zadanie zostało zedytowane!')
                 return redirect('task_detail_view', task_id=task_id)
 
         if 'task_done' in request.POST:
             task.status = 'Zrobione'
             task.save()
-            add_notifiaction(request.user, task, 'Zadanie', 'task_detail_view',
-                             'Status zadania został zmieniony na "Zrobione"!')
+            user.userprofile.completed_tasks += 1
+            user.userprofile.save()
+
+            add_notifiaction(request.user, task, 'Zadanie', 'Status zadania został zmieniony na "Zrobione"!')
             messages.success(request, 'Zadanie oznaczone jako wykonane!')
             return redirect('dashboard')
 
         if 'task_delete' in request.POST:
-            add_notifiaction(request.user, task, 'Zadanie', 'task_detail_view',
-                             'Zadanie zostało usunięte!')
+            add_notifiaction(request.user, task, 'Zadanie', 'Zadanie zostało usunięte!')
             task.delete()
             return redirect('dashboard')
 
@@ -397,16 +456,14 @@ def delivery_detail_view(request, delivery_id):
         if 'delivery_received' in request.POST:
             delivery.status = 'Odebrana'
             delivery.save()
-            add_notifiaction(request.user, delivery, 'Dostawa', 'delivery_detail_view',
-                             'Status dostawy został zmieniony na "Odebrana"!')
+            add_notifiaction(request.user, delivery, 'Dostawa', 'Status dostawy został zmieniony na "Odebrana"!')
             messages.success(request, 'Dostawa oznaczona jako odebrana!')
             return redirect('dashboard')
 
         if 'delivery_not_delivered' in request.POST:
             delivery.status = 'Nie dostarczona'
             delivery.save()
-            add_notifiaction(request.user, delivery, 'Dostawa', 'delivery_detail_view',
-                             'Status dostawy został zmieniony na "Nie dostarczona"!')
+            add_notifiaction(request.user, delivery, 'Dostawa', 'Status dostawy został zmieniony na "Nie dostarczona"!')
 
             miesiace = [
                 'stycznia', 'lutego', 'marca', 'kwietnia',
@@ -447,14 +504,12 @@ def delivery_detail_view(request, delivery_id):
         if 'delivery_edited' in request.POST:
             if delivery_edit_form.is_valid():
                 instance = delivery_edit_form.save()
-                add_notifiaction(request.user, instance, 'Dostawa', 'delivery_detail_view',
-                                 'Dostawa została zedytowana!')
+                add_notifiaction(request.user, instance, 'Dostawa', 'Dostawa została zedytowana!')
                 messages.success(request, 'Dostawa została zedytowana!')
                 return redirect('delivery_detail_view', delivery_id=delivery_id)
 
         if 'delivery_delete' in request.POST:
-            add_notifiaction(request.user, delivery, 'Dostawa', 'delivery_detail_view',
-                             'Dostawa została usunięta!')
+            add_notifiaction(request.user, delivery, 'Dostawa', 'Dostawa została usunięta!')
             delivery.delete()
             return redirect('dashboard')
 
@@ -591,16 +646,14 @@ def returns_detail_view(request, return_id):
         if 'return_packed' in request.POST:
             return_detail.status = 'Przygotowany'
             return_detail.save()
-            add_notifiaction(request.user, return_detail, 'Zwrot', 'returns_detail_view',
-                             'Status zwrotu został zmieniony na "Przygotowany"!')
+            add_notifiaction(request.user, return_detail, 'Zwrot', 'Status zwrotu został zmieniony na "Przygotowany"!')
             messages.success(request, 'Zwrot oznaczony jako przygotowany!')
             return redirect('dashboard')
 
         if 'return_received' in request.POST:
             return_detail.status = 'Odebrany'
             return_detail.save()
-            add_notifiaction(request.user, return_detail, 'Zwrot', 'returns_detail_view',
-                             'Status zwrotu został zmieniony na "Odebrany"!')
+            add_notifiaction(request.user, return_detail, 'Zwrot', 'Status zwrotu został zmieniony na "Odebrany"!')
             messages.success(request, 'Zwrot oznaczony jako odebrany!')
             return redirect('dashboard')
 
@@ -611,12 +664,12 @@ def returns_detail_view(request, return_id):
         if 'return_edited' in request.POST:
             if return_edit_form.is_valid():
                 instance = return_edit_form.save()
-                add_notifiaction(request.user, instance, 'Zwrot', 'returns_detail_view', 'Zwrot został zedytowany!')
+                add_notifiaction(request.user, instance, 'Zwrot', 'Zwrot został zedytowany!')
                 messages.success(request, 'Zwrot został zedytowany!')
                 return redirect('returns_detail_view', return_id=return_id)
 
         if 'return_delete' in request.POST:
-            add_notifiaction(request.user, return_detail, 'Zwrot', 'returns_detail_view', 'Zwrot został usunięty!')
+            add_notifiaction(request.user, return_detail, 'Zwrot', 'Zwrot został usunięty!')
             return_detail.delete()
             return redirect('dashboard')
 
@@ -659,8 +712,7 @@ def order_item(request):
                 order_item = form.save(commit=False)
                 order_item.created_by = request.user
                 order_item.save()
-                add_notifiaction(request.user, order_item, 'Zamówienie', 'order_item_detail_view',
-                                 'Nowy przedmiot do zamówienia został dodany!')
+                add_notifiaction(request.user, order_item, 'Zamówienie', 'Nowy przedmiot do zamówienia został dodany!')
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('order_item')
 
@@ -671,8 +723,7 @@ def order_item(request):
             item = OrderItem.objects.get(id=item_id)
             item.status = new_status
             item.save()
-            add_notifiaction(request.user, item, 'Zamówienie', 'order_item_detail_view',
-                             'Status przedmiotu do zamówienia został zmieniony!')
+            add_notifiaction(request.user, item, 'Zamówienie', 'Status przedmiotu do zamówienia został zmieniony!')
 
     else:
         create_order_item_form = OrderItemCreateForm()
@@ -700,7 +751,7 @@ def order_item_detail_view(request, order_item_id):
         if 'order_item_ordered' in request.POST:
             order_item_detail.status = 'Zamówione'
             order_item_detail.save()
-            add_notifiaction(request.user, order_item_detail, 'Zamówienie', 'order_item_detail_view',
+            add_notifiaction(request.user, order_item_detail, 'Zamówienie',
                              'Status przedmiotu do zamówienia został zmieniony na "Zamówione"!')
             messages.success(request, 'Produkt oznaczony jako zamówiony!')
             return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
@@ -708,7 +759,7 @@ def order_item_detail_view(request, order_item_id):
         if 'order_item_not_available' in request.POST:
             order_item_detail.status = 'Niedostępne'
             order_item_detail.save()
-            add_notifiaction(request.user, order_item_detail, 'Zamówienie', 'order_item_detail_view',
+            add_notifiaction(request.user, order_item_detail, 'Zamówienie',
                              'Status przedmiotu do zamówienia został zmieniony na "Niedostępne"!')
             messages.success(request, 'Produkt oznaczony jako niedostępny!')
             return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
@@ -716,14 +767,12 @@ def order_item_detail_view(request, order_item_id):
         if 'order_item_edited' in request.POST:
             if order_item_edit_form.is_valid():
                 instance = order_item_edit_form.save()
-                add_notifiaction(request.user, instance, 'Zamówienie', 'order_item_detail_view',
-                                 'Przedmiot do zamówienia został zedytowany!')
+                add_notifiaction(request.user, instance, 'Zamówienie', 'Przedmiot do zamówienia został zedytowany!')
                 messages.success(request, 'Przedmiot został zedytowany!')
                 return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
 
         if 'order_item_delete' in request.POST:
-            add_notifiaction(request.user, order_item_detail, 'Zamówienie', 'order_item_detail_view',
-                             'Przedmiot do zamówienia został usunięty!')
+            add_notifiaction(request.user, order_item_detail, 'Zamówienie', 'Przedmiot do zamówienia został usunięty!')
             order_item_detail.delete()
             return redirect('order_item')
 
@@ -766,8 +815,7 @@ def stock_item(request):
                 stock_item = form.save(commit=False)
                 stock_item.created_by = request.user
                 stock_item.save()
-                add_notifiaction(request.user, stock_item, 'Magazyn', 'stock_item_detail_view',
-                                 'Nowy przedmiot na magazynie został dodany!')
+                add_notifiaction(request.user, stock_item, 'Magazyn', 'Nowy przedmiot na magazynie został dodany!')
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('stock_item')
 
@@ -779,8 +827,7 @@ def stock_item(request):
             item = StockItem.objects.get(id=item_id)
             item.quantity += quantity
             item.save()
-            add_notifiaction(request.user, item, 'Magazyn', 'stock_item_detail_view',
-                             'Ilość przedmiotu na magazynie została zwiększona!')
+            add_notifiaction(request.user, item, 'Magazyn', 'Ilość przedmiotu na magazynie została zwiększona!')
             messages.success(request, 'Ilość przedmiotu została zwiększona!')
             return redirect('stock_item')
 
@@ -793,8 +840,7 @@ def stock_item(request):
             item = StockItem.objects.get(id=item_id)
             item.quantity -= quantity
             item.save()
-            add_notifiaction(request.user, item, 'Magazyn', 'stock_item_detail_view',
-                             'Ilość przedmiotu na magazynie została zmniejszona!')
+            add_notifiaction(request.user, item, 'Magazyn', 'Ilość przedmiotu na magazynie została zmniejszona!')
             messages.success(request, 'Ilość przedmiotu została zmniejszona!')
             return redirect('stock_item')
     else:
@@ -825,7 +871,7 @@ def stock_item_detail_view(request, stock_item_id):
             increase_quantity_value = int(request.POST.get('increase_quantity_value'))
             stock_item_detail.quantity += increase_quantity_value
             stock_item_detail.save()
-            add_notifiaction(request.user, stock_item_detail, 'Magazyn', 'stock_item_detail_view',
+            add_notifiaction(request.user, stock_item_detail, 'Magazyn',
                              'Ilość przedmiotu na magazynie została zwiększona!')
             messages.success(request, 'Ilość przedmiotu została zwiększona!')
             return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
@@ -834,7 +880,7 @@ def stock_item_detail_view(request, stock_item_id):
             reduce_quantity_value = int(request.POST.get('reduce_quantity_value'))
             stock_item_detail.quantity -= reduce_quantity_value
             stock_item_detail.save()
-            add_notifiaction(request.user, stock_item_detail, 'Magazyn', 'stock_item_detail_view',
+            add_notifiaction(request.user, stock_item_detail, 'Magazyn',
                              'Ilość przedmiotu na magazynie została zmniejszona!')
             messages.success(request, 'Ilość przedmiotu została zmniejszona!')
             return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
@@ -842,14 +888,12 @@ def stock_item_detail_view(request, stock_item_id):
         if 'stock_item_edited' in request.POST:
             if stock_item_edit_form.is_valid():
                 instance = stock_item_edit_form.save()
-                add_notifiaction(request.user, instance, 'Magazyn', 'stock_item_detail_view',
-                                 'Przedmiot na magazynie został zedytowany!')
+                add_notifiaction(request.user, instance, 'Magazyn', 'Przedmiot na magazynie został zedytowany!')
                 messages.success(request, 'Przedmiot został zedytowany!')
                 return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
 
         if 'stock_item_delete' in request.POST:
-            add_notifiaction(request.user, stock_item_detail, 'Magazyn', 'stock_item_detail_view',
-                             'Przedmiot na magazynie został usunięty!')
+            add_notifiaction(request.user, stock_item_detail, 'Magazyn', 'Przedmiot na magazynie został usunięty!')
             stock_item_detail.delete()
             return redirect('stock_item')
 
@@ -888,8 +932,6 @@ def admin_panel(request):
         for worker in all_workers:
             completed_tasks = worker.completed_tasks
             assigned_tasks = worker.assigned_tasks
-            print(completed_tasks)
-            print(assigned_tasks)
 
             if assigned_tasks == 0:
                 workers_rating[worker.user.username] = 'Brak zadań'
@@ -994,28 +1036,29 @@ def admin_panel(request):
             form = AddDeliveryForm(request.POST)
             if form.is_valid():
                 instance = form.save()
-                add_notifiaction(request.user, instance, 'Dostawa', 'delivery_detail_view',
-                                 'Nowa dostawa została dodana!')
+                add_notifiaction(request.user, instance, 'Dostawa', 'Nowa dostawa została dodana!')
                 messages.success(request, 'Dostawa została utworzona!')
                 return redirect('admin_panel')
         if 'add_task' in request.POST:
             form = AddTaskForm(request.POST)
             if form.is_valid():
                 instance = form.save()
-                add_notifiaction(request.user, instance, 'Zadanie', 'task_detail_view', 'Nowe zadanie zostało dodane!')
+                assigned_user = UserProfile.objects.get(user__username=instance.assigned_to)
+                assigned_user.assigned_tasks += 1
+                assigned_user.save()
+                add_notifiaction(request.user, instance, 'Zadanie', 'Nowe zadanie zostało dodane!')
                 messages.success(request, 'Zadanie zostało utworzone!')
                 return redirect('admin_panel')
         if 'add_return' in request.POST:
             form = AddReturnForm(request.POST)
             if form.is_valid():
                 instance = form.save()
-                add_notifiaction(request.user, instance, 'Zwrot', 'returns_detail_view', 'Nowy zwrot został dodany')
+                add_notifiaction(request.user, instance, 'Zwrot', 'Nowy zwrot został dodany')
                 messages.success(request, 'Zwrot został utworzony!')
                 return redirect('admin_panel')
 
         if 'set_day' in request.POST:
             day_date = request.POST.get('day_date')
-            print(day_date)
 
             try:
                 existing_day = Day.objects.get(day_date=day_date)
@@ -1030,12 +1073,18 @@ def admin_panel(request):
                 if existing_day:
                     existing_day.end_of_work_hour = day.end_of_work_hour
                     existing_day.save()
-                    add_notifiaction(request.user, existing_day, 'Godzina', '', 'Nowa godzina pracy została ustawiona!')
+                    polish_month = MONTHS_PL.get(existing_day.day_date.month, '')[:3]
+                    add_notifiaction(request.user, existing_day, 'Godzina',
+                                     f'Nowa godzina pracy na dzień {existing_day.day_date.strftime("%d")} {polish_month} {existing_day.day_date.strftime("%Y")} została ustawiona!')
                     messages.success(request, 'Godzina pracy została zaktualizowana!')
                 else:
                     day.day_date = day_date
                     day.save()
-                    add_notifiaction(request.user, day, 'Godzina', '', 'Nowa godzina pracy została ustawiona!')
+                    new_day = Day.objects.get(day_date=day.day_date)
+                    polish_month = MONTHS_PL.get(new_day.day_date.month, '')[:3]
+                    add_notifiaction(request.user, day, 'Godzina',
+                                     f'Nowa godzina pracy na dzień {new_day.day_date.strftime("%d")} {polish_month} {new_day.day_date.strftime("%Y")} została ustawiona!')
+
                     messages.success(request, 'Godzina pracy została ustawiona!')
 
                 return redirect('admin_panel')
@@ -1054,3 +1103,37 @@ def admin_panel(request):
     }
 
     return render(request, 'admin_panel.html', context)
+
+
+@login_required(login_url='login_user')
+def notification(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    unread_notifications, read_notifications = get_notifications(request.user)
+    users = UserProfile.objects.all()
+
+    if request.method == 'POST':
+        if 'mark_as_read' in request.POST:
+            notification_id = request.POST.get('notification_id')
+
+            notification = Notification.objects.get(id=notification_id)
+            notification.read_by.add(request.user)
+            notification.save()
+            return redirect('notification')
+
+        if 'set_all_as_read' in request.POST:
+            for notification in unread_notifications:
+                notification.read_by.add(request.user)
+                notification.save()
+            messages.success(request, 'Wszystkie powiadomienia oznaczone jako przeczytane!')
+            return redirect('notification')
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+        'users': users,
+    }
+
+    return render(request, 'notification.html', context)
