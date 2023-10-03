@@ -25,6 +25,22 @@ MONTHS_PL = {
 
 
 def add_notifiaction(user, target, notif_name, notif_destination, notif_description):
+    """
+    Add a notification for a given user and target.
+
+    Parameters:
+        user (User): The user for whom the notification is intended.
+        target (Model): The target model associated with the notification.
+        notif_name (str): The name or type of the notification.
+        notif_destination (str): The destination or purpose of the notification.
+        notif_description (str): A description or additional information for the notification.
+
+    This function creates a new notification with the provided information and links it to a specific target model.
+    The notification is intended for the user and is based on the user's position ('Pracownik' or 'Other').
+
+    - If the user's position is 'Pracownik', the notification is intended for 'Other'.
+    - If the user's position is different, the notification is intended for 'Pracownik'.
+    """
     notify_for = 'Other' if user.userprofile.position == 'Pracownik' else 'Pracownik'
 
     Notification.objects.create(
@@ -38,26 +54,44 @@ def add_notifiaction(user, target, notif_name, notif_destination, notif_descript
 
 
 def get_notifications(user):
+    """
+    Get notifications for a given user.
+
+    Parameters:
+        user (User): The user for whom notifications are to be retrieved.
+
+    Returns:
+        tuple: A tuple containing two querysets - unread_notifications and read_notifications.
+
+    The function first checks the user's position. If the position is 'Pracownik' (employee),
+    it retrieves unread and read notifications targeted at employees. If the position is different,
+    it retrieves notifications targeted at others.
+
+    For 'Pracownik':
+    - unread_notifications: Unread notifications for employees.
+    - read_notifications: Read notifications for employees (up to 10, ordered by creation time).
+
+    For other positions:
+    - unread_notifications: Unread notifications for others.
+    - read_notifications: Read notifications for others (up to 10, ordered by creation time).
+    """
+
     if user.userprofile.position == 'Pracownik':
         # Get notifications that have not yet been read and are for an employee
         unread_notifications = Notification.objects.filter(
             Q(notify_for='Pracownik') & ~Q(read_by=user)
         ).order_by('-creation_time')
-        print(unread_notifications.count())
         read_notifications = Notification.objects.filter(
             Q(notify_for='Pracownik') & Q(read_by=user)
-        ).order_by('-creation_time')
-        print(read_notifications.count())
+        ).order_by('-creation_time')[:10]
     else:
         # Get notifications that have not yet been read and are for others
         unread_notifications = Notification.objects.filter(
             Q(notify_for='Other') & ~Q(read_by=user)
         ).order_by('-creation_time')
-        print(unread_notifications.count())
         read_notifications = Notification.objects.filter(
             Q(notify_for='Other') & Q(read_by=user)
-        ).order_by('-creation_time')
-        print(read_notifications.count())
+        ).order_by('-creation_time')[:10]
 
     return unread_notifications, read_notifications
 
