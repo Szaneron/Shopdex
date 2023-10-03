@@ -1,0 +1,21 @@
+{% if notification.model_name == 'Zadanie' %}
+    <a href="{% url 'task_detail_view' task_id=notification.model_id %}">
+        <span class="material-icons-sharp open">visibility</span>
+    </a>
+{% elif notification.model_name == 'Dostawa' %}
+    <a href="{% url 'delivery_detail_view' delivery_id=notification.model_id %}">
+        <span class="material-icons-sharp open">visibility</span>
+    </a>
+{% elif notification.model_name == 'Zwrot' %}
+    <a href="{% url 'returns_detail_view' return_id=notification.model_id %}">
+        <span class="material-icons-sharp open">visibility</span>
+    </a>
+{% elif notification.model_name == 'Zamówienie' %}
+    <a href="{% url 'order_item_detail_view' order_item_id=notification.model_id %}">
+        <span class="material-icons-sharp open">visibility</span>
+    </a>
+{% elif notification.model_name == 'Magazyn' %}
+    <a href="{% url 'stock_item_detail_view' stock_item_id=notification.model_id %}">
+        <span class="material-icons-sharp open">visibility</span>
+    </a>
+{% endif %}

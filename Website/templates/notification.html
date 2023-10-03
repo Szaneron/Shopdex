@@ -36,45 +36,50 @@
             </div>
         </div>
         <div class="notification-list">
-            <div class="unread-notification-content">
-                {% for notification in unread_notifications %}
-                    <div class="unread-notification-card">
-                        <div>
-                            <img src="{{ notification.made_by.userprofile.profile_picture.url }}" alt="">
-                        </div>
-                        <div class="notif-info">
-                            <p class="notif_head">
-                                <span class="notif-title">{{ notification.model_name }}</span>
-                                <span class="notif-date">{{ notification.creation_time.date }}</span>
-                            </p>
-                            {{ notification.description }}
-                        </div>
-                        <div class="notif_mark_as_read">
-                            {% if user not in notification.read_by.all %}
-                                <span class="material-icons-sharp mark-as-read"
-                                      data-notification-id="{{ notification.id }}">close
-                            </span>
-                            {% endif %}
-                        </div>
+            {% for notification in unread_notifications %}
+
+                <div class="notification-card">
+                    <div>
+                        <img src="{{ notification.made_by.userprofile.profile_picture.url }}" alt="">
                     </div>
-                {% endfor %}</div>
-            <div class="read-notification-content">
-                {% for notification in read_notifications %}
-                    <div class="read-notification-card">
-                        <div>
-                            <img src="{{ notification.made_by.userprofile.profile_picture.url }}" alt="">
-                        </div>
-                        <div class="notif-info">
-                            <p>
-                                <span class="notif-title">{{ notification.model_name }}</span>
-                                <span class="notif-date">{{ notification.creation_time.date }}</span>
-                            </p>
-                            {{ notification.description }}
-                        </div>
-                        <div class="notif_mark_as_read">
-                        </div>
+                    <div class="notif-info">
+                        <p class="notif_head">
+                            <span class="notif-title">{{ notification.model_name }}</span>
+                            <span class="notif-date">{{ notification.creation_time.date|date:"d b Y" }}</span>
+                        </p>
+                        {{ notification.description }}
                     </div>
-                {% endfor %}</div>
+                    <div class="notif-open">
+                        {% include  "notification_check.html" %}
+                    </div>
+                    <div class="notif_mark_as_read">
+                        {% if user not in notification.read_by.all %}
+                            <span class="material-icons-sharp mark-as-read"
+                                  data-notification-id="{{ notification.id }}">close
+                                    </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            {% for notification in read_notifications %}
+                <div class="notification-card read">
+                    <div>
+                        <img src="{{ notification.made_by.userprofile.profile_picture.url }}" alt="">
+                    </div>
+                    <div class="notif-info">
+                        <p>
+                            <span class="notif-title">{{ notification.model_name }}</span>
+                            <span class="notif-date">{{ notification.creation_time.date|date:"d b Y" }}</span>
+                        </p>
+                        {{ notification.description }}
+                    </div>
+                    <div class="notif-open">
+                        {% include  "notification_check.html" %}
+                    </div>
+                    <div class="notif_mark_as_read">
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </main>
 </div>
