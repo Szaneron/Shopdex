@@ -37,6 +37,31 @@ def add_notifiaction(user, target, notif_name, notif_destination, notif_descript
     )
 
 
+def get_notifications(user):
+    if user.userprofile.position == 'Pracownik':
+        # Get notifications that have not yet been read and are for an employee
+        unread_notifications = Notification.objects.filter(
+            Q(notify_for='Pracownik') & ~Q(read_by=user)
+        ).order_by('-creation_time')
+        print(unread_notifications.count())
+        read_notifications = Notification.objects.filter(
+            Q(notify_for='Pracownik') & Q(read_by=user)
+        ).order_by('-creation_time')
+        print(read_notifications.count())
+    else:
+        # Get notifications that have not yet been read and are for others
+        unread_notifications = Notification.objects.filter(
+            Q(notify_for='Other') & ~Q(read_by=user)
+        ).order_by('-creation_time')
+        print(unread_notifications.count())
+        read_notifications = Notification.objects.filter(
+            Q(notify_for='Other') & Q(read_by=user)
+        ).order_by('-creation_time')
+        print(read_notifications.count())
+
+    return unread_notifications, read_notifications
+
+
 def get_current_date():
     current_date = datetime.now()
     return current_date
@@ -93,6 +118,7 @@ def logout_user(request):
 @login_required(login_url='login_user')
 def dashboard(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
     day_name = current_date.strftime('%A')
@@ -217,6 +243,7 @@ def dashboard(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'current_date': current_date,
         'day_name': day_name,
         'all_tasks': all_tasks,
@@ -888,8 +915,6 @@ def admin_panel(request):
         for worker in all_workers:
             completed_tasks = worker.completed_tasks
             assigned_tasks = worker.assigned_tasks
-            print(completed_tasks)
-            print(assigned_tasks)
 
             if assigned_tasks == 0:
                 workers_rating[worker.user.username] = 'Brak zadań'
@@ -1015,7 +1040,6 @@ def admin_panel(request):
 
         if 'set_day' in request.POST:
             day_date = request.POST.get('day_date')
-            print(day_date)
 
             try:
                 existing_day = Day.objects.get(day_date=day_date)
@@ -1054,3 +1078,37 @@ def admin_panel(request):
     }
 
     return render(request, 'admin_panel.html', context)
+
+
+@login_required(login_url='login_user')
+def notification(request):
+    user = request.user
+    user_rating = get_employee_rating(user)
+    unread_notifications, read_notifications = get_notifications(request.user)
+    users = UserProfile.objects.all()
+
+    if request.method == 'POST':
+        if 'mark_as_read' in request.POST:
+            notification_id = request.POST.get('notification_id')
+
+            notification = Notification.objects.get(id=notification_id)
+            notification.read_by.add(request.user)
+            notification.save()
+            return redirect('notification')
+
+        if 'set_all_as_read' in request.POST:
+            for notification in unread_notifications:
+                notification.read_by.add(request.user)
+                notification.save()
+            messages.success(request, 'Wszystkie powiadomienia oznaczone jako przeczytane!')
+            return redirect('notification')
+
+    context = {
+        'user': user,
+        'user_rating': user_rating,
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+        'users': users,
+    }
+
+    return render(request, 'notification.html', context)
