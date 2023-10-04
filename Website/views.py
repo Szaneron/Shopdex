@@ -95,6 +95,48 @@ def get_progress_bar_data(all_tasks, all_delivery, all_returns):
     return progress_bar_data
 
 
+def get_progress_bar_data_for_user(all_tasks_for_user, all_delivery, all_returns):
+    """
+    Calculate progress bar data based on tasks deliveries and returns for specific logged user.
+
+    This function calculates progress bar data for tasks deliveries and returns by determining the total number
+    of tasks deliveries and returns to be done, the number of completed tasks deliveries and returns,
+    and the percentage of completion.
+
+    Args:
+    all_tasks_for_user (QuerySet): Queryset of all tasks for specific logged user.
+    all_delivery (QuerySet): Queryset of all deliveries.
+    all_returns (QuerySet): Queryset of all returns.
+
+    Returns:
+    dict: A dictionary containing progress bar data with keys:
+    - 'all_to_do': Total count of tasks deliveries and returns to be done.
+    - 'all_done': Total count of completed tasks deliveries and returns.
+    - 'percentage_done': Percentage of completion.
+    """
+
+    all_to_do = all_tasks_for_user.count() + all_delivery.count() + all_returns.count()
+    progress_tasks_done = all_tasks_for_user.filter(status="Zrobione")
+    progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
+    progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
+    all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
+
+    def calculate_percentage(x, y):
+        if y == 0:
+            return 100  # Avoid division by zero
+        percentage = (x / y) * 100
+        return int(round(percentage, 0))
+
+    percentage_done = calculate_percentage(all_done, all_to_do)
+
+    progress_bar_data = {
+        'all_to_do': all_to_do,
+        'all_done': all_done,
+        'percentage_done': percentage_done,
+    }
+    return progress_bar_data
+
+
 def generate_return_pdf(return_id):
     """
     Generate a PDF file for a given return based on its ID.
@@ -269,47 +311,6 @@ def dashboard(request):
     returns_for_dashboard = all_returns[:2]
 
     progress_bar_data = get_progress_bar_data(all_tasks, all_delivery, all_returns)
-
-    def get_progress_bar_data_for_user(all_tasks_for_user, all_delivery, all_returns):
-        """
-        Calculate progress bar data based on tasks deliveries and returns for specific logged user.
-
-        This function calculates progress bar data for tasks deliveries and returns by determining the total number
-        of tasks deliveries and returns to be done, the number of completed tasks deliveries and returns,
-        and the percentage of completion.
-
-        Args:
-        all_tasks_for_user (QuerySet): Queryset of all tasks for specific logged user.
-        all_delivery (QuerySet): Queryset of all deliveries.
-        all_returns (QuerySet): Queryset of all returns.
-
-        Returns:
-        dict: A dictionary containing progress bar data with keys:
-        - 'all_to_do': Total count of tasks deliveries and returns to be done.
-        - 'all_done': Total count of completed tasks deliveries and returns.
-        - 'percentage_done': Percentage of completion.
-        """
-
-        all_to_do = all_tasks_for_user.count() + all_delivery.count() + all_returns.count()
-        progress_tasks_done = all_tasks_for_user.filter(status="Zrobione")
-        progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
-        progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
-        all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
-
-        def calculate_percentage(x, y):
-            if y == 0:
-                return 100  # Avoid division by zero
-            percentage = (x / y) * 100
-            return int(round(percentage, 0))
-
-        percentage_done = calculate_percentage(all_done, all_to_do)
-
-        progress_bar_data = {
-            'all_to_do': all_to_do,
-            'all_done': all_done,
-            'percentage_done': percentage_done,
-        }
-        return progress_bar_data
 
     progress_bar_data_for_user = get_progress_bar_data_for_user(all_tasks_for_user, all_delivery, all_returns)
 
