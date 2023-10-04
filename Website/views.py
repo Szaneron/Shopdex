@@ -24,7 +24,176 @@ MONTHS_PL = {
 }
 
 
-def add_notifiaction(user, target, notif_name, notif_description):
+def get_current_date():
+    current_date = datetime.now()
+    return current_date
+
+
+def get_employee_rating(user):
+    """
+    Calculate the user's rating based on completed and assigned tasks.
+
+    This function calculates the user's rating based on the ratio of completed tasks
+    to assigned tasks. The rating is scaled to a range from 1 to 5.
+
+    Args:
+        user.userprofile (UserProfile): The user's profile containing task information.
+
+    Returns:
+        float: The calculated user's rating.
+
+    """
+    completed_tasks = user.userprofile.completed_tasks
+    assigned_tasks = user.userprofile.assigned_tasks
+
+    if assigned_tasks == 0:
+        return 'Brak zadań'
+
+    rating = min(5, max(1, completed_tasks / assigned_tasks * 5))
+    return round(rating, 1)
+
+
+def get_progress_bar_data(all_tasks, all_delivery, all_returns):
+    """
+    Calculate progress bar data based on tasks deliveries and returns.
+
+    This function calculates progress bar data for tasks deliveries and returns by determining the total number
+    of tasks deliveries and returns to be done, the number of completed tasks deliveries and returns,
+    and the percentage of completion.
+
+    Args:
+    all_tasks (QuerySet): Queryset of all tasks.
+    all_delivery (QuerySet): Queryset of all deliveries.
+    all_returns (QuerySet): Queryset of all returns.
+
+    Returns:
+    dict: A dictionary containing progress bar data with keys:
+    - 'all_to_do': Total count of tasks deliveries and returns to be done.
+    - 'all_done': Total count of completed tasks deliveries and returns.
+    - 'percentage_done': Percentage of completion.
+    """
+
+    all_to_do = all_tasks.count() + all_delivery.count() + all_returns.count()
+    progress_tasks_done = all_tasks.filter(status="Zrobione")
+    progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
+    progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
+    all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
+
+    def calculate_percentage(x, y):
+        if y == 0:
+            return 100  # Avoid division by zero
+        percentage = (x / y) * 100
+        return int(round(percentage, 0))
+
+    percentage_done = calculate_percentage(all_done, all_to_do)
+
+    progress_bar_data = {
+        'all_to_do': all_to_do,
+        'all_done': all_done,
+        'percentage_done': percentage_done,
+    }
+    return progress_bar_data
+
+
+def get_progress_bar_data_for_user(all_tasks_for_user, all_delivery, all_returns):
+    """
+    Calculate progress bar data based on tasks deliveries and returns for specific logged user.
+
+    This function calculates progress bar data for tasks deliveries and returns by determining the total number
+    of tasks deliveries and returns to be done, the number of completed tasks deliveries and returns,
+    and the percentage of completion.
+
+    Args:
+    all_tasks_for_user (QuerySet): Queryset of all tasks for specific logged user.
+    all_delivery (QuerySet): Queryset of all deliveries.
+    all_returns (QuerySet): Queryset of all returns.
+
+    Returns:
+    dict: A dictionary containing progress bar data with keys:
+    - 'all_to_do': Total count of tasks deliveries and returns to be done.
+    - 'all_done': Total count of completed tasks deliveries and returns.
+    - 'percentage_done': Percentage of completion.
+    """
+
+    all_to_do = all_tasks_for_user.count() + all_delivery.count() + all_returns.count()
+    progress_tasks_done = all_tasks_for_user.filter(status="Zrobione")
+    progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
+    progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
+    all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
+
+    def calculate_percentage(x, y):
+        if y == 0:
+            return 100  # Avoid division by zero
+        percentage = (x / y) * 100
+        return int(round(percentage, 0))
+
+    percentage_done = calculate_percentage(all_done, all_to_do)
+
+    progress_bar_data = {
+        'all_to_do': all_to_do,
+        'all_done': all_done,
+        'percentage_done': percentage_done,
+    }
+    return progress_bar_data
+
+
+def generate_return_pdf(return_id):
+    """
+    Generate a PDF file for a given return based on its ID.
+
+    :param return_id: The ID of the return for which the PDF file should be generated.
+    :type return_id: int
+    :return: HttpResponse containing the PDF file with return data.
+    :rtype: HttpResponse
+    """
+    return_data = get_object_or_404(Return, id=return_id)
+    package_quantity = return_data.package_quantity
+
+    # Add a font to PDF
+    pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
+    pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="return_{return_data.name}_{return_data.return_date}.pdf"'
+
+    # Creating a PDF file with ReportLab
+    c = canvas.Canvas(response, pagesize=landscape(A6))
+
+    for package_number in range(1, package_quantity + 1):
+        c.setFont("Poppins_bold", 15)
+        c.drawString(50, 250, 'Awizo: ')
+        c.setFont("Poppins_light", 15)
+        c.drawString(100, 250, return_data.notice)
+
+        c.setFont("Poppins_bold", 15)
+        c.drawString(50, 200, 'Hurtownia: ')
+        c.setFont("Poppins_light", 15)
+        c.drawString(134, 200, return_data.wholesale)
+
+        c.setFont("Poppins_bold", 15)
+        c.drawString(50, 150, 'Data: ')
+        c.setFont("Poppins_light", 15)
+        c.drawString(93, 150, return_data.return_date.strftime('%d/%m/%Y'))
+
+        c.setFont("Poppins_bold", 15)
+        c.drawString(50, 100, 'Uwagi: ')
+        c.setFont("Poppins_light", 15)
+        c.drawString(103, 100, return_data.notes)
+
+        c.setFont("Poppins_bold", 15)
+        c.drawString(50, 50, 'Ilość paczek: ')
+        c.setFont("Poppins_light", 15)
+        c.drawString(150, 50, f'{package_number}/{package_quantity}')
+
+        if package_number < package_quantity:
+            c.showPage()  # Switch to next page
+
+    c.save()
+
+    return response
+
+
+def add_notification(user, target, notif_name, notif_description):
     """
     Add a notification for a given user and target.
 
@@ -94,35 +263,6 @@ def get_notifications(user):
     return unread_notifications, read_notifications
 
 
-def get_current_date():
-    current_date = datetime.now()
-    return current_date
-
-
-def get_employee_rating(user):
-    """
-    Calculate the user's rating based on completed and assigned tasks.
-
-    This function calculates the user's rating based on the ratio of completed tasks
-    to assigned tasks. The rating is scaled to a range from 1 to 5.
-
-    Args:
-        user.userprofile (UserProfile): The user's profile containing task information.
-
-    Returns:
-        float: The calculated user's rating.
-
-    """
-    completed_tasks = user.userprofile.completed_tasks
-    assigned_tasks = user.userprofile.assigned_tasks
-
-    if assigned_tasks == 0:
-        return 'Brak zadań'
-
-    rating = min(5, max(1, completed_tasks / assigned_tasks * 5))
-    return round(rating, 1)
-
-
 def login_user(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -170,89 +310,7 @@ def dashboard(request):
                                                                                                'creation_time')
     returns_for_dashboard = all_returns[:2]
 
-    def get_progress_bar_data(all_tasks, all_delivery, all_returns):
-        """
-        Calculate progress bar data based on tasks deliveries and returns.
-
-        This function calculates progress bar data for tasks deliveries and returns by determining the total number
-        of tasks deliveries and returns to be done, the number of completed tasks deliveries and returns,
-        and the percentage of completion.
-
-        Args:
-        all_tasks (QuerySet): Queryset of all tasks.
-        all_delivery (QuerySet): Queryset of all deliveries.
-        all_returns (QuerySet): Queryset of all returns.
-
-        Returns:
-        dict: A dictionary containing progress bar data with keys:
-        - 'all_to_do': Total count of tasks deliveries and returns to be done.
-        - 'all_done': Total count of completed tasks deliveries and returns.
-        - 'percentage_done': Percentage of completion.
-        """
-
-        all_to_do = all_tasks.count() + all_delivery.count() + all_returns.count()
-        progress_tasks_done = all_tasks.filter(status="Zrobione")
-        progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
-        progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
-        all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
-
-        def calculate_percentage(x, y):
-            if y == 0:
-                return 100  # Avoid division by zero
-            percentage = (x / y) * 100
-            return int(round(percentage, 0))
-
-        percentage_done = calculate_percentage(all_done, all_to_do)
-
-        progress_bar_data = {
-            'all_to_do': all_to_do,
-            'all_done': all_done,
-            'percentage_done': percentage_done,
-        }
-        return progress_bar_data
-
     progress_bar_data = get_progress_bar_data(all_tasks, all_delivery, all_returns)
-
-    def get_progress_bar_data_for_user(all_tasks_for_user, all_delivery, all_returns):
-        """
-        Calculate progress bar data based on tasks deliveries and returns for specific logged user.
-
-        This function calculates progress bar data for tasks deliveries and returns by determining the total number
-        of tasks deliveries and returns to be done, the number of completed tasks deliveries and returns,
-        and the percentage of completion.
-
-        Args:
-        all_tasks_for_user (QuerySet): Queryset of all tasks for specific logged user.
-        all_delivery (QuerySet): Queryset of all deliveries.
-        all_returns (QuerySet): Queryset of all returns.
-
-        Returns:
-        dict: A dictionary containing progress bar data with keys:
-        - 'all_to_do': Total count of tasks deliveries and returns to be done.
-        - 'all_done': Total count of completed tasks deliveries and returns.
-        - 'percentage_done': Percentage of completion.
-        """
-
-        all_to_do = all_tasks_for_user.count() + all_delivery.count() + all_returns.count()
-        progress_tasks_done = all_tasks_for_user.filter(status="Zrobione")
-        progress_delivery_done = all_delivery.filter(status__in=["Odebrana", "Nie dostarczona"])
-        progress_returns_done = all_returns.filter(status__in=["Odebrany", "Przygotowany"])
-        all_done = progress_tasks_done.count() + progress_delivery_done.count() + progress_returns_done.count()
-
-        def calculate_percentage(x, y):
-            if y == 0:
-                return 100  # Avoid division by zero
-            percentage = (x / y) * 100
-            return int(round(percentage, 0))
-
-        percentage_done = calculate_percentage(all_done, all_to_do)
-
-        progress_bar_data = {
-            'all_to_do': all_to_do,
-            'all_done': all_done,
-            'percentage_done': percentage_done,
-        }
-        return progress_bar_data
 
     progress_bar_data_for_user = get_progress_bar_data_for_user(all_tasks_for_user, all_delivery, all_returns)
 
@@ -290,8 +348,8 @@ def dashboard(request):
         'end_of_work_hour': end_of_work_hour,
         'all_returns': all_returns,
         'returns_for_dashboard': returns_for_dashboard,
-
     }
+
     return render(request, "dashboard.html", context)
 
 
@@ -355,6 +413,7 @@ def task(request):
         'all_tasks_for_user': all_tasks_for_user,
         'current_date': current_date,
     }
+
     return render(request, "task.html", context)
 
 
@@ -370,7 +429,7 @@ def task_detail_view(request, task_id):
         if 'task_edited' in request.POST:
             if task_edit_form.is_valid():
                 instance = task_edit_form.save()
-                add_notifiaction(request.user, instance, 'Zadanie', 'Zadanie zostało zedytowane!')
+                add_notification(request.user, instance, 'Zadanie', 'Zadanie zostało zedytowane!')
                 messages.success(request, 'Zadanie zostało zedytowane!')
                 return redirect('task_detail_view', task_id=task_id)
 
@@ -380,12 +439,12 @@ def task_detail_view(request, task_id):
             user.userprofile.completed_tasks += 1
             user.userprofile.save()
 
-            add_notifiaction(request.user, task, 'Zadanie', 'Status zadania został zmieniony na "Zrobione"!')
+            add_notification(request.user, task, 'Zadanie', 'Status zadania został zmieniony na "Zrobione"!')
             messages.success(request, 'Zadanie oznaczone jako wykonane!')
             return redirect('dashboard')
 
         if 'task_delete' in request.POST:
-            add_notifiaction(request.user, task, 'Zadanie', 'Zadanie zostało usunięte!')
+            add_notification(request.user, task, 'Zadanie', 'Zadanie zostało usunięte!')
             task.delete()
             return redirect('dashboard')
 
@@ -441,6 +500,7 @@ def delivery(request):
         'all_delivery': all_delivery,
         'current_date': current_date,
     }
+
     return render(request, "delivery.html", context)
 
 
@@ -456,14 +516,14 @@ def delivery_detail_view(request, delivery_id):
         if 'delivery_received' in request.POST:
             delivery.status = 'Odebrana'
             delivery.save()
-            add_notifiaction(request.user, delivery, 'Dostawa', 'Status dostawy został zmieniony na "Odebrana"!')
+            add_notification(request.user, delivery, 'Dostawa', 'Status dostawy został zmieniony na "Odebrana"!')
             messages.success(request, 'Dostawa oznaczona jako odebrana!')
             return redirect('dashboard')
 
         if 'delivery_not_delivered' in request.POST:
             delivery.status = 'Nie dostarczona'
             delivery.save()
-            add_notifiaction(request.user, delivery, 'Dostawa', 'Status dostawy został zmieniony na "Nie dostarczona"!')
+            add_notification(request.user, delivery, 'Dostawa', 'Status dostawy został zmieniony na "Nie dostarczona"!')
 
             miesiace = [
                 'stycznia', 'lutego', 'marca', 'kwietnia',
@@ -504,12 +564,12 @@ def delivery_detail_view(request, delivery_id):
         if 'delivery_edited' in request.POST:
             if delivery_edit_form.is_valid():
                 instance = delivery_edit_form.save()
-                add_notifiaction(request.user, instance, 'Dostawa', 'Dostawa została zedytowana!')
+                add_notification(request.user, instance, 'Dostawa', 'Dostawa została zedytowana!')
                 messages.success(request, 'Dostawa została zedytowana!')
                 return redirect('delivery_detail_view', delivery_id=delivery_id)
 
         if 'delivery_delete' in request.POST:
-            add_notifiaction(request.user, delivery, 'Dostawa', 'Dostawa została usunięta!')
+            add_notification(request.user, delivery, 'Dostawa', 'Dostawa została usunięta!')
             delivery.delete()
             return redirect('dashboard')
 
@@ -576,6 +636,7 @@ def returns(request):
         'page_active': page_active,
         'search_query': search_query,
     }
+
     return render(request, "return.html", context)
 
 
@@ -587,73 +648,18 @@ def returns_detail_view(request, return_id):
     user_rating = get_employee_rating(user)
     return_edit_form = ReturnEditForm(request.POST, instance=return_detail)
 
-    def generate_return_pdf(return_id):
-        """
-        Generate a PDF file for a given return based on its ID.
-
-        :param return_id: The ID of the return for which the PDF file should be generated.
-        :type return_id: int
-        :return: HttpResponse containing the PDF file with return data.
-        :rtype: HttpResponse
-        """
-        return_data = get_object_or_404(Return, id=return_id)
-        package_quantity = return_data.package_quantity
-
-        # Add a font to PDF
-        pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
-        pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
-
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="return_{return_id}.pdf"'
-
-        # Creating a PDF file with ReportLab
-        c = canvas.Canvas(response, pagesize=landscape(A6))
-
-        for package_number in range(1, package_quantity + 1):
-            c.setFont("Poppins_bold", 15)
-            c.drawString(50, 250, 'Awizo: ')
-            c.setFont("Poppins_light", 15)
-            c.drawString(100, 250, return_data.notice)
-
-            c.setFont("Poppins_bold", 15)
-            c.drawString(50, 200, 'Hurtownia: ')
-            c.setFont("Poppins_light", 15)
-            c.drawString(134, 200, return_data.wholesale)
-
-            c.setFont("Poppins_bold", 15)
-            c.drawString(50, 150, 'Data: ')
-            c.setFont("Poppins_light", 15)
-            c.drawString(93, 150, return_data.return_date.strftime('%d/%m/%Y'))
-
-            c.setFont("Poppins_bold", 15)
-            c.drawString(50, 100, 'Uwagi: ')
-            c.setFont("Poppins_light", 15)
-            c.drawString(103, 100, return_data.notes)
-
-            c.setFont("Poppins_bold", 15)
-            c.drawString(50, 50, 'Ilość paczek: ')
-            c.setFont("Poppins_light", 15)
-            c.drawString(150, 50, f'{package_number}/{package_quantity}')
-
-            if package_number < package_quantity:
-                c.showPage()  # Switch to next page
-
-        c.save()
-
-        return response
-
     if request.method == 'POST':
         if 'return_packed' in request.POST:
             return_detail.status = 'Przygotowany'
             return_detail.save()
-            add_notifiaction(request.user, return_detail, 'Zwrot', 'Status zwrotu został zmieniony na "Przygotowany"!')
+            add_notification(request.user, return_detail, 'Zwrot', 'Status zwrotu został zmieniony na "Przygotowany"!')
             messages.success(request, 'Zwrot oznaczony jako przygotowany!')
             return redirect('dashboard')
 
         if 'return_received' in request.POST:
             return_detail.status = 'Odebrany'
             return_detail.save()
-            add_notifiaction(request.user, return_detail, 'Zwrot', 'Status zwrotu został zmieniony na "Odebrany"!')
+            add_notification(request.user, return_detail, 'Zwrot', 'Status zwrotu został zmieniony na "Odebrany"!')
             messages.success(request, 'Zwrot oznaczony jako odebrany!')
             return redirect('dashboard')
 
@@ -664,12 +670,12 @@ def returns_detail_view(request, return_id):
         if 'return_edited' in request.POST:
             if return_edit_form.is_valid():
                 instance = return_edit_form.save()
-                add_notifiaction(request.user, instance, 'Zwrot', 'Zwrot został zedytowany!')
+                add_notification(request.user, instance, 'Zwrot', 'Zwrot został zedytowany!')
                 messages.success(request, 'Zwrot został zedytowany!')
                 return redirect('returns_detail_view', return_id=return_id)
 
         if 'return_delete' in request.POST:
-            add_notifiaction(request.user, return_detail, 'Zwrot', 'Zwrot został usunięty!')
+            add_notification(request.user, return_detail, 'Zwrot', 'Zwrot został usunięty!')
             return_detail.delete()
             return redirect('dashboard')
 
@@ -712,7 +718,7 @@ def order_item(request):
                 order_item = form.save(commit=False)
                 order_item.created_by = request.user
                 order_item.save()
-                add_notifiaction(request.user, order_item, 'Zamówienie', 'Nowy przedmiot do zamówienia został dodany!')
+                add_notification(request.user, order_item, 'Zamówienie', 'Nowy przedmiot do zamówienia został dodany!')
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('order_item')
 
@@ -723,7 +729,7 @@ def order_item(request):
             item = OrderItem.objects.get(id=item_id)
             item.status = new_status
             item.save()
-            add_notifiaction(request.user, item, 'Zamówienie', 'Status przedmiotu do zamówienia został zmieniony!')
+            add_notification(request.user, item, 'Zamówienie', 'Status przedmiotu do zamówienia został zmieniony!')
 
     else:
         create_order_item_form = OrderItemCreateForm()
@@ -736,6 +742,7 @@ def order_item(request):
         'create_order_item_form': create_order_item_form,
         'search_query': search_query,
     }
+
     return render(request, "order_item.html", context)
 
 
@@ -751,7 +758,7 @@ def order_item_detail_view(request, order_item_id):
         if 'order_item_ordered' in request.POST:
             order_item_detail.status = 'Zamówione'
             order_item_detail.save()
-            add_notifiaction(request.user, order_item_detail, 'Zamówienie',
+            add_notification(request.user, order_item_detail, 'Zamówienie',
                              'Status przedmiotu do zamówienia został zmieniony na "Zamówione"!')
             messages.success(request, 'Produkt oznaczony jako zamówiony!')
             return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
@@ -759,7 +766,7 @@ def order_item_detail_view(request, order_item_id):
         if 'order_item_not_available' in request.POST:
             order_item_detail.status = 'Niedostępne'
             order_item_detail.save()
-            add_notifiaction(request.user, order_item_detail, 'Zamówienie',
+            add_notification(request.user, order_item_detail, 'Zamówienie',
                              'Status przedmiotu do zamówienia został zmieniony na "Niedostępne"!')
             messages.success(request, 'Produkt oznaczony jako niedostępny!')
             return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
@@ -767,12 +774,12 @@ def order_item_detail_view(request, order_item_id):
         if 'order_item_edited' in request.POST:
             if order_item_edit_form.is_valid():
                 instance = order_item_edit_form.save()
-                add_notifiaction(request.user, instance, 'Zamówienie', 'Przedmiot do zamówienia został zedytowany!')
+                add_notification(request.user, instance, 'Zamówienie', 'Przedmiot do zamówienia został zedytowany!')
                 messages.success(request, 'Przedmiot został zedytowany!')
                 return redirect('order_item_detail_view', order_item_id=order_item_detail.id)
 
         if 'order_item_delete' in request.POST:
-            add_notifiaction(request.user, order_item_detail, 'Zamówienie', 'Przedmiot do zamówienia został usunięty!')
+            add_notification(request.user, order_item_detail, 'Zamówienie', 'Przedmiot do zamówienia został usunięty!')
             order_item_detail.delete()
             return redirect('order_item')
 
@@ -815,7 +822,7 @@ def stock_item(request):
                 stock_item = form.save(commit=False)
                 stock_item.created_by = request.user
                 stock_item.save()
-                add_notifiaction(request.user, stock_item, 'Magazyn', 'Nowy przedmiot na magazynie został dodany!')
+                add_notification(request.user, stock_item, 'Magazyn', 'Nowy przedmiot na magazynie został dodany!')
                 messages.success(request, 'Przedmiot został dodany!')
                 return redirect('stock_item')
 
@@ -827,7 +834,7 @@ def stock_item(request):
             item = StockItem.objects.get(id=item_id)
             item.quantity += quantity
             item.save()
-            add_notifiaction(request.user, item, 'Magazyn', 'Ilość przedmiotu na magazynie została zwiększona!')
+            add_notification(request.user, item, 'Magazyn', 'Ilość przedmiotu na magazynie została zwiększona!')
             messages.success(request, 'Ilość przedmiotu została zwiększona!')
             return redirect('stock_item')
 
@@ -840,7 +847,7 @@ def stock_item(request):
             item = StockItem.objects.get(id=item_id)
             item.quantity -= quantity
             item.save()
-            add_notifiaction(request.user, item, 'Magazyn', 'Ilość przedmiotu na magazynie została zmniejszona!')
+            add_notification(request.user, item, 'Magazyn', 'Ilość przedmiotu na magazynie została zmniejszona!')
             messages.success(request, 'Ilość przedmiotu została zmniejszona!')
             return redirect('stock_item')
     else:
@@ -871,7 +878,7 @@ def stock_item_detail_view(request, stock_item_id):
             increase_quantity_value = int(request.POST.get('increase_quantity_value'))
             stock_item_detail.quantity += increase_quantity_value
             stock_item_detail.save()
-            add_notifiaction(request.user, stock_item_detail, 'Magazyn',
+            add_notification(request.user, stock_item_detail, 'Magazyn',
                              'Ilość przedmiotu na magazynie została zwiększona!')
             messages.success(request, 'Ilość przedmiotu została zwiększona!')
             return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
@@ -880,7 +887,7 @@ def stock_item_detail_view(request, stock_item_id):
             reduce_quantity_value = int(request.POST.get('reduce_quantity_value'))
             stock_item_detail.quantity -= reduce_quantity_value
             stock_item_detail.save()
-            add_notifiaction(request.user, stock_item_detail, 'Magazyn',
+            add_notification(request.user, stock_item_detail, 'Magazyn',
                              'Ilość przedmiotu na magazynie została zmniejszona!')
             messages.success(request, 'Ilość przedmiotu została zmniejszona!')
             return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
@@ -888,12 +895,12 @@ def stock_item_detail_view(request, stock_item_id):
         if 'stock_item_edited' in request.POST:
             if stock_item_edit_form.is_valid():
                 instance = stock_item_edit_form.save()
-                add_notifiaction(request.user, instance, 'Magazyn', 'Przedmiot na magazynie został zedytowany!')
+                add_notification(request.user, instance, 'Magazyn', 'Przedmiot na magazynie został zedytowany!')
                 messages.success(request, 'Przedmiot został zedytowany!')
                 return redirect('stock_item_detail_view', stock_item_id=stock_item_detail.id)
 
         if 'stock_item_delete' in request.POST:
-            add_notifiaction(request.user, stock_item_detail, 'Magazyn', 'Przedmiot na magazynie został usunięty!')
+            add_notification(request.user, stock_item_detail, 'Magazyn', 'Przedmiot na magazynie został usunięty!')
             stock_item_detail.delete()
             return redirect('stock_item')
 
@@ -1036,7 +1043,7 @@ def admin_panel(request):
             form = AddDeliveryForm(request.POST)
             if form.is_valid():
                 instance = form.save()
-                add_notifiaction(request.user, instance, 'Dostawa', 'Nowa dostawa została dodana!')
+                add_notification(request.user, instance, 'Dostawa', 'Nowa dostawa została dodana!')
                 messages.success(request, 'Dostawa została utworzona!')
                 return redirect('admin_panel')
         if 'add_task' in request.POST:
@@ -1046,14 +1053,14 @@ def admin_panel(request):
                 assigned_user = UserProfile.objects.get(user__username=instance.assigned_to)
                 assigned_user.assigned_tasks += 1
                 assigned_user.save()
-                add_notifiaction(request.user, instance, 'Zadanie', 'Nowe zadanie zostało dodane!')
+                add_notification(request.user, instance, 'Zadanie', 'Nowe zadanie zostało dodane!')
                 messages.success(request, 'Zadanie zostało utworzone!')
                 return redirect('admin_panel')
         if 'add_return' in request.POST:
             form = AddReturnForm(request.POST)
             if form.is_valid():
                 instance = form.save()
-                add_notifiaction(request.user, instance, 'Zwrot', 'Nowy zwrot został dodany')
+                add_notification(request.user, instance, 'Zwrot', 'Nowy zwrot został dodany')
                 messages.success(request, 'Zwrot został utworzony!')
                 return redirect('admin_panel')
 
@@ -1074,7 +1081,7 @@ def admin_panel(request):
                     existing_day.end_of_work_hour = day.end_of_work_hour
                     existing_day.save()
                     polish_month = MONTHS_PL.get(existing_day.day_date.month, '')[:3]
-                    add_notifiaction(request.user, existing_day, 'Godzina',
+                    add_notification(request.user, existing_day, 'Godzina',
                                      f'Nowa godzina pracy na dzień {existing_day.day_date.strftime("%d")} {polish_month} {existing_day.day_date.strftime("%Y")} została ustawiona!')
                     messages.success(request, 'Godzina pracy została zaktualizowana!')
                 else:
@@ -1082,7 +1089,7 @@ def admin_panel(request):
                     day.save()
                     new_day = Day.objects.get(day_date=day.day_date)
                     polish_month = MONTHS_PL.get(new_day.day_date.month, '')[:3]
-                    add_notifiaction(request.user, day, 'Godzina',
+                    add_notification(request.user, day, 'Godzina',
                                      f'Nowa godzina pracy na dzień {new_day.day_date.strftime("%d")} {polish_month} {new_day.day_date.strftime("%Y")} została ustawiona!')
 
                     messages.success(request, 'Godzina pracy została ustawiona!')
