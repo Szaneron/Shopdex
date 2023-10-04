@@ -3,6 +3,9 @@ from .models import Task, Delivery, Return, OrderItem, StockItem, Day
 
 
 class TaskEditForm(forms.ModelForm):
+    # Form for editing a Task.
+    # This form defines the fields and widgets for editing a Task using a ModelForm.
+
     class Meta:
         model = Task
         fields = ['name', 'description', 'status', 'assigned_to', 'is_important', 'task_date']
@@ -15,6 +18,9 @@ class TaskEditForm(forms.ModelForm):
 
 
 class DeliveryEditForm(forms.ModelForm):
+    # Form for editing a Delivery.
+    # This form defines the fields and widgets for editing a Delivery using a ModelForm.
+
     class Meta:
         model = Delivery
         fields = ['delivery_company', 'form', 'quantity', 'description', 'status', 'delivery_date']
@@ -26,6 +32,9 @@ class DeliveryEditForm(forms.ModelForm):
 
 
 class ReturnEditForm(forms.ModelForm):
+    # Form for editing a Return.
+    # This form defines the fields and widgets for editing a Return using a ModelForm.
+
     class Meta:
         model = Return
         fields = ['name', 'description', 'status', 'return_date', 'receiving_company', 'notice', 'wholesale', 'notes',
@@ -39,6 +48,9 @@ class ReturnEditForm(forms.ModelForm):
 
 
 class OrderItemCreateForm(forms.ModelForm):
+    # Form for creating an OrderItem.
+    # This form defines the fields and widgets for creating an OrderItem using a ModelForm.
+
     class Meta:
         model = OrderItem
         fields = ['name', 'description']
@@ -49,6 +61,9 @@ class OrderItemCreateForm(forms.ModelForm):
 
 
 class OrderItemEditForm(forms.ModelForm):
+    # Form for editing an OrderItem.
+    # This form defines the fields and widgets for editing an OrderItem using a ModelForm.
+
     class Meta:
         model = OrderItem
         fields = ['name', 'description', 'status']
@@ -59,6 +74,9 @@ class OrderItemEditForm(forms.ModelForm):
 
 
 class StockItemCreateForm(forms.ModelForm):
+    # Form for creating a StockItem.
+    # This form defines the fields and widgets for creating a StockItem using a ModelForm.
+
     class Meta:
         model = StockItem
         fields = ['dimensions', 'usage', 'quantity']
@@ -69,6 +87,9 @@ class StockItemCreateForm(forms.ModelForm):
 
 
 class StockItemEditForm(forms.ModelForm):
+    # Form for editing a StockItem.
+    # This form defines the fields and widgets for editing a StockItem using a ModelForm.
+
     class Meta:
         model = StockItem
         fields = ['dimensions', 'usage', 'quantity']
@@ -79,6 +100,9 @@ class StockItemEditForm(forms.ModelForm):
 
 
 class AddDeliveryForm(forms.ModelForm):
+    # Form for adding a new Delivery.
+    # This form defines the fields and widgets for adding a new Delivery using a ModelForm.
+
     class Meta:
         model = Delivery
         fields = ['delivery_company', 'form', 'quantity', 'description', 'delivery_date']
@@ -90,6 +114,9 @@ class AddDeliveryForm(forms.ModelForm):
 
 
 class AddTaskForm(forms.ModelForm):
+    # Form for adding a new Task.
+    # This form defines the fields and widgets for adding a new Task using a ModelForm.
+
     class Meta:
         model = Task
         fields = ['name', 'description', 'assigned_to', 'is_important', 'task_date']
@@ -102,6 +129,9 @@ class AddTaskForm(forms.ModelForm):
 
 
 class AddReturnForm(forms.ModelForm):
+    # Form for adding a new Return.
+    # This form defines the fields and widgets for adding a new Return using a ModelForm.
+
     class Meta:
         model = Return
         fields = ['name', 'description', 'return_date', 'receiving_company', 'notice', 'wholesale', 'notes',
@@ -115,6 +145,9 @@ class AddReturnForm(forms.ModelForm):
 
 
 class DayForm(forms.ModelForm):
+    # Form for creating and editing a Day.
+    # This form defines the fields and widgets for creating and editing a Day model using a ModelForm.
+
     class Meta:
         model = Day
         fields = ['day_date', 'end_of_work_hour']
