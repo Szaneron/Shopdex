@@ -262,7 +262,17 @@ def get_notifications(user):
     return unread_notifications, read_notifications
 
 
-def get_pdf():
+def get_stock_items_pdf():
+    """
+    Generate a PDF containing a list of stock items.
+
+    This function retrieves data from the Django model `StockItem`,
+    formats it into a tabular structure, and generates a PDF file with
+    appropriate headers, pagination, and formatting.
+
+    Returns:
+        HttpResponse: HTTP response with the PDF file as content.
+    """
     # Get the current date and format it
     current_date = datetime.now().strftime("%d-%m-%Y")
 
@@ -1242,8 +1252,8 @@ def admin_panel(request):
                 return redirect('admin_panel')
 
         if 'get_pdf' in request.POST:
-            stock = get_pdf()
-            return stock
+            stock_items_pdf = get_stock_items_pdf()
+            return stock_items_pdf
 
     context = {
         'delivery_month_labels': delivery_month_labels,
