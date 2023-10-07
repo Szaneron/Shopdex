@@ -7,13 +7,12 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from collections import defaultdict
-
 from django.utils import timezone
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
-    StockItemCreateForm, StockItemEditForm, AddDeliveryForm, AddTaskForm, AddReturnForm, DayForm
-from .models import Task, Delivery, Day, Return, OrderItem, StockItem, UserProfile, Notification
+    StockItemCreateForm, StockItemEditForm, AddDeliveryForm, AddTaskForm, AddReturnForm, DayForm, AddCommentForm
+from .models import Task, Delivery, Day, Return, OrderItem, StockItem, UserProfile, Notification, Comment
 
-from reportlab.lib.pagesizes import A6, landscape
+from reportlab.lib.pagesizes import A6, landscape, A4
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -263,6 +262,134 @@ def get_notifications(user):
     return unread_notifications, read_notifications
 
 
+def get_pdf():
+    # Get the current date and format it
+    current_date = datetime.now().strftime("%d-%m-%Y")
+
+    # Retrieve data from the Django model
+    data = StockItem.objects.all()
+
+    # Register fonts
+    pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
+    pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
+
+    # Create a PDF file
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Stan magazynowy - {current_date}.pdf"'
+
+    # Create the PDF object
+    p = canvas.Canvas(response, pagesize=A4)
+
+    # Define the table headers
+    headers = ['LP', 'Przedmiot', 'Ilość']  # Add other fields as needed
+
+    # Calculate the width of each column
+    col_widths = [50, 395, 50]  # Adjust widths as needed
+
+    # Set the position of the table
+    x = 50
+
+    # Calculate the padding for text
+    text_padding = 5  # Adjust padding as needed
+
+    # Calculate the length of horizontal lines based on the number of items per page
+    items_per_page = 30  # Adjust as needed
+
+    # Calculate the total number of pages needed based on the number of items
+    total_pages = len(data) // items_per_page + (1 if len(data) % items_per_page != 0 else 0)
+
+    lp = 1
+
+    # Iterate through each page
+    for page_num in range(total_pages):
+        # Create a new page for each page except the first one
+        if page_num > 0:
+            p.showPage()
+
+        # Set the counter for items in table
+        count_table_item = 1
+
+        # Add title and date on the first page
+        if page_num == 0:
+            # Set the position of the table on first page
+            y = 730
+
+            # Draw the title
+            p.setFont("Poppins_bold", 13)
+            p.drawString(x, y + 60, "Lista przedmiotów na magazynie")
+
+            # Draw the date line
+            p.setFont("Poppins_light", 11)
+            p.drawString(x, y + 45, "Data: " + current_date)
+        else:
+            # Set the position of the table for next pages
+            y = 770
+
+        # Draw the top horizontal line above headers
+        p.line(x, y + 20, x + sum(col_widths), y + 20)
+
+        # Calculate the length of horizontal lines for the current page
+        if page_num == total_pages - 1 and len(data) % items_per_page != 0:
+            line_length = ((len(data) % items_per_page) * 20) + 10
+        else:
+            line_length = (items_per_page * 20) + 10
+
+        # Draw the table headers
+        p.setFont("Poppins_bold", 12)
+        for i, header in enumerate(headers):
+            x_offset = x + sum(col_widths[:i])
+            p.drawString(x_offset + text_padding, y, header)
+
+            # Draw vertical lines between columns
+            p.line(x_offset + col_widths[i], y + 20, x_offset + col_widths[i], y - line_length)
+
+        # Draw the right vertical line to complete the table frame
+        p.line(x, y + 20, x, y - line_length)
+
+        # Draw the bottom horizontal line to complete the table
+        y -= 10
+        p.line(x, y, x + sum(col_widths), y)
+
+        # Draw the table data with padding
+        p.setFont("Poppins_light", 11)
+
+        # Iterate through items based on items_per_page
+        start_index = page_num * items_per_page
+        end_index = min(start_index + items_per_page, len(data))
+
+        for item_counter in range(start_index, end_index):
+            item = data[item_counter]
+            y -= 15
+
+            p.drawString(x + text_padding, y, str(lp))
+            p.drawString(x + col_widths[0] + text_padding, y, item.dimensions)
+            p.drawString(x + col_widths[0] + col_widths[1] + text_padding, y, str(item.quantity))
+
+            if count_table_item < items_per_page:
+                y -= 5
+                p.line(x, y, x + sum(col_widths), y)
+
+            lp += 1
+            count_table_item += 1
+
+        # Draw the bottom horizontal line to complete the table
+        count_table_item -= 1
+        if count_table_item % items_per_page == 0:
+            y -= 5
+            p.line(x, y, x + sum(col_widths), y)
+
+        # Calculate the width of the text
+        text_width = p.stringWidth(f"Strona: {page_num + 1} / {total_pages}", "Poppins_light", 11)
+
+        # Draw the text aligned to the right
+        p.drawString(545 - text_width, 50, f"Strona: {page_num + 1} / {total_pages}")
+
+    # Save the PDF file
+    p.save()
+
+    return response
+
+
 def login_user(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -507,10 +634,12 @@ def delivery(request):
 @login_required(login_url='login_user')
 def delivery_detail_view(request, delivery_id):
     delivery = get_object_or_404(Delivery, id=delivery_id)
+    delivery_comments = Comment.objects.filter(model_id=delivery.id).order_by('-creation_time')
     current_date = get_current_date()
     user = request.user
     user_rating = get_employee_rating(user)
     delivery_edit_form = DeliveryEditForm(request.POST, instance=delivery)
+    delivery_comment_form = AddCommentForm()
 
     if request.method == 'POST':
         if 'delivery_received' in request.POST:
@@ -573,15 +702,29 @@ def delivery_detail_view(request, delivery_id):
             delivery.delete()
             return redirect('dashboard')
 
+        if 'add_comment' in request.POST:
+            form = AddCommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.model_id = delivery.id
+                comment.added_by = request.user.userprofile
+                comment.save()
+                delivery.comments.add(comment)
+                add_notification(request.user, delivery, 'Komentarz', 'Nowy komentarz do dostawy został dodany!')
+                messages.success(request, 'Komentarz został dadany!')
+                return redirect('delivery_detail_view', delivery_id=delivery_id)
+
     else:
         delivery_edit_form = DeliveryEditForm(instance=delivery)
 
     context = {
         'delivery': delivery,
+        'delivery_comments': delivery_comments,
         'current_date': current_date,
         'user': user,
         'user_rating': user_rating,
         'delivery_edit_form': delivery_edit_form,
+        'delivery_comment_form': delivery_comment_form,
     }
 
     return render(request, 'delivery_detail.html', context)
@@ -1046,6 +1189,7 @@ def admin_panel(request):
                 add_notification(request.user, instance, 'Dostawa', 'Nowa dostawa została dodana!')
                 messages.success(request, 'Dostawa została utworzona!')
                 return redirect('admin_panel')
+
         if 'add_task' in request.POST:
             form = AddTaskForm(request.POST)
             if form.is_valid():
@@ -1056,6 +1200,7 @@ def admin_panel(request):
                 add_notification(request.user, instance, 'Zadanie', 'Nowe zadanie zostało dodane!')
                 messages.success(request, 'Zadanie zostało utworzone!')
                 return redirect('admin_panel')
+
         if 'add_return' in request.POST:
             form = AddReturnForm(request.POST)
             if form.is_valid():
@@ -1095,6 +1240,10 @@ def admin_panel(request):
                     messages.success(request, 'Godzina pracy została ustawiona!')
 
                 return redirect('admin_panel')
+
+        if 'get_pdf' in request.POST:
+            stock = get_pdf()
+            return stock
 
     context = {
         'delivery_month_labels': delivery_month_labels,

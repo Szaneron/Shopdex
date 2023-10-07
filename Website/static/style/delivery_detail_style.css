@@ -20,7 +20,6 @@ main {
 
 .delivery-content {
     margin-top: 1rem;
-    margin-bottom: 1rem;
     width: 100%;
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
@@ -219,6 +218,37 @@ main {
     color: var(--color-white);
 }
 
+.comment-content {
+    margin: 1.8rem 0 1.8rem 0;
+    border-radius: var(--card-border-radius);
+    padding: 1.8rem 3.6rem 1.8rem 3.6rem;
+    background-color: var(--color-white);
+}
+
+.comment-content-container {
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+
+.comment-section {
+    height: 9.5rem;
+    overflow-y: auto;
+}
+
+.form-group {
+    padding: 0 2rem;
+    margin: 0;
+}
+
+.send-element {
+    margin-top: 0.5rem;
+}
+
+.comment-content h2 {
+    border-bottom: 2px solid var(--color-secondary);
+    margin-bottom: 0.5rem;
+}
+
 @media screen and (max-width: 1300px) {
     .container {
         grid-template-columns: 7rem auto;
@@ -227,6 +257,15 @@ main {
     .delivery-card {
         grid-template-columns: 50% 50%;
         gap: 1.8rem;
+    }
+
+    .comment-content-container {
+        grid-template-columns: 50% 50%;
+        gap: 1.8rem;
+    }
+
+    .form-group {
+        padding: 0;
     }
 
     .status-size h2 {
@@ -277,6 +316,15 @@ main {
     .delivery-card {
         grid-template-columns: 1fr;
         gap: 1.8rem;
+    }
+
+    .comment-content-container {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .comment-section {
+        height: 10.5rem;
     }
 
     .delivery-icon span {
