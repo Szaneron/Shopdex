@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, Task, Delivery, Day, Return, OrderItem, StockItem, Notification
+from .models import UserProfile, Task, Delivery, Day, Return, OrderItem, StockItem, Notification, Comment
 
 
 class TaskAdmin(admin.ModelAdmin):
@@ -31,6 +31,7 @@ class DeliveryAdmin(admin.ModelAdmin):
         'status',
         'delivery_date',
         'creation_time',
+        'comments',
         'generated_context',
     )
     list_display = ('delivery_combine_company_and_date', 'form', 'quantity', 'status')
@@ -147,3 +148,4 @@ admin.site.register(Return, ReturnAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(StockItem, StockItemAdmin)
 admin.site.register(Notification, NotificationAdmin)
+admin.site.register(Comment)

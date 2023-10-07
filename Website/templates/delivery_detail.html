@@ -105,6 +105,34 @@
 
             </div>
         </div>
+        <div class="comment-content">
+            <h2>Komentarze</h2>
+            <div class="comment-content-container">
+                <div class="comment-section">
+                    {% for comment in delivery_comments %}
+                        <div class="single-comment">
+                            {{ comment.creation_time|date:"j b Y - H:i" }} -
+                            <b>{{ comment.added_by }}:</b> {{ comment.description }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="comment-form">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-content">
+                            <div class="form-group">
+                                <label class="control-label">Komentarz</label>
+                                {% render_field delivery_comment_form.description class="form-control-description" %}
+                            </div>
+                        </div>
+
+                        <div class="send-element">
+                            <button class="send-form" name="add_comment" type="submit">Dodaj</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
     <!-- End of Main content -->
 

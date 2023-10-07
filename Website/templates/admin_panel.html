@@ -43,6 +43,7 @@
                             <div class="tab-item" id="task-tab-item" onclick="showTab('task')">Dodaj zadanie</div>
                             <div class="tab-item" id="return-tab-item" onclick="showTab('return')">Dodaj zwrot</div>
                             <div class="tab-item" id="time-tab-item" onclick="showTab('time')">Zmień godzinę</div>
+                            <div class="tab-item" id="generate-tab-item" onclick="showTab('generate')">Generuj</div>
                         </div>
 
                         <div class="tab-content">
@@ -180,6 +181,29 @@
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+
+                            <div class="tab-pane" id="generate-tab">
+                                <table class="generate-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Opis</th>
+                                        <th>Akcja</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Generuj stan magazynowy</td>
+                                        <td>
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="generate-button" name="get_pdf" type="submit">Pobierz
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task, Delivery, Return, OrderItem, StockItem, Day
+from .models import Task, Delivery, Return, OrderItem, StockItem, Day, Comment
 
 
 class TaskEditForm(forms.ModelForm):
@@ -110,6 +110,18 @@ class AddDeliveryForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
             'delivery_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class AddCommentForm(forms.ModelForm):
+    # Form for adding a new Comment.
+    # This form defines the fields and widgets for adding a new Comment using a ModelForm.
+    class Meta:
+        model = Comment
+        fields = ['description']
+
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 2}),
         }
 
 

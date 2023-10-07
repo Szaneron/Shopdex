@@ -20,6 +20,7 @@ main {
 
 .content-container {
     width: 100%;
+    margin-bottom: 1.8rem;
     height: calc(89% + 7px);
     max-height: calc(89% + 7px);
     margin-top: calc(1.1rem - 1px);
@@ -90,6 +91,7 @@ main {
 
 .tab-content .tab-pane {
     display: none;
+    margin-top: 1rem;
     padding: 0 1.2rem 1.2rem 1.2rem;
 }
 
@@ -103,6 +105,29 @@ main {
 
 .form-control {
     height: 2.5rem;
+}
+
+.generate-table {
+    border-spacing: 0;
+    width: 100%;
+    min-height: 5rem;
+    text-align: center;
+}
+
+.generate-table thead th {
+    height: 2.8rem;
+}
+
+.generate-table tbody td {
+    height: 2.8rem;
+    border-bottom: 1px solid var(--color-light);
+    color: var(--color-dark);
+}
+
+.generate-button {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    cursor: pointer;
 }
 
 /* Right Main */
@@ -127,6 +152,17 @@ main {
     border-bottom: 2px solid var(--color-secondary);
     margin-bottom: 0.5rem;
 }
+
+
+.generate-button:hover {
+    box-shadow: none;
+}
+
+.generate-content {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
 
 .users-container {
     margin-top: 1.8rem;
@@ -154,17 +190,9 @@ main {
     display: flex;
     align-items: center;
     gap: 1rem;
-    overflow-x: scroll;
-
-    /* Hide scrollbar for IE, Edge and Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    overflow-x: auto;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.users-layout::-webkit-scrollbar {
-    display: none;
-}
 
 .single-user {
     display: grid;

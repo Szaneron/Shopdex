@@ -2,7 +2,7 @@
     <a href="{% url 'task_detail_view' task_id=notification.model_id %}">
         <span class="material-icons-sharp open">visibility</span>
     </a>
-{% elif notification.model_name == 'Dostawa' %}
+{% elif notification.model_name == 'Dostawa' or notification.model_name == 'Komentarz' %}
     <a href="{% url 'delivery_detail_view' delivery_id=notification.model_id %}">
         <span class="material-icons-sharp open">visibility</span>
     </a>
