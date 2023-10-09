@@ -197,9 +197,18 @@
                                         <td>
                                             <form method="post">
                                                 {% csrf_token %}
-                                                <button class="generate-button" name="get_pdf" type="submit">Pobierz
+                                                <button class="generate-button" name="generate_items_stock_pdf"
+                                                        type="submit">Pobierz
                                                 </button>
                                             </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Generuj listę dostaw</td>
+                                        <td>
+                                            <button class="generate-button" id="get_delivery_pdf_button" type="submit">
+                                                Pobierz
+                                            </button>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -245,6 +254,32 @@
         </div>
         <!-- End of Midle view -->
     </main>
+
+    <!-- Start modal for dates to generate pdf -->
+    <div id="datesModal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="material-icons-sharp close-form">close</span>
+            <h2>Przedział dat</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label">Od</label>
+                    <input type="date" class="form-control" name="from" max="{{ current_date.date|date:"Y-m-d" }}"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Do</label>
+                    <input type="date" class="form-control" name="to" required>
+                </div>
+                <div class="send-element">
+                    <button class="send-form" id="generate_delivery_pdf" name="generate_delivery_pdf" type="submit">
+                        Generuj
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of modal for dates to generate pdf -->
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -255,6 +290,17 @@
     const monthLabels = {{ delivery_month_labels|safe }};
     const deliveryMonthData = {{ delivery_month_data|safe }};
     const tasksMonthData = {{ tasks_month_data|safe }};
+
+    $("input[name='from']").change(function () {
+        let fromDate = $(this).val(); // Get first input value
+
+        // Set attr 'min' for second input
+        $("input[name='to']").attr("min", fromDate);
+    });
+
+    $("form").submit(function () {
+        datesModal.style.display = 'none';
+    });
 
 
     {%  include 'message_alert.html' %}

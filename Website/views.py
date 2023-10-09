@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from collections import defaultdict
 from django.utils import timezone
+from django.utils.dateparse import parse_date
+
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
     StockItemCreateForm, StockItemEditForm, AddDeliveryForm, AddTaskForm, AddReturnForm, DayForm, AddCommentForm
 from .models import Task, Delivery, Day, Return, OrderItem, StockItem, UserProfile, Notification, Comment
@@ -262,7 +264,7 @@ def get_notifications(user):
     return unread_notifications, read_notifications
 
 
-def get_stock_items_pdf():
+def generate_items_stock_pdf():
     """
     Generate a PDF containing a list of stock items.
 
@@ -274,7 +276,7 @@ def get_stock_items_pdf():
         HttpResponse: HTTP response with the PDF file as content.
     """
     # Get the current date and format it
-    current_date = datetime.now().strftime("%d-%m-%Y")
+    current_date = get_current_date()
 
     # Retrieve data from the Django model
     data = StockItem.objects.all()
@@ -324,13 +326,19 @@ def get_stock_items_pdf():
             # Set the position of the table on first page
             y = 730
 
+            # Calculate the width of the text
+            generated_text_width = p.stringWidth(
+                f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
+                "Poppins_light", 11)
+
             # Draw the title
             p.setFont("Poppins_bold", 13)
             p.drawString(x, y + 60, "Lista przedmiotów na magazynie")
 
-            # Draw the date line
             p.setFont("Poppins_light", 11)
-            p.drawString(x, y + 45, "Data: " + current_date)
+            p.drawString(545 - generated_text_width, 790,
+                         f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
+
         else:
             # Set the position of the table for next pages
             y = 770
@@ -398,6 +406,163 @@ def get_stock_items_pdf():
     p.save()
 
     return response
+
+
+def generate_delivery_pdf(start_date, end_date):
+    """
+    Generate a PDF containing a list of delivery from a specific date range.
+
+    This function retrieves data from the Django model `Delivery`,
+    formats it into a tabular structure, and generates a PDF file with
+    appropriate headers, pagination, and formatting.
+
+    Returns:
+        HttpResponse: HTTP response with the PDF file as content.
+    """
+    data = Delivery.objects.filter(delivery_date__range=[start_date, end_date]).order_by('delivery_date')
+    current_date = get_current_date()
+
+    start_date = parse_date(start_date).strftime('%d.%m.%Y')
+    end_date = parse_date(end_date).strftime('%d.%m.%Y')
+
+    if data.count() == 0:
+        return 0
+    else:
+
+        # Register fonts
+        pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
+        pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
+
+        # Create a PDF file
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Dostawy_{start_date}-{end_date}.pdf"'
+
+        # Create the PDF object
+        p = canvas.Canvas(response, pagesize=A4)
+
+        # Define the table headers
+        headers = ['LP', 'Dostawca', 'Forma', 'Ilość', 'Data', 'Status']  # Add other fields as needed
+
+        # Calculate the width of each column
+        col_widths = [50, 120, 50, 50, 100, 125]  # Adjust widths as needed
+
+        # Set the position of the table
+        x = 50
+
+        # Calculate the padding for text
+        text_padding = 5  # Adjust padding as needed
+
+        # Calculate the length of horizontal lines based on the number of items per page
+        items_per_page = 30  # Adjust as needed
+
+        # Calculate the total number of pages needed based on the number of items
+        total_pages = len(data) // items_per_page + (1 if len(data) % items_per_page != 0 else 0)
+
+        lp = 1
+
+        # Iterate through each page
+        for page_num in range(total_pages):
+            # Create a new page for each page except the first one
+            if page_num > 0:
+                p.showPage()
+
+            # Set the counter for items in table
+            count_table_item = 1
+
+            # Add title and date on the first page
+            if page_num == 0:
+                # Set the position of the table on first page
+                y = 730
+
+                # Calculate the width of the text
+                generated_text_width = p.stringWidth(
+                    f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
+                    "Poppins_light", 11)
+
+                # Draw the title
+                p.setFont("Poppins_bold", 13)
+                p.drawString(x, y + 60, "Lista dostaw")
+
+                # Draw the text aligned to the right
+                p.setFont("Poppins_light", 11)
+                p.drawString(545 - generated_text_width, 790,
+                             f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
+
+                # Draw the date line
+                p.drawString(x, y + 45, f"Przedział czasowy: {start_date} - {end_date}")
+            else:
+                # Set the position of the table for next pages
+                y = 770
+
+            # Draw the top horizontal line above headers
+            p.line(x, y + 20, x + sum(col_widths), y + 20)
+
+            # Calculate the length of horizontal lines for the current page
+            if page_num == total_pages - 1 and len(data) % items_per_page != 0:
+                line_length = ((len(data) % items_per_page) * 20) + 10
+            else:
+                line_length = (items_per_page * 20) + 10
+
+            # Draw the table headers
+            p.setFont("Poppins_bold", 12)
+            for i, header in enumerate(headers):
+                x_offset = x + sum(col_widths[:i])
+                p.drawString(x_offset + text_padding, y, header)
+
+                # Draw vertical lines between columns
+                p.line(x_offset + col_widths[i], y + 20, x_offset + col_widths[i], y - line_length)
+
+            # Draw the right vertical line to complete the table frame
+            p.line(x, y + 20, x, y - line_length)
+
+            # Draw the bottom horizontal line to complete the table
+            y -= 10
+            p.line(x, y, x + sum(col_widths), y)
+
+            # Draw the table data with padding
+            p.setFont("Poppins_light", 11)
+
+            # Iterate through items based on items_per_page
+            start_index = page_num * items_per_page
+            end_index = min(start_index + items_per_page, len(data))
+
+            for item_counter in range(start_index, end_index):
+                item = data[item_counter]
+                y -= 15
+
+                p.drawString(x + text_padding, y, str(lp))
+                p.drawString(x + col_widths[0] + text_padding, y, item.delivery_company)
+                p.drawString(x + col_widths[0] + col_widths[1] + text_padding, y, item.form)
+                p.drawString(x + col_widths[0] + col_widths[1] + col_widths[2] + text_padding, y, str(item.quantity))
+                p.drawString(x + col_widths[0] + col_widths[1] + col_widths[2] + col_widths[3] + text_padding, y,
+                             str(item.delivery_date))
+                p.drawString(
+                    x + col_widths[0] + col_widths[1] + col_widths[2] + col_widths[3] + col_widths[4] + text_padding, y,
+                    item.status)
+
+                if count_table_item < items_per_page:
+                    y -= 5
+                    p.line(x, y, x + sum(col_widths), y)
+
+                lp += 1
+                count_table_item += 1
+
+            # Draw the bottom horizontal line to complete the table
+            count_table_item -= 1
+            if count_table_item % items_per_page == 0:
+                y -= 5
+                p.line(x, y, x + sum(col_widths), y)
+
+            # Calculate the width of the text
+            site_text_width = p.stringWidth(f"Strona: {page_num + 1} / {total_pages}", "Poppins_light", 11)
+
+            # Draw the text aligned to the right
+            p.drawString(545 - site_text_width, 50, f"Strona: {page_num + 1} / {total_pages}")
+
+        # Save the PDF file
+        p.save()
+
+        return response
 
 
 def login_user(request):
@@ -1074,6 +1239,7 @@ def stock_item_detail_view(request, stock_item_id):
 @login_required(login_url='login_user')
 def admin_panel(request):
     all_workers = UserProfile.objects.all().filter(position='Pracownik')
+    current_date = get_current_date()
 
     def get_workers_rating_in_dict(all_workers):
         """
@@ -1251,11 +1417,26 @@ def admin_panel(request):
 
                 return redirect('admin_panel')
 
-        if 'get_pdf' in request.POST:
-            stock_items_pdf = get_stock_items_pdf()
+        if 'generate_items_stock_pdf' in request.POST:
+            stock_items_pdf = generate_items_stock_pdf()
             return stock_items_pdf
 
+        if 'generate_delivery_pdf' in request.POST:
+            start_date = request.POST.get('from')
+            end_date = request.POST.get('to')
+
+            print(start_date, end_date)
+
+            delivery_pdf = generate_delivery_pdf(start_date, end_date)
+            print('delivery return', delivery_pdf)
+
+            if delivery_pdf == 0:
+                messages.error(request, "W wybranym przedziale nie ma dostaw")
+            else:
+                return delivery_pdf
+
     context = {
+        'current_date': current_date,
         'delivery_month_labels': delivery_month_labels,
         'delivery_month_data': delivery_month_data,
         'tasks_month_labels': tasks_month_labels,
