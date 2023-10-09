@@ -52,6 +52,33 @@ function showTab(tabName) {
     }
 }
 
+
+const datesModal = document.getElementById('datesModal');
+const datesButton = document.getElementById('get_delivery_pdf_button');
+
+
+datesButton.addEventListener("click", () => {
+    datesModal.style.display = 'block';
+})
+
+// Get the <span> element that closes the modal
+const closeButtons = document.querySelectorAll('.close-form');
+
+closeButtons.forEach(closeButton => {
+    closeButton.addEventListener('click', () => {
+        const parentModal = closeButton.closest('.modal');
+        parentModal.style.display = 'none';
+    });
+});
+
+// When the user clicks anywhere outside the modal, close it
+window.onclick = function (event) {
+    if (event.target === datesModal) {
+        datesModal.style.display = 'none';
+    }
+}
+
+
 // Create a chart using the retrieved data
 const ctx = document.getElementById('adminChart').getContext('2d');
 const chart = new Chart(ctx, {
