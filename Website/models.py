@@ -138,7 +138,7 @@ class Delivery(models.Model):
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='W drodze')
     delivery_date = models.DateField(default=timezone.now)
     creation_time = models.DateTimeField(default=timezone.now)
-    comments = models.ManyToManyField(Comment, blank=True, null=True)
+    comments = models.ManyToManyField(Comment, blank=True)
     generated_context = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -277,17 +277,17 @@ class Notification(models.Model):
         ('Nieprzeczytane', 'Nieprzeczytane'),
     ]
 
-    NOTIFY_CHOICES = [
-        ('Pracownik', 'Pracownik'),
-        ('Other', 'Other'),
-    ]
+    # NOTIFY_CHOICES = [
+    #     ('Pracownik', 'Pracownik'),
+    #     ('Other', 'Other'),
+    # ]
 
     model_name = models.CharField(max_length=150, choices=NAME_CHOICES)
     model_id = models.PositiveIntegerField()
     description = models.TextField()
-    read_by = models.ManyToManyField(User, related_name='read_notifications')
+    read_by = models.ManyToManyField(UserProfile, related_name='read_notifications')
     creation_time = models.DateTimeField(default=timezone.now)
-    notify_for = models.CharField(max_length=20, choices=NOTIFY_CHOICES)
+    notify_for = models.ManyToManyField(UserProfile, blank=True, related_name='notifications_for')
     made_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
