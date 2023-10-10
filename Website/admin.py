@@ -126,9 +126,9 @@ class NotificationAdmin(admin.ModelAdmin):
         'notify_for',
         'made_by',
     )
-    list_display = ('notification_combine_name_and_date', 'model_id', 'notify_for', 'made_by', 'creation_date_field')
+    list_display = ('notification_combine_name_and_date', 'model_id', 'made_by', 'creation_date_field')
     list_display_links = ('notification_combine_name_and_date',)
-    list_filter = ('notify_for', 'made_by')
+    list_filter = ('made_by',)
     search_fields = ('model_name', 'description')
 
     @staticmethod

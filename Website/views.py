@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from collections import defaultdict
 from django.utils import timezone
 from django.utils.dateparse import parse_date
-
+from django.contrib.auth.models import User
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
     StockItemCreateForm, StockItemEditForm, AddDeliveryForm, AddTaskForm, AddReturnForm, DayForm, AddCommentForm
 from .models import Task, Delivery, Day, Return, OrderItem, StockItem, UserProfile, Notification, Comment
@@ -196,69 +196,103 @@ def generate_return_pdf(return_id):
 
 def add_notification(user, target, notif_name, notif_description):
     """
-    Add a notification for a given user and target.
+    Create a notification based on the user, target, notification name, and description.
 
-    Parameters:
-        user (User): The user for whom the notification is intended.
-        target (Model): The target model associated with the notification.
-        notif_name (str): The name or type of the notification.
-        notif_description (str): A description or additional information for the notification.
+    Args:
+        user (User): The user triggering the notification.
+        target (Task or other): The target object for the notification.
+        notif_name (str): The name of the notification.
+        notif_description (str): The description of the notification.
 
-    This function creates a new notification with the provided information and links it to a specific target model.
-    The notification is intended for the user and is based on the user's position ('Pracownik' or 'Other').
+    Returns:
+        None
 
-    - If the user's position is 'Pracownik', the notification is intended for 'Other'.
-    - If the user's position is different, the notification is intended for 'Pracownik'.
+    Creates a notification with the provided details. If the target is a Task, the notification is
+    added for the assigned user. If the target is not a Task, notifications are added for employees
+    or designated higher-level positions like 'Szef' or 'Admin' based on the user's position.
     """
-    notify_for = 'Other' if user.userprofile.position == 'Pracownik' else 'Pracownik'
 
-    Notification.objects.create(
-        model_name=notif_name,
-        model_id=target.id,
-        description=notif_description,
-        notify_for=notify_for,
-        made_by=user
-    )
+    # Check if the target is a Task
+    if isinstance(target, Task):
+        if user.userprofile.position != 'Pracownik':
+            # Create a notification and add it for the assigned user
+            notification = Notification.objects.create(
+                model_name=notif_name,
+                model_id=target.id,
+                description=notif_description,
+                made_by=user
+            )
+            notification.notify_for.add(target.assigned_to)
+        elif user.userprofile.position == 'Pracownik':
+            users = UserProfile.objects.filter(Q(position='Szef') | Q(position='Admin'))
+            # Create a notification and add it for the specified users
+            notification = Notification.objects.create(
+                model_name=notif_name,
+                model_id=target.id,
+                description=notif_description,
+                made_by=user
+            )
+            for _ in users:
+                notification.notify_for.add(_)
+    # If the target is not a Task
+    else:
+        if user.userprofile.position != 'Pracownik':
+            users = UserProfile.objects.filter(position='Pracownik')
+            # Create a notification and add it for the specified users
+            notification = Notification.objects.create(
+                model_name=notif_name,
+                model_id=target.id,
+                description=notif_description,
+                made_by=user
+            )
+            for _ in users:
+                notification.notify_for.add(_)
+
+        elif user.userprofile.position == 'Pracownik':
+            users = UserProfile.objects.filter(Q(position='Szef') | Q(position='Admin'))
+            # Create a notification and add it for the specified users
+            notification = Notification.objects.create(
+                model_name=notif_name,
+                model_id=target.id,
+                description=notif_description,
+                made_by=user
+            )
+            for _ in users:
+                notification.notify_for.add(_)
 
 
 def get_notifications(user):
     """
-    Get notifications for a given user.
+    Retrieves notifications based on the user's profile position.
 
-    Parameters:
-        user (User): The user for whom notifications are to be retrieved.
+    Args:
+        user (User): The user object.
 
     Returns:
         tuple: A tuple containing two querysets - unread_notifications and read_notifications.
-
-    The function first checks the user's position. If the position is 'Pracownik' (employee),
-    it retrieves unread and read notifications targeted at employees. If the position is different,
-    it retrieves notifications targeted at others.
-
-    For 'Pracownik':
-    - unread_notifications: Unread notifications for employees.
-    - read_notifications: Read notifications for employees (up to 10, ordered by creation time).
-
-    For other positions:
-    - unread_notifications: Unread notifications for others.
-    - read_notifications: Read notifications for others (up to 10, ordered by creation time).
+            unread_notifications (QuerySet): Notifications not yet read for the user's profile.
+            read_notifications (QuerySet): Latest 10 notifications that have been read for the user's profile.
     """
 
     if user.userprofile.position == 'Pracownik':
-        # Get notifications that have not yet been read and are for an employee
+        # Get notifications that have not yet been read and are for the employee
         unread_notifications = Notification.objects.filter(
-            Q(notify_for='Pracownik') & ~Q(read_by=user)
+            Q(notify_for=user.userprofile) & ~Q(read_by=user.userprofile)
         ).order_by('-creation_time')
+
+        # Get notifications that have been read and are for the employee
         read_notifications = Notification.objects.filter(
-            Q(notify_for='Pracownik') & Q(read_by=user)
+            Q(notify_for=user.userprofile) & Q(read_by=user.userprofile)
         ).order_by('-creation_time')[:10]
     else:
-        # Get notifications that have not yet been read and are for others
+        # Get notifications that have not yet been read and are for the employee
         unread_notifications = Notification.objects.filter(
-            Q(notify_for='Other') & ~Q(read_by=user)
+            Q(notify_for=user.userprofile) & ~Q(read_by=user.userprofile)
         ).order_by('-creation_time')
+
+        # Get notifications that have been read and are for the employee
         read_notifications = Notification.objects.filter(
-            Q(notify_for='Other') & Q(read_by=user)
+            Q(notify_for=user.userprofile) & Q(read_by=user.userprofile)
         ).order_by('-creation_time')[:10]
 
     return unread_notifications, read_notifications
@@ -658,6 +692,7 @@ def dashboard(request):
 @login_required(login_url='login_user')
 def task(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
     all_tasks = Task.objects.filter(task_date=current_date).order_by('status', '-is_important', 'creation_time')
@@ -710,6 +745,7 @@ def task(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'all_tasks': all_tasks,
         'all_tasks_for_user': all_tasks_for_user,
@@ -724,6 +760,7 @@ def task_detail_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     current_date = get_current_date()
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     task_edit_form = TaskEditForm(request.POST, instance=task)
 
@@ -755,6 +792,7 @@ def task_detail_view(request, task_id):
 
     context = {
         'task': task,
+        'unread_notifications': unread_notifications,
         'current_date': current_date,
         'user': user,
         'user_rating': user_rating,
@@ -767,6 +805,7 @@ def task_detail_view(request, task_id):
 @login_required(login_url='login_user')
 def delivery(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
     all_delivery = Delivery.objects.filter(delivery_date=current_date).order_by('-status', 'creation_time')
@@ -798,6 +837,7 @@ def delivery(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'all_delivery': all_delivery,
         'current_date': current_date,
@@ -812,6 +852,7 @@ def delivery_detail_view(request, delivery_id):
     delivery_comments = Comment.objects.filter(model_id=delivery.id).order_by('-creation_time')
     current_date = get_current_date()
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     delivery_edit_form = DeliveryEditForm(request.POST, instance=delivery)
     delivery_comment_form = AddCommentForm()
@@ -897,6 +938,7 @@ def delivery_detail_view(request, delivery_id):
         'delivery_comments': delivery_comments,
         'current_date': current_date,
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'delivery_edit_form': delivery_edit_form,
         'delivery_comment_form': delivery_comment_form,
@@ -908,6 +950,7 @@ def delivery_detail_view(request, delivery_id):
 @login_required(login_url='login_user')
 def returns(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     current_date = get_current_date()
 
@@ -946,6 +989,7 @@ def returns(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'active_returns': active_returns,
         'received_returns': received_returns,
@@ -963,6 +1007,7 @@ def returns_detail_view(request, return_id):
     return_detail = get_object_or_404(Return, id=return_id)
     current_date = get_current_date()
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     return_edit_form = ReturnEditForm(request.POST, instance=return_detail)
 
@@ -1004,6 +1049,7 @@ def returns_detail_view(request, return_id):
         'return_detail': return_detail,
         'current_date': current_date,
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'return_edit_form': return_edit_form,
     }
@@ -1014,6 +1060,7 @@ def returns_detail_view(request, return_id):
 @login_required(login_url='login_user')
 def order_item(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     create_order_item_form = OrderItemCreateForm(request.POST)
 
@@ -1054,6 +1101,7 @@ def order_item(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'items_to_order': items_to_order,
         'page': page,
@@ -1069,6 +1117,7 @@ def order_item_detail_view(request, order_item_id):
     order_item_detail = get_object_or_404(OrderItem, id=order_item_id)
     current_date = get_current_date()
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     order_item_edit_form = OrderItemEditForm(request.POST, instance=order_item_detail)
 
@@ -1108,6 +1157,7 @@ def order_item_detail_view(request, order_item_id):
         'order_item_detail': order_item_detail,
         'current_date': current_date,
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'order_item_edit_form': order_item_edit_form,
     }
@@ -1118,6 +1168,7 @@ def order_item_detail_view(request, order_item_id):
 @login_required(login_url='login_user')
 def stock_item(request):
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     stock_items = StockItem.objects.all().order_by('quantity')
     create_stock_item_form = StockItemCreateForm(request.POST)
@@ -1173,6 +1224,7 @@ def stock_item(request):
 
     context = {
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'stock_items': stock_items,
         'page': page,
@@ -1188,6 +1240,7 @@ def stock_item_detail_view(request, stock_item_id):
     stock_item_detail = get_object_or_404(StockItem, id=stock_item_id)
     current_date = get_current_date()
     user = request.user
+    unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     stock_item_edit_form = StockItemEditForm(request.POST, instance=stock_item_detail)
 
@@ -1229,6 +1282,7 @@ def stock_item_detail_view(request, stock_item_id):
         'stock_item_detail': stock_item_detail,
         'current_date': current_date,
         'user': user,
+        'unread_notifications': unread_notifications,
         'user_rating': user_rating,
         'stock_item_edit_form': stock_item_edit_form,
     }
@@ -1240,6 +1294,7 @@ def stock_item_detail_view(request, stock_item_id):
 def admin_panel(request):
     all_workers = UserProfile.objects.all().filter(position='Pracownik')
     current_date = get_current_date()
+    unread_notifications, read_notifications = get_notifications(request.user)
 
     def get_workers_rating_in_dict(all_workers):
         """
@@ -1436,6 +1491,7 @@ def admin_panel(request):
                 return delivery_pdf
 
     context = {
+        'unread_notifications': unread_notifications,
         'current_date': current_date,
         'delivery_month_labels': delivery_month_labels,
         'delivery_month_data': delivery_month_data,
