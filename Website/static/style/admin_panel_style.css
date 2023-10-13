@@ -235,6 +235,21 @@ main {
     border-radius: 50%;
 }
 
+#id_invoice_pdf {
+    display: flex;
+    font-family: 'Poppins', sans-serif;
+}
+
+input[type="file"]::file-selector-button {
+    border: 1px solid var(--color-secondary);
+    border-radius: 1rem;
+    height: 2rem;
+    padding: 0 1rem;
+    background-color: var(--color-white);
+    transition: 1s;
+}
+
+
 @media screen and (max-width: 1300px) {
     .container {
         grid-template-columns: 7rem auto;

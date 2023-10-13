@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -18,6 +20,11 @@ from reportlab.lib.pagesizes import A6, landscape, A4
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 
 MONTHS_PL = {
     1: 'styczeń', 2: 'luty', 3: 'marzec', 4: 'kwiecień', 5: 'maj', 6: 'czerwiec',
@@ -298,7 +305,7 @@ def get_notifications(user):
     return unread_notifications, read_notifications
 
 
-def generate_items_stock_pdf():
+def generate_stock_items_pdf():
     """
     Generate a PDF containing a list of stock items.
 
@@ -360,18 +367,26 @@ def generate_items_stock_pdf():
             # Set the position of the table on first page
             y = 730
 
-            # Calculate the width of the text
-            generated_text_width = p.stringWidth(
-                f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
+            # Calculate the width of the text for generation date
+            generated_text_width_first = p.stringWidth(
+                "Wygnerowano:",
+                "Poppins_light", 11)
+
+            # Calculate the width of the text for generation date
+            generated_text_width_second = p.stringWidth(
+                f"{current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
                 "Poppins_light", 11)
 
             # Draw the title
             p.setFont("Poppins_bold", 13)
             p.drawString(x, y + 60, "Lista przedmiotów na magazynie")
 
+            # Draw the generation text
             p.setFont("Poppins_light", 11)
-            p.drawString(545 - generated_text_width, 790,
-                         f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
+            p.drawString(545 - generated_text_width_first, 790,
+                         "Wygnerowano:")
+            p.drawString(545 - generated_text_width_second, 775,
+                         f"{current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
 
         else:
             # Set the position of the table for next pages
@@ -508,19 +523,26 @@ def generate_delivery_pdf(start_date, end_date):
                 # Set the position of the table on first page
                 y = 730
 
-                # Calculate the width of the text
-                generated_text_width = p.stringWidth(
-                    f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
+                # Calculate the width of the text for generation date
+                generated_text_width_first = p.stringWidth(
+                    "Wygnerowano:",
+                    "Poppins_light", 11)
+
+                # Calculate the width of the text for generation date
+                generated_text_width_second = p.stringWidth(
+                    f"{current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
                     "Poppins_light", 11)
 
                 # Draw the title
                 p.setFont("Poppins_bold", 13)
                 p.drawString(x, y + 60, "Lista dostaw")
 
-                # Draw the text aligned to the right
+                # Draw the generation text
                 p.setFont("Poppins_light", 11)
-                p.drawString(545 - generated_text_width, 790,
-                             f"Wygnerowano: {current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
+                p.drawString(545 - generated_text_width_first, 790,
+                             "Wygnerowano:")
+                p.drawString(545 - generated_text_width_second, 775,
+                             f"{current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
 
                 # Draw the date line
                 p.drawString(x, y + 45, f"Przedział czasowy: {start_date} - {end_date}")
@@ -597,6 +619,72 @@ def generate_delivery_pdf(start_date, end_date):
         p.save()
 
         return response
+
+
+def generate_user_stock_items_pdf():
+    # Pobierz dane z modelu StockItem
+    stock_items = StockItem.objects.all()
+
+    pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
+    pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
+
+    # Definiuj dane i nagłówki
+    data = [['ID', 'Name', 'Quantity', 'Nd', 'So', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Suma']]
+    lp = 1
+    for item in stock_items:
+        data.append([str(lp), item.dimensions, str(item.quantity), '', '', '', '', '', '', '', ''])
+        lp += 1
+
+    left_margin = 70
+    right_margin = 70
+    # Oblicz szerokość strony minus marginesy
+    usable_width = letter[0] - (left_margin + right_margin)
+
+    # Proporcjonalnie podziel szerokość dla kolumn
+    num_columns = 11
+    col_widths = [usable_width / num_columns] * num_columns
+
+    # Przypisz większą szerokość dla drugiej kolumny
+    col_widths[1] = col_widths[1] * 3  # Możesz dostosować szerokość według potrzeb
+
+    # Ustawienia stylu
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Poppins_bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 3),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ])
+
+    # Styl dla danych
+    style_data = TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Poppins_light'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ])
+
+    # Utwórz tabelę
+    stock_table = Table(data, colWidths=col_widths)
+    stock_table.setStyle(style)
+    stock_table.setStyle(style_data)
+
+    # Twórz plik PDF w pamięci
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=20, bottomMargin=20)
+    doc.build([stock_table])
+
+    # Ustaw odpowiednie nagłówki dla automatycznego pobierania
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="weekly_stock_items.pdf"'
+
+    # Zapisz zawartość bufora do odpowiedzi
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
 
 
 def login_user(request):
@@ -854,7 +942,7 @@ def delivery_detail_view(request, delivery_id):
     user = request.user
     unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
-    delivery_edit_form = DeliveryEditForm(request.POST, instance=delivery)
+    delivery_edit_form = DeliveryEditForm(request.POST, request.FILES, instance=delivery)
     delivery_comment_form = AddCommentForm()
 
     if request.method == 'POST':
@@ -907,6 +995,7 @@ def delivery_detail_view(request, delivery_id):
             return redirect('dashboard')
 
         if 'delivery_edited' in request.POST:
+            print(request.FILES)
             if delivery_edit_form.is_valid():
                 instance = delivery_edit_form.save()
                 add_notification(request.user, instance, 'Dostawa', 'Dostawa została zedytowana!')
@@ -1414,7 +1503,7 @@ def admin_panel(request):
 
     if request.method == 'POST':
         if 'add_delivery' in request.POST:
-            form = AddDeliveryForm(request.POST)
+            form = AddDeliveryForm(request.POST, request.FILES)
             if form.is_valid():
                 instance = form.save()
                 add_notification(request.user, instance, 'Dostawa', 'Nowa dostawa została dodana!')
@@ -1472,23 +1561,24 @@ def admin_panel(request):
 
                 return redirect('admin_panel')
 
-        if 'generate_items_stock_pdf' in request.POST:
-            stock_items_pdf = generate_items_stock_pdf()
+        if 'generate_stock_items_pdf' in request.POST:
+            stock_items_pdf = generate_stock_items_pdf()
             return stock_items_pdf
 
         if 'generate_delivery_pdf' in request.POST:
             start_date = request.POST.get('from')
             end_date = request.POST.get('to')
 
-            print(start_date, end_date)
-
             delivery_pdf = generate_delivery_pdf(start_date, end_date)
-            print('delivery return', delivery_pdf)
 
             if delivery_pdf == 0:
                 messages.error(request, "W wybranym przedziale nie ma dostaw")
             else:
                 return delivery_pdf
+
+        if 'generate_user_stock_items_pdf' in request.POST:
+            user_stock_items_pdf = generate_user_stock_items_pdf()
+            return user_stock_items_pdf
 
     context = {
         'unread_notifications': unread_notifications,

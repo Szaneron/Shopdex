@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <title>Shopdex</title>
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'media/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/delivery_detail_style.css' %}"/>
 </head>
 <body>
@@ -32,6 +32,13 @@
 
             <div class="delivery-heading">
                 <div class="delivery-delivery-company"><h2> {{ delivery.delivery_company }}</h2></div>
+                {% if delivery.invoice_pdf %}
+                    <div class="delivery-open-invoice">
+                        <a href=" {{ delivery.invoice_pdf.url }}" target="_blank">
+                            Otwórz fakturę PDF
+                        </a>
+                    </div>
+                {% endif %}
             </div>
 
             <div class="delivery-card">
@@ -49,10 +56,10 @@
                     <div class="delivery-icon">
                         {% if delivery.form == 'Paleta' %}
                             <span>{{ delivery.quantity }}</span>
-                            <img src="{% static 'images/delivery_images/pallet.png' %}" alt="">
+                            <img src="{% static 'media/delivery_images/pallet.png' %}" alt="">
                         {% elif delivery.form == 'Paczka' %}
                             <span>{{ delivery.quantity }}</span>
-                            <img src="{% static 'images/delivery_images/package.png' %}" alt="">
+                            <img src="{% static 'media/delivery_images/package.png' %}" alt="">
                         {% endif %}
                     </div>
                     {% if delivery.status == 'W drodze' %}
@@ -141,7 +148,7 @@
         <div class="modal-content">
             <span id="close-modal" class="material-icons-sharp close-form">close</span>
             <h2>Edycja dostawy</h2>
-            <form method="post" action="{% url 'delivery_detail_view' delivery.id %}">
+            <form method="post" enctype="multipart/form-data" action="{% url 'delivery_detail_view' delivery.id %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <label class="control-label">Dostawca</label>
@@ -166,6 +173,10 @@
                 <div class="form-group">
                     <label class="control-label">Data dostawy</label>
                     {% render_field delivery_edit_form.delivery_date class="form-control" %}
+                </div>
+                <div class="form-group">
+                    <label class="control-label invoice">Faktura PDF</label>
+                    {% render_field delivery_edit_form.invoice_pdf name="invoice_pdf" %}
                 </div>
                 <div class="send-element">
                     <button class="send-form" name="delivery_edited" type="submit">Zapisz zmiany</button>
