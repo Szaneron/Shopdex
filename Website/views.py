@@ -12,6 +12,8 @@ from collections import defaultdict
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.contrib.auth.models import User
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+
 from .forms import TaskEditForm, DeliveryEditForm, ReturnEditForm, OrderItemEditForm, OrderItemCreateForm, \
     StockItemCreateForm, StockItemEditForm, AddDeliveryForm, AddTaskForm, AddReturnForm, DayForm, AddCommentForm
 from .models import Task, Delivery, Day, Return, OrderItem, StockItem, UserProfile, Notification, Comment
@@ -20,11 +22,11 @@ from reportlab.lib.pagesizes import A6, landscape, A4
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 MONTHS_PL = {
     1: 'styczeń', 2: 'luty', 3: 'marzec', 4: 'kwiecień', 5: 'maj', 6: 'czerwiec',
@@ -305,6 +307,35 @@ def get_notifications(user):
     return unread_notifications, read_notifications
 
 
+class PageNumCanvas(canvas.Canvas):
+    """
+    Klasa obsługująca numerację stron.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pages = []
+
+    def showPage(self):
+        self.pages.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        num_pages = len(self.pages)
+        for page_num, page in enumerate(self.pages, start=1):
+            self.__dict__.update(page)
+            self.draw_page_number(page_num, num_pages)
+            super().showPage()
+
+        super().save()
+
+    def draw_page_number(self, page_num, total_pages):
+        page_text = f"Strona {page_num}/{total_pages}"
+        text_width = self.stringWidth(page_text, 'Poppins_light', 10)
+        self.setFont('Poppins_light', 10)
+        self.drawRightString(587 - text_width, 50, page_text)  # Adjusted coordinates
+
+
 def generate_stock_items_pdf():
     """
     Generate a PDF containing a list of stock items.
@@ -316,144 +347,104 @@ def generate_stock_items_pdf():
     Returns:
         HttpResponse: HTTP response with the PDF file as content.
     """
-    # Get the current date and format it
-    current_date = get_current_date()
 
-    # Retrieve data from the Django model
-    data = StockItem.objects.all()
+    # Get data from the StockItem model
+    stock_items = StockItem.objects.all()
 
     # Register fonts
     pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
     pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
 
-    # Create a PDF file
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Stan magazynowy - {current_date}.pdf"'
-
-    # Create the PDF object
-    p = canvas.Canvas(response, pagesize=A4)
-
-    # Define the table headers
-    headers = ['LP', 'Przedmiot', 'Ilość']  # Add other fields as needed
-
-    # Calculate the width of each column
-    col_widths = [50, 395, 50]  # Adjust widths as needed
-
-    # Set the position of the table
-    x = 50
-
-    # Calculate the padding for text
-    text_padding = 5  # Adjust padding as needed
-
-    # Calculate the length of horizontal lines based on the number of items per page
-    items_per_page = 30  # Adjust as needed
-
-    # Calculate the total number of pages needed based on the number of items
-    total_pages = len(data) // items_per_page + (1 if len(data) % items_per_page != 0 else 0)
-
+    # Define data and headers
+    data = [['Nr', 'Nazwa', 'Ilość']]
     lp = 1
+    for item in stock_items:
+        data.append([str(lp), item.dimensions, str(item.quantity)])
+        lp += 1
 
-    # Iterate through each page
-    for page_num in range(total_pages):
-        # Create a new page for each page except the first one
-        if page_num > 0:
-            p.showPage()
+    left_margin = 50
+    right_margin = 50
 
-        # Set the counter for items in table
-        count_table_item = 1
+    # Calculate the page width minus margins
+    usable_width = A4[0] - (left_margin + right_margin)
 
-        # Add title and date on the first page
-        if page_num == 0:
-            # Set the position of the table on first page
-            y = 730
+    # Proportionally divide width for columns
+    num_columns = 3
+    col_widths = [usable_width / num_columns] * num_columns
 
-            # Calculate the width of the text for generation date
-            generated_text_width_first = p.stringWidth(
-                "Wygnerowano:",
-                "Poppins_light", 11)
+    # Assign a larger width for the second column
+    col_widths[0] = col_widths[0] * 0.24  # Możesz dostosować szerokość według potrzeb
+    col_widths[1] = col_widths[1] * 2.4  # Możesz dostosować szerokość według potrzeb
+    col_widths[2] = col_widths[2] * 0.28  # Możesz dostosować szerokość według potrzeb
 
-            # Calculate the width of the text for generation date
-            generated_text_width_second = p.stringWidth(
-                f"{current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}",
-                "Poppins_light", 11)
+    # Style settings
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Poppins_bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 3),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ])
 
-            # Draw the title
-            p.setFont("Poppins_bold", 13)
-            p.drawString(x, y + 60, "Lista przedmiotów na magazynie")
+    # Style for data
+    style_data = TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Poppins_light'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ])
 
-            # Draw the generation text
-            p.setFont("Poppins_light", 11)
-            p.drawString(545 - generated_text_width_first, 790,
-                         "Wygnerowano:")
-            p.drawString(545 - generated_text_width_second, 775,
-                         f"{current_date.date().strftime('%d.%m.%Y')} - {current_date.time().strftime('%H:%m')}")
+    # Create a table
+    stock_table = Table(data, colWidths=col_widths)
+    stock_table.setStyle(style)
+    stock_table.setStyle(style_data)
 
-        else:
-            # Set the position of the table for next pages
-            y = 770
+    # Get the current date and format
+    current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        # Draw the top horizontal line above headers
-        p.line(x, y + 20, x + sum(col_widths), y + 20)
+    # Add a style for the title and date
+    style_title = ParagraphStyle(
+        'CustomTitle',
+        parent=getSampleStyleSheet()['Heading1'],
+        fontName='Poppins_bold',
+        alignment=TA_LEFT,
+    )
 
-        # Calculate the length of horizontal lines for the current page
-        if page_num == total_pages - 1 and len(data) % items_per_page != 0:
-            line_length = ((len(data) % items_per_page) * 20) + 10
-        else:
-            line_length = (items_per_page * 20) + 10
+    style_generated_date = ParagraphStyle(
+        'CustomGeneratedDate',
+        parent=getSampleStyleSheet()['Normal'],
+        fontName='Poppins_light',
+        fontSize=10,
+        alignment=TA_RIGHT,
+    )
 
-        # Draw the table headers
-        p.setFont("Poppins_bold", 12)
-        for i, header in enumerate(headers):
-            x_offset = x + sum(col_widths[:i])
-            p.drawString(x_offset + text_padding, y, header)
+    title = Paragraph("Lista przedmiotów na magazynie", style_title)
+    generated_date = Paragraph(f"Wygenerowano: {current_date}", style_generated_date)
 
-            # Draw vertical lines between columns
-            p.line(x_offset + col_widths[i], y + 20, x_offset + col_widths[i], y - line_length)
+    # Create content
+    content = [title, generated_date, Spacer(1, 10), stock_table, Spacer(1, 10)]
 
-        # Draw the right vertical line to complete the table frame
-        p.line(x, y + 20, x, y - line_length)
+    # Create PDF file in memory
+    buffer = BytesIO()
 
-        # Draw the bottom horizontal line to complete the table
-        y -= 10
-        p.line(x, y, x + sum(col_widths), y)
+    # Add a title
+    c = canvas.Canvas(buffer)
+    c.setTitle("Shopdex")
 
-        # Draw the table data with padding
-        p.setFont("Poppins_light", 11)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=50, bottomMargin=50, leftMargin=50, rightMargin=50)
+    doc.title = "Lista przedmiotów na magazynie"
+    doc.build(content, canvasmaker=PageNumCanvas)
 
-        # Iterate through items based on items_per_page
-        start_index = page_num * items_per_page
-        end_index = min(start_index + items_per_page, len(data))
+    # Set appropriate headers for automatic downloading
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="stock_items.pdf"'
 
-        for item_counter in range(start_index, end_index):
-            item = data[item_counter]
-            y -= 15
-
-            p.drawString(x + text_padding, y, str(lp))
-            p.drawString(x + col_widths[0] + text_padding, y, item.dimensions)
-            p.drawString(x + col_widths[0] + col_widths[1] + text_padding, y, str(item.quantity))
-
-            if count_table_item < items_per_page:
-                y -= 5
-                p.line(x, y, x + sum(col_widths), y)
-
-            lp += 1
-            count_table_item += 1
-
-        # Draw the bottom horizontal line to complete the table
-        count_table_item -= 1
-        if count_table_item % items_per_page == 0:
-            y -= 5
-            p.line(x, y, x + sum(col_widths), y)
-
-        # Calculate the width of the text
-        text_width = p.stringWidth(f"Strona: {page_num + 1} / {total_pages}", "Poppins_light", 11)
-
-        # Draw the text aligned to the right
-        p.drawString(545 - text_width, 50, f"Strona: {page_num + 1} / {total_pages}")
-
-    # Save the PDF file
-    p.save()
-
+    # Save the contents of the response buffer
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
     return response
 
 
@@ -622,14 +613,24 @@ def generate_delivery_pdf(start_date, end_date):
 
 
 def generate_user_stock_items_pdf():
-    # Pobierz dane z modelu StockItem
+    """
+    Generate a PDF containing a list of stock items for a user.
+
+    This function retrieves data from the Django model `StockItem`,
+    formats it into a tabular structure, and generates a PDF file with
+    appropriate headers, pagination, and formatting.
+
+    Returns:
+        HttpResponse: HTTP response with the PDF file as content.
+    """
+    # Get data from the StockItem model
     stock_items = StockItem.objects.all()
 
     pdfmetrics.registerFont(TTFont('Poppins_light', 'Website/static/fonts/Poppins_Light_300.ttf'))
     pdfmetrics.registerFont(TTFont('Poppins_bold', 'Website/static/fonts/Poppins_Medium_500.ttf'))
 
-    # Definiuj dane i nagłówki
-    data = [['ID', 'Name', 'Quantity', 'Nd', 'So', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Suma']]
+    # Define data and headers
+    data = [['Nr', 'Nazwa', 'Ilość', 'Nd', 'So', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Suma']]
     lp = 1
     for item in stock_items:
         data.append([str(lp), item.dimensions, str(item.quantity), '', '', '', '', '', '', '', ''])
@@ -637,17 +638,18 @@ def generate_user_stock_items_pdf():
 
     left_margin = 70
     right_margin = 70
-    # Oblicz szerokość strony minus marginesy
+
+    # Calculate the page width minus margins
     usable_width = letter[0] - (left_margin + right_margin)
 
-    # Proporcjonalnie podziel szerokość dla kolumn
+    # Proportionally divide width for columns
     num_columns = 11
     col_widths = [usable_width / num_columns] * num_columns
 
-    # Przypisz większą szerokość dla drugiej kolumny
-    col_widths[1] = col_widths[1] * 3  # Możesz dostosować szerokość według potrzeb
+    # Assign a larger width for the second column
+    col_widths[1] = col_widths[1] * 3
 
-    # Ustawienia stylu
+    # Style settings
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -658,29 +660,30 @@ def generate_user_stock_items_pdf():
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
     ])
 
-    # Styl dla danych
+    # Style for data
     style_data = TableStyle([
         ('FONTNAME', (0, 0), (-1, -1), 'Poppins_light'),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ])
 
-    # Utwórz tabelę
+    # Create a table
     stock_table = Table(data, colWidths=col_widths)
     stock_table.setStyle(style)
     stock_table.setStyle(style_data)
 
-    # Twórz plik PDF w pamięci
+    # Create PDF file in memory
     buffer = BytesIO()
 
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=20, bottomMargin=20)
+    doc.title = "Tygodniowa lista przedmiotów - pracownik"
     doc.build([stock_table])
 
-    # Ustaw odpowiednie nagłówki dla automatycznego pobierania
+    # Set appropriate headers for automatic downloading
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="weekly_stock_items.pdf"'
 
-    # Zapisz zawartość bufora do odpowiedzi
+    # Save the contents of the response buffer
     pdf = buffer.getvalue()
     buffer.close()
     response.write(pdf)
