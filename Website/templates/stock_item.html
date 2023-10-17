@@ -40,6 +40,13 @@
                         <span class="material-icons-sharp add-icon">add</span>
                         <span class="header-text">Dodaj</span>
                     </button>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button id="stock_item_download_button" name="generate_user_stock_items_pdf" type="submit">
+                            <span class="material-icons-sharp add-icon">file_download</span>
+                            <span class="header-text">Pobierz PDF</span>
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="search-box-container">

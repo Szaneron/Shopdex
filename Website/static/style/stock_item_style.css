@@ -29,7 +29,7 @@ main h2 {
     justify-content: space-between;
 }
 
-.header-add-content button {
+#stock_item_create_button, #stock_item_download_button {
     background-color: var(--color-secondary);
     border-radius: var(--border-radius-1);
     font-weight: 550;
@@ -41,6 +41,10 @@ main h2 {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+}
+
+#stock_item_download_button {
+    background-color: var(--color-primary);
 }
 
 .header-add-content {
