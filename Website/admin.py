@@ -33,6 +33,7 @@ class DeliveryAdmin(admin.ModelAdmin):
         'creation_time',
         'comments',
         'generated_context',
+        'invoice_pdf',
     )
     list_display = ('delivery_combine_company_and_date', 'form', 'quantity', 'status')
     list_display_links = ('delivery_combine_company_and_date',)

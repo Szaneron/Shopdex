@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <title>Shopdex</title>
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'media/favicon.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/admin_panel_style.css' %}"/>
 
 </head>
@@ -48,7 +48,7 @@
 
                         <div class="tab-content">
                             <div class="tab-pane" id="delivery-tab">
-                                <form method="post">
+                                <form method="post" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="form-content">
                                         <div class="form-group">
@@ -70,6 +70,10 @@
                                         <div class="form-group">
                                             <label class="control-label">Data dostawy</label>
                                             {% render_field add_delivery_form.delivery_date class="form-control" %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Faktura PDF</label>
+                                            {% render_field add_delivery_form.invoice_pdf %}
                                         </div>
                                     </div>
 
@@ -197,7 +201,7 @@
                                         <td>
                                             <form method="post">
                                                 {% csrf_token %}
-                                                <button class="generate-button" name="generate_items_stock_pdf"
+                                                <button class="generate-button" name="generate_stock_items_pdf"
                                                         type="submit">Pobierz
                                                 </button>
                                             </form>

@@ -9,11 +9,11 @@
 }
 
 .pagination {
+    margin-bottom: 1.8rem !important;
     display: flex;
     list-style: none;
     justify-content: right;
     padding: 0;
-    margin: 0;
 }
 
 .pagination > li {

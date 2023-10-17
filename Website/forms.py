@@ -23,7 +23,7 @@ class DeliveryEditForm(forms.ModelForm):
 
     class Meta:
         model = Delivery
-        fields = ['delivery_company', 'form', 'quantity', 'description', 'status', 'delivery_date']
+        fields = ['delivery_company', 'form', 'quantity', 'description', 'status', 'delivery_date', 'invoice_pdf']
 
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
@@ -105,12 +105,14 @@ class AddDeliveryForm(forms.ModelForm):
 
     class Meta:
         model = Delivery
-        fields = ['delivery_company', 'form', 'quantity', 'description', 'delivery_date']
+        fields = ['delivery_company', 'form', 'quantity', 'description', 'delivery_date', 'invoice_pdf']
 
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
             'delivery_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    invoice_pdf = forms.FileField(required=False)
 
 
 class AddCommentForm(forms.ModelForm):
