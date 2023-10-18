@@ -124,6 +124,12 @@ main {
     color: var(--color-dark);
 }
 
+.generate-button {
+    background-color: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
 /* Right Main */
 .right-container {
     margin-left: 1.8rem;
