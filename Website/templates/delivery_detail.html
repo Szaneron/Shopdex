@@ -118,8 +118,15 @@
                 <div class="comment-section">
                     {% for comment in delivery_comments %}
                         <div class="single-comment">
-                            {{ comment.creation_time|date:"j b Y - H:i" }} -
-                            <b>{{ comment.added_by }}:</b> {{ comment.description }}
+                            <div class="single-commnet-grid">
+                                <div class="com-date">
+                                    {{ comment.creation_time|date:"j b Y - H:i" }}
+                                </div>
+                                -
+                                <div class="com-val">
+                                    <b>{{ comment.added_by }}:</b> {{ comment.description }}
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>

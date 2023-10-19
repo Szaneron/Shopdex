@@ -180,6 +180,49 @@ main {
     box-shadow: var(--box-shadow);
 }
 
+.comment-content {
+    margin: 1.8rem 0 1.8rem 0;
+    border-radius: var(--card-border-radius);
+    padding: 1.8rem 3.6rem 1.8rem 3.6rem;
+    background-color: var(--color-white);
+}
+
+.comment-content-container {
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+
+.comment-section {
+    max-height: 9.5rem;
+    overflow-y: auto;
+}
+
+.comment-form .form-group {
+    padding: 0 2rem;
+    margin: 0;
+}
+
+.comment-form .send-element {
+    margin-top: 0.5rem;
+}
+
+.delivery-description {
+    max-height: 9rem;
+    overflow-y: auto;
+
+}
+
+.comment-content h2 {
+    border-bottom: 2px solid var(--color-secondary);
+    margin-bottom: 0.5rem;
+}
+
+
+.single-commnet-grid {
+    display: grid;
+    grid-template-columns: 8.5rem 1rem auto;
+    text-align: left;
+}
 
 @media screen and (max-width: 1300px) {
     .container {

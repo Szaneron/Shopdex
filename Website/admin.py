@@ -11,6 +11,7 @@ class TaskAdmin(admin.ModelAdmin):
         'is_important',
         'task_date',
         'creation_time',
+        'comments',
     )
     list_display = ('task_combine_name_and_date', 'status', 'assigned_to', 'is_important')
     list_display_links = ('task_combine_name_and_date',)
@@ -141,6 +142,28 @@ class NotificationAdmin(admin.ModelAdmin):
         return '{}'.format(self.creation_time.strftime("%d %m %Y - %H:%M"))
 
 
+class CommentAdmin(admin.ModelAdmin):
+    fields = (
+        'added_by',
+        'model_id',
+        'model_name',
+        'description',
+        'creation_time',
+    )
+    list_display = ('comment_combine_name_and_id', 'added_by', 'creation_date_field')
+    list_display_links = ('comment_combine_name_and_id',)
+    list_filter = ('model_name', 'added_by')
+    search_fields = ('model_name', 'description', 'model_id')
+
+    @staticmethod
+    def comment_combine_name_and_id(self):
+        return '{} - {}'.format(self.model_name, self.model_id)
+
+    @staticmethod
+    def creation_date_field(self):
+        return '{}'.format(self.creation_time.strftime("%d %m %Y - %H:%M"))
+
+
 admin.site.register(UserProfile)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(Delivery, DeliveryAdmin)
@@ -149,4 +172,4 @@ admin.site.register(Return, ReturnAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(StockItem, StockItemAdmin)
 admin.site.register(Notification, NotificationAdmin)
-admin.site.register(Comment)
+admin.site.register(Comment, CommentAdmin)

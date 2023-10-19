@@ -823,11 +823,13 @@ def task(request):
 @login_required(login_url='login_user')
 def task_detail_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
+    task_comments = Comment.objects.filter(model_id=task.id, model_name='Zadanie').order_by('-creation_time')
     current_date = get_current_date()
     user = request.user
     unread_notifications, read_notifications = get_notifications(request.user)
     user_rating = get_employee_rating(user)
     task_edit_form = TaskEditForm(request.POST, instance=task)
+    task_comment_form = AddCommentForm()
 
     if request.method == 'POST':
         if 'task_edited' in request.POST:
@@ -851,17 +853,31 @@ def task_detail_view(request, task_id):
             add_notification(request.user, task, 'Zadanie', 'Zadanie zostało usunięte!')
             task.delete()
             return redirect('dashboard')
+        if 'add_comment' in request.POST:
+            form = AddCommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.model_id = task.id
+                comment.model_name = 'Zadanie'
+                comment.added_by = request.user.userprofile
+                comment.save()
+                task.comments.add(comment)
+                add_notification(request.user, task, 'Komentarz', 'Nowy komentarz do zadania został dodany!')
+                messages.success(request, 'Komentarz został dadany!')
+                return redirect('task_detail_view', task_id=task_id)
 
     else:
         task_edit_form = TaskEditForm(instance=task)
 
     context = {
         'task': task,
+        'task_comments': task_comments,
         'unread_notifications': unread_notifications,
         'current_date': current_date,
         'user': user,
         'user_rating': user_rating,
         'task_edit_form': task_edit_form,
+        'task_comment_form': task_comment_form,
     }
 
     return render(request, 'task_detail.html', context)
@@ -914,7 +930,7 @@ def delivery(request):
 @login_required(login_url='login_user')
 def delivery_detail_view(request, delivery_id):
     delivery = get_object_or_404(Delivery, id=delivery_id)
-    delivery_comments = Comment.objects.filter(model_id=delivery.id).order_by('-creation_time')
+    delivery_comments = Comment.objects.filter(model_id=delivery.id, model_name='Dostawa').order_by('-creation_time')
     current_date = get_current_date()
     user = request.user
     unread_notifications, read_notifications = get_notifications(request.user)
@@ -989,6 +1005,7 @@ def delivery_detail_view(request, delivery_id):
             if form.is_valid():
                 comment = form.save(commit=False)
                 comment.model_id = delivery.id
+                comment.model_name = 'Dostawa'
                 comment.added_by = request.user.userprofile
                 comment.save()
                 delivery.comments.add(comment)
@@ -1587,7 +1604,7 @@ def notification(request):
             notification_id = request.POST.get('notification_id')
 
             notification = Notification.objects.get(id=notification_id)
-            notification.read_by.add(request.user)
+            notification.read_by.add(request.user.userprofile)
             notification.save()
             return redirect('notification')
 
