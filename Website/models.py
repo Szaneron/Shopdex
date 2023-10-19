@@ -35,6 +35,27 @@ class UserProfile(models.Model):
         return self.user.username
 
 
+class Comment(models.Model):
+    """
+    Model for comments.
+
+    Fields:
+    - added_by (ForeignKey): A foreign key to UserProfile, representing the user who added the comment.
+    - model_id (PositiveIntegerField): The ID of the related model for the comment.
+    - description (TextField): The description or content of the comment.
+    - creation_time (DateTimeField): The date and time when the comment was created.
+    """
+
+    added_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    model_id = models.PositiveIntegerField()
+    model_name = models.CharField(max_length=100)
+    description = models.TextField()
+    creation_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.added_by} - {self.model_name} - {self.model_id}"
+
+
 class Task(models.Model):
     """
     Model representing tasks assigned to users.
@@ -47,6 +68,7 @@ class Task(models.Model):
     - is_important (BooleanField): Indicates if the task is important.
     - task_date (DateField): Date of the task.
     - creation_time (DateTimeField): Date and time when the task was created.
+    - comments (ManyToManyField):  Comments that have been added to the task.
 
     Methods:
     - __str__: Returns the string representation of the task.
@@ -65,29 +87,10 @@ class Task(models.Model):
     is_important = models.BooleanField(default=False)
     task_date = models.DateField(default=timezone.now)
     creation_time = models.DateTimeField(default=timezone.now)
+    comments = models.ManyToManyField(Comment, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.task_date}"
-
-
-class Comment(models.Model):
-    """
-    Model for comments.
-
-    Fields:
-    - added_by (ForeignKey): A foreign key to UserProfile, representing the user who added the comment.
-    - model_id (PositiveIntegerField): The ID of the related model for the comment.
-    - description (TextField): The description or content of the comment.
-    - creation_time (DateTimeField): The date and time when the comment was created.
-    """
-
-    added_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    model_id = models.PositiveIntegerField()
-    description = models.TextField()
-    creation_time = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.added_by} - {self.model_id}"
 
 
 class Delivery(models.Model):
