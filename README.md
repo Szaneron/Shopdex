@@ -11,7 +11,7 @@ The project is a web application written in Python using the Django framework. T
 - [Usage](#usage)
 - [Database structure](#database-structure)
 - [Notifications](#notifications)
-- [Requirements](#requirements)
+- [Technologies used](#technologies-used)
 
 ## Features
 - **Authentication**:
@@ -64,14 +64,16 @@ The project is a web application written in Python using the Django framework. T
   cd your-repository
   ```
 
-2. Install dependencies::
+2. Install dependencies:
   ```bash
   pip install -r requirements.txt
   ```
 
-3. Environment Variables (.env)
+3. Environment Variables (.env):
+  ```bash
   SECRET_KEY='Your django secret key'
-  
+  ```
+
 ## Usage
 Start the Django development server:
   ```bash
@@ -104,7 +106,7 @@ Start the Django development server:
 ## Notifications
 The application uses notifications to keep users informed about various events and activities. Notifications are sent for actions like adding a new delivery, marking a task as completed, or adding comments. These notifications help users stay updated and navigate directly to relevant views.
 
-## Technologies Used
+## Technologies used
 * Django 4.2.4
 * python-dotenv 1.0.0
 * reportlab 4.0.4
