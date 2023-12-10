@@ -5,7 +5,7 @@ The project is a web application written in Python using the Django framework. T
 
 ## Table of Contents
 - [Features](#features)
-- [Getting Started](#getting-started)
+- [Set up](#set-up)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
@@ -48,7 +48,7 @@ The project is a web application written in Python using the Django framework. T
   - PDFs can be generated directly from the admin panel, allowing easy access to essential documents for printing and record-keeping.
 
 
-## Getting Started
+## Set up
 
 ### Prerequisites
 
@@ -69,6 +69,9 @@ The project is a web application written in Python using the Django framework. T
   pip install -r requirements.txt
   ```
 
+3. Environment Variables (.env)
+  SECRET_KEY='Your django secret key'
+  
 ## Usage
 Start the Django development server:
   ```bash
